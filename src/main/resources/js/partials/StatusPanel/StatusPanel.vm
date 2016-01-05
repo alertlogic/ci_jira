@@ -1,0 +1,11 @@
+
+<script>
+	var globalIssueID = "$issue.id";
+	/**
+	 * On demand loading of the controller, this should be
+	 * a JIRA panel.
+	 */
+	statusController();
+</script>
+<div id="remediationStatusPanel"></div>
+<div id="remediationStatusMessage"></div>

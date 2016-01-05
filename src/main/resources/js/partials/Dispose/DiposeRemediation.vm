@@ -1,0 +1,64 @@
+<html>
+	<head>
+	    <title>$i18n.getText('ci.partials.dispose.vm.title')</title>
+	    <meta name="decorator" content="atl.general">
+	</head>
+	<body class="page-type-admin">
+		<script>
+			/**
+			 * This Controller is embeded as a modal, needs
+			 * to be loaded explictly here to make it work.
+			 * TODO: This should be load using webresources or use
+			 * a very special context.
+			 */
+			disposeController();
+		</script>
+
+		<div class="content-container">
+		    <div class="content-body">
+
+			   <header class="aui-page-header">
+				    <div class="aui-page-header-inner">
+				        <div class="aui-page-header-main">
+				            <h1>$i18n.getText('ci.partials.dispose.vm.title')</h1>
+				        </div>
+				    </div>
+				</header>
+				<div id="disposeMsg">
+				</div>
+				<form class="aui" id="disposeForm">
+
+				  	<input type="hidden"  id="jiraIssueId" name="jiraIssueId" value="$jiraIssueId">
+				  	<div class="field-group">
+				        <label for="select-reason">$i18n.getText('ci.partials.dispose.vm.reason.label')</label>
+				        <select class="select" id="disposeReason" name="disposeReason">
+				            <option value="acceptable_risk"> $i18n.getText('ci.partials.dispose.vm.reason.acceptable.risk') </option>
+				            <option value="false_positive"> $i18n.getText('ci.partials.dispose.vm.reason.false.positive') </option>
+				            <option value="compensating_control"> $i18n.getText('ci.partials.dispose.vm.reason.compensating.control') </option>
+				     	</select>
+				    </div>
+
+				    <div class="field-group">
+				        <label for="select-until"> $i18n.getText('ci.partials.dispose.vm.until.label') </label>
+				        <select class="select" id="disposeUntil" name="disposeUntil">
+				            <option value="tomorrow"> $i18n.getText('ci.partials.dispose.vm.until.tomorrow') </option>
+				            <option value="none"> $i18n.getText('ci.partials.dispose.vm.until.none') </option>
+				            <option value="week"> $i18n.getText('ci.partials.dispose.vm.until.week') </option>
+				            <option value="month"> $i18n.getText('ci.partials.dispose.vm.until.month') </option>
+				     	</select>
+				    </div>
+
+					<div class="field-group">
+			            <label for="textarea-id"> $i18n.getText('ci.partials.dispose.vm.comment.label') </label>
+			            <textarea class="textarea" name="comment" id="disposeComment" placeholder="$i18n.getText('ci.partials.dispose.vm.comment.placeholder')"></textarea>
+			        </div>
+
+				</form>
+				<div class="button-align-right">
+			       	<button class="aui-button aui-button-primary" type="button" id="disposeRemediationButton"> $i18n.getText('ci.partials.dispose.vm.button.dispose') </button>
+			        <button class="aui-button" type="button" id="disposeCancelButton"> $i18n.getText('ci.partials.dispose.vm.button.cancel') </a>
+				</div>
+		    </div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,69 @@
+<html>
+<head>
+    <title>$i18n.getText('ci.partials.ruleconfiguration.vm.title')</title>
+    <meta name="decorator" content="atl.general">
+</head>
+<body class="page-type-admin">
+    <div class="content-container">
+        <div class="content-body">
+            <!-- Page Content -->
+            <div class="aui-group">
+                <div class="aui-item">
+    		      <h1>$i18n.getText('ci.partials.ruleconfiguration.vm.title')</h1>
+                </div>
+                <div class="aui-item button-align-right">
+                    <button id="unblock-rule-button" class="aui-button aui-button-primary">
+                        $i18n.getText('ci.partials.ruleconfiguration.vm.button.unblock')
+                    </button>
+                    <button id="delete-rule-button" class="aui-button aui-button-primary">
+                        $i18n.getText('ci.partials.ruleconfiguration.vm.button.delete')
+                    </button>
+                </div>
+            </div>
+            <!-- Remediations -->
+            <section id="content" role="main">
+                <div class="aui-page-panel">
+
+                    <table class="aui" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th id="header-select">
+                                    <input id="allCheck" class="check-input" type="checkbox">
+                                </th>
+                                <th id="header-name">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.name')
+                                </th>
+                                <th id="header-project">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.project')
+                                </th>
+                                <th id="header-environment">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.environment')
+                                </th>
+                                <th id="header-group">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.group')
+                                </th>
+                                <th id="header-user">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.user')
+                                </th>
+                                <th id="header-status">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.status')
+                                </th>
+                                <th id="header-edit">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.action')
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div id="ruleConfigurationLoading" class="text-align-center">
+                        $i18n.getText('ci.partials.generic.vm.loading')
+                    </div>
+                    <div id="fake_form" >
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

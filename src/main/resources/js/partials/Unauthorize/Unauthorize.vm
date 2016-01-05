@@ -1,0 +1,18 @@
+<html>
+	<head>
+	    <title>$i18n.getText('ci.partials.unauthorize.vm.page.title')</title>
+	    <meta name="decorator" content="atl.general">
+	</head>
+	<body>
+		<div class="content-container">
+		    <div class="content-body">
+		       	<div class="aui-message aui-message-warning">
+				    <p class="title">
+				        <strong>$i18n.getText('ci.partials.unauthorize.vm.message.title')</strong>
+				    </p>
+				    <p>$i18n.getText('ci.partials.unauthorize.vm.message.body')</p>
+				</div>
+		    </div>
+		</div>
+	</body>
+</html>

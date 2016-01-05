@@ -1,0 +1,113 @@
+<html>
+<head>
+    <title>$i18n.getText('ci.partials.remediationssync.vm.title')</title>
+    <meta name="decorator" content="atl.general">
+</head>
+<body class="page-type-admin">
+
+<div class="content-container">
+    <div class="content-body">
+        <!-- Page Content -->
+
+		<h1>$i18n.getText('ci.partials.remediationssync.vm.title')</h1>
+
+        <div class="aui">
+            $i18n.getText('ci.partials.remediationssync.vm.environment.select'):
+
+            <select id="select-environment" class="select-medium" size="1">
+                <option value="">$i18n.getText('ci.partials.remediationssync.vm.environment.select.option')</option>
+            </select>
+
+            $i18n.getText('ci.partials.remediationssync.vm.rule.name'):
+            <input id="rule-name" class="height-field-input" type="text"
+                #if ($ruleName)
+                value="$ruleName"
+                #end
+            />
+			<input id="rule-id" class="text long-field" type="hidden"
+                #if ($ruleId)
+                value="$ruleId"
+                #end
+            />
+            <button id="save-rule-button" class="aui-button aui-button-primary">
+                $i18n.getText('ci.partials.remediationssync.vm.button.save')
+            </button>
+        </div>
+
+        <!-- Remediations -->
+        <section id="content" role="main">
+          <div class="aui-page-panel">
+
+            <div class="aui-page-panel-inner">
+                <div class="aui-page-panel-nav filters-panel">
+                    <b>$i18n.getText('ci.partials.remediationssync.vm.filters')</b>
+                    <hr>
+                    <div class="content-data-div">
+
+                        <table class="aui" id="selectedFilters">
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                    <b>$i18n.getText('ci.partials.remediationssync.vm.available.filters')</b>
+                    <hr>
+                    <div class="content-data-div">
+                        $i18n.getText('ci.partials.remediationssync.vm.type.filters'):
+                        <br>
+                        <select id="filter-types" class="select-short" size="1"></select>
+                    </div>
+                    <div class="content-data-div">
+
+                        <table class="aui" id="dataFilters">
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div class="content-data-div">
+                    <div class="bottom-panel">
+                        $i18n.getText('ci.partials.remediationssync.vm.project.select'):
+                        <select id="select-project" class="select-medium" size="1">
+                            <option value="">$i18n.getText('ci.partials.remediationssync.vm.project.select.option')</option>
+                        </select>
+
+                        $i18n.getText('ci.partials.remediationssync.vm.group.select'):
+                        <select id="select-group" class="select-medium" size="1">
+                            <option value="">$i18n.getText('ci.partials.remediationssync.vm.group.select.option')</option>
+                        </select>
+                        <button id="assign-button" class="aui-button aui-button-primary">$i18n.getText('ci.partials.remediationssync.vm.button.assign')</button>
+                    </div>
+
+                    <table class="aui" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th id="header-select">
+                                    <input id="allCheck" class="check-input" type="checkbox">
+                                </th>
+                                <th id="header-description">
+                                    $i18n.getText('ci.partials.remediationssync.js.header.steps') (0)
+                                </th>
+                                <th id="header-vulnerability">
+                                    $i18n.getText('ci.partials.remediationssync.js.header.count')
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div id="remediationSyncLoading" class="text-align-center">
+                        $i18n.getText('ci.partials.remediationssync.vm.remediations.loading')
+                    </div>
+                </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        <!-- End of Content -->
+    </div>
+</div>
+
+</body>
+</html>
