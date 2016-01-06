@@ -7,7 +7,6 @@
 
 	<!-- Describe your add-on logo and banner. The banner is only displayed in the UPM. -->
 	<logo image="images/marketing/01_al-logo.png"/>
-	<banner image="images/marketing/02_banner.jpg"/>
 
 	<highlights>
         <highlight image="images/marketing/03_highlight_remediations.png" cropped="images/marketing/04_highlight_remediations_cropped.png" />
