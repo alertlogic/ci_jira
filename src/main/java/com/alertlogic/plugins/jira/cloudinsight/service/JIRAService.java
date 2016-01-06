@@ -165,9 +165,8 @@ public class JIRAService {
 		if( description.length() > 255){
 			 formated = description.substring(0,255) ;
 	    }
-		formated.replace("\\r\\n", " ");
-		formated.replace("\\n", " ");
-
+		formated = formated.replaceAll("(\\r|\\n)", " ");
+		
 		return formated;
 	}
 
