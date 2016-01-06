@@ -225,6 +225,8 @@ public class AutoAssignTask implements PluginJob {
     	{
     		//Get the filters for this rule
 	    	JSONArray filters = rule.getJSONArray("filters");
+	    	JSONArray filtersString = rule.getJSONArray("filtersString");
+	    	
 	    	//Get all remediation items for the configures environment in the rule
 	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environment);
 	    	//Get all remediations based on the environment an the filter
@@ -235,7 +237,7 @@ public class AutoAssignTask implements PluginJob {
 	    	if (currentRemediations.length() > 0) {
 	    		
 	    		JSONArray remediationKeys = this.remediationsService.getRemediationsKeys(currentRemediations);
-	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filters);
+	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString);
 	    		
 	    		if (plannedItems.length() <= 0) {
 	    			throw new Exception(currentRemediations.length()+" "+monitor.getI18nResolver().getText("ci.job.autoassign.msg.plannederror"));

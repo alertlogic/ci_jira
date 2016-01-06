@@ -156,6 +156,22 @@ public class JIRAService {
 	}
 
 	/**
+	 * Format a summary, remove special characters and crop if it is necessary
+	 * @param description
+	 * @return
+	 */
+	public String formatSummary(String description){
+		String formated = description;
+		if( description.length() > 255){
+			 formated = description.substring(0,255) ;
+	    }
+		formated.replace("\\r\\n", " ");
+		formated.replace("\\n", " ");
+
+		return formated;
+	}
+
+	/**
 	 * Create an issue with the information of cloud insight
 	 * @param summary
 	 * @param description
@@ -198,7 +214,7 @@ public class JIRAService {
 		//setting values
         IssueInputParameters issueInputParameters = issueService.newIssueInputParameters();
 
-        issueInputParameters.setSummary( summary );
+        issueInputParameters.setSummary( formatSummary(summary) );
         issueInputParameters.setDescription( description );
         issueInputParameters.setProjectId( project.getId() );
         issueInputParameters.setIssueTypeId( ciIssueType.getId() );
