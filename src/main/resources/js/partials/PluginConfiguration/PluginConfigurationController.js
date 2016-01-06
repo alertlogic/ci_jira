@@ -89,7 +89,7 @@ AJS.$( document ).ready( function() {
 
                 jiraService.AuthProxy().done(
                     function(data) {
-                    ciAIMSService.saveSessionData(data);
+                        window.location = window.location.href;
                     });
 
                 AJS.$('#btnDelete').prop('disabled', false);

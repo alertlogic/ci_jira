@@ -1,6 +1,8 @@
 package com.alertlogic.plugins.jira.cloudinsight.service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import net.java.ao.Query;
 
@@ -294,16 +296,18 @@ public class RuleConfigService {
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(rules[i].getLastStatus()));
 
         	JSONArray filtersArray  =  new JSONArray();
-
         	Filter[] filters = rules[i].getFilters();
+            JSONArray filtersString = new JSONArray();
 
         	for ( int j = 0; j < filters.length ; j++ ) {
         		JSONObject filter  =  new JSONObject();
         		filter.put( "key", filters[j].getKey() );
         		filtersArray.put(filter);
+                filtersString.put( filters[j].getKey() );
         	}
 
         	obj.put("filters",filtersArray);
+            obj.put("filtersString",filtersString);
 
         	rulesArray.put( obj );
         }
@@ -338,16 +342,18 @@ public class RuleConfigService {
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(ruleConfig.getLastStatus()));
 
         	JSONArray filtersArray  =  new JSONArray();
-
         	Filter[] filters = ruleConfig.getFilters();
+            JSONArray filtersString = new JSONArray();
 
         	for ( int j = 0; j < filters.length ; j++ ) {
         		JSONObject filter  =  new JSONObject();
         		filter.put( "key", filters[j].getKey() );
         		filtersArray.put(filter);
+                filtersString.put ( filters[j].getKey() );
         	}
 
         	obj.put("filters",filtersArray);
+            obj.put("filtersString",filtersString);
         }
 
         return obj;
