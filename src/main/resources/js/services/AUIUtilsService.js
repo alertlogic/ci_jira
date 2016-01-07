@@ -399,6 +399,37 @@ var AUIUtilsService = function() {
            loading.hide();
         }
     };
+
+    /**
+     * Creates a confirm dialog for an operation.
+     * @param  {String}     name        The id of the dialog
+     * @param  {String}     message     The message
+     * @param  {function}   callback    The callback function
+     */
+    self.confirmDialog = function( name, message, callback ) {
+
+        var dialog = new AJS.Dialog({
+            width:300,
+            height:200,
+            id:name,
+            closeOnOutsideClick: true
+        });
+
+        dialog.addHeader(AJS.I18n.getText("ci.atlassianplugin.utils.confirmation.header"));
+
+        dialog.addPanel("", "<p>"+message+"</p>", "panel-body");
+
+        dialog.addButton(AJS.I18n.getText("ci.atlassianplugin.utils.cancel.button"), function(){
+            dialog.hide();
+        });
+
+        dialog.addButton(AJS.I18n.getText("ci.atlassianplugin.utils.ok.button"), function(){
+            callback();
+            dialog.hide();
+        });
+
+        dialog.show();
+    };
 };
 /**
  * Creates the service instance.

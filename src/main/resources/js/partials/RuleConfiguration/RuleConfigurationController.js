@@ -251,6 +251,16 @@ AJS.$(document).ready(
 			};
 
 			/**
+			 * Shows a confirmation dialog before a rule deletion
+			 */
+			self.confirmDelete = function() {
+				AUIUtils.confirmDialog(
+					"confirm-delete-dialog",
+					AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.delete.rule"),
+					self.deleteRules );
+			};
+
+			/**
 			 * Delete the rules selected
 			 */
 			self.deleteRules = function() {
@@ -408,7 +418,7 @@ AJS.$(document).ready(
 
 				AJS.$( "#delete-rule-button" ).prop('disabled', true);
 				AJS.$( "#delete-rule-button" ).click(function() {
-					self.deleteRules();
+					self.confirmDelete();
 				});
 			});
 
