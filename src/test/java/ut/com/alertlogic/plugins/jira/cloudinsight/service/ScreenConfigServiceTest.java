@@ -13,10 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.ScreenConfigService;
 import com.atlassian.jira.avatar.AvatarManager;
-import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.config.PriorityManager;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.customfields.CustomFieldSearcher;
@@ -32,7 +30,6 @@ import com.atlassian.jira.issue.fields.screen.FieldScreenSchemeManager;
 import com.atlassian.jira.issue.fields.screen.issuetype.IssueTypeScreenSchemeManager;
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.sal.api.message.I18nResolver;
-import com.atlassian.webresource.api.assembler.PageBuilderService;
 import com.atlassian.jira.mock.component.MockComponentWorker;
 import com.atlassian.jira.project.Project;
 
@@ -54,7 +51,6 @@ public class ScreenConfigServiceTest {
 	private FieldScreenSchemeManager fieldScreenSchemeManager;
 	private IssueTypeSchemeManager issueTypeSchemeManager;
 	private CustomField customFieldMock;
-	private PriorityManager priorityManager;
 	private IssueType issueTypeMock;
 	
 	@SuppressWarnings("deprecation")
@@ -67,14 +63,11 @@ public class ScreenConfigServiceTest {
 		i18nResolver = mock(I18nResolver.class);
 		fieldScreenSchemeManager = mock(FieldScreenSchemeManager.class);
 		issueTypeSchemeManager = mock(IssueTypeSchemeManager.class);
-		priorityManager = mock(PriorityManager.class);
 		
 		FieldScreenManager fieldScreenManager = mock(FieldScreenManager.class);
-		ProjectService projectService = mock(ProjectService.class);
 		IssueTypeScreenSchemeManager issueTypeScreenSchemeManager = mock(IssueTypeScreenSchemeManager.class);		
 		IssueTypeManager issueTypeManager = mock(IssueTypeManager.class);
-		PageBuilderService pageBuilderService = mock(PageBuilderService.class);
-		FieldConfigSchemeManager  fieldConfigSchemeManager = mock(FieldConfigSchemeManager.class);
+		FieldConfigSchemeManager fieldConfigSchemeManager = mock(FieldConfigSchemeManager.class);
 
 		AvatarManager avatarManager = mock(AvatarManager.class);
 		
@@ -87,14 +80,11 @@ public class ScreenConfigServiceTest {
 		ScreenConfigService screenConfigService = new ScreenConfigService(
 			 customFieldManager,
 			 fieldScreenManager,
-			 projectService,
 			 fieldScreenSchemeManager,
 			 issueTypeScreenSchemeManager,
 			 constantsManager,
 			 issueTypeManager,
 			 i18nResolver,
-			 priorityManager,
-			 pageBuilderService,
 			 fieldConfigSchemeManager
 			);
 

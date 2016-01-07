@@ -44,9 +44,6 @@ public class JIRAServiceTest {
 			 null,
 			 null,
 			 null,
-			 null,
-			 null,
-			 null,
 			 null
 		);
 		
