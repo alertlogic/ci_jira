@@ -188,7 +188,14 @@ AJS.$(document).ready(
 										);
 									}
 									self.updateTableHeader( remediationCount );
-									AUIUtils.loadingMsg( "#remediationSyncLoading", false );
+
+									if (remediationCount <= 0) {
+										AJS.$("#div-zero-state").show();
+									} else {
+										AJS.$("#div-zero-state").hide();
+									}
+
+									AJS.$("#remediationSyncLoading").hide();
 								}
 							}
 
@@ -206,7 +213,8 @@ AJS.$(document).ready(
 			self.loadAllRemediationsItems = function() {
 				AUIUtils.clearTable( "#dataTable" );
 				self.updateTableHeader( 0 );
-				AUIUtils.loadingMsg( "#remediationSyncLoading" , true );
+				AJS.$("#div-zero-state").hide();
+				AJS.$("#remediationSyncLoading").show();
 
 				if (currentEnvironment) {
 
@@ -504,6 +512,10 @@ AJS.$(document).ready(
 
 					self.isReadySaveRuleButton();
 				});
+			});
+
+			Bootstrap.onView("#div-zero-state",function(){
+				AJS.$("#div-zero-state").hide();
 			});
 
 			Bootstrap.onView("#select-group", function(){

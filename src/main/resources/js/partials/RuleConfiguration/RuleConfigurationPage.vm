@@ -55,12 +55,17 @@
                         </thead>
                         <tbody></tbody>
                     </table>
+                    
+                    <div id="ruleZeroState" class="zero-state">
+                        $i18n.getText('ci.partials.ruleconfiguration.js.msg.rule.zero')
+                    </div>
 
                     <div id="ruleConfigurationLoading" class="text-align-center">
                         $i18n.getText('ci.partials.generic.vm.loading')
                     </div>
-                    <div id="fake_form" >
-                    </div>
+                    
+                    <!-- Do not add fields to this form, is used to send data without showing params-->
+                    <div id="fake_form"></div>
                 </div>
             </section>
         </div>

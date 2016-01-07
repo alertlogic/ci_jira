@@ -340,19 +340,28 @@ AJS.$(document).ready(
 
 				AUIUtils.clearTable( "#dataTable" );
 
+				AJS.$("#ruleZeroState").hide();
+				AJS.$("#ruleConfigurationLoading").show();
+
 				projectsAll.done(function( data ){
 					for(var i=0; i<data.length; i++){
 						projects[ data[i].id ] = data[i].name;
 					}
 
 					rulesAll.done( function( data ) {
-						AUIUtils.loadingMsg( "#ruleConfigurationLoading", false );
+						AJS.$("#ruleConfigurationLoading").hide();
 
-						for(var i = 0 ; i < data.length; i++){
+						if (data.length <= 0) {
+							AJS.$("#ruleZeroState").show();
+						} else {
+							AJS.$("#ruleZeroState").hide();
+						}
+
+						for(var i = 0 ; i < data.length; i++)
+						{
 							self.checkRule( data[i] );
 							rules[ data[i].id ]= data[i];
 							self.addRuleToView( data[i] );
-
 						}
 					});
 				});
@@ -415,7 +424,7 @@ AJS.$(document).ready(
 			 * Delete button
 			 */
 			Bootstrap.onView( "#delete-rule-button", function(){
-
+				AJS.$("#ruleZeroState").hide();
 				AJS.$( "#delete-rule-button" ).prop('disabled', true);
 				AJS.$( "#delete-rule-button" ).click(function() {
 					self.confirmDelete();
@@ -455,7 +464,7 @@ AJS.$(document).ready(
 			 * Load the environments and call load rules
 			 */
 			environmentsService.listEnvironments( function( data ){
-				for(var i=0; i<data.length; i++){
+				for (var i = 0; i < data.length; i++) {
 					environments[ data[i].id ] = data[i].name;
 				}
 				self.loadAllRules();
