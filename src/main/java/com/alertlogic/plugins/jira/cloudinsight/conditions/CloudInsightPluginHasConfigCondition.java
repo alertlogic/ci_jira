@@ -1,9 +1,9 @@
 package com.alertlogic.plugins.jira.cloudinsight.conditions;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
-import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.plugin.webfragment.conditions.AbstractJiraCondition;
 import com.atlassian.jira.plugin.webfragment.model.JiraHelper;
+import com.atlassian.jira.user.ApplicationUser;
 
 /**
  * Condition for web fragments, used to check if
@@ -20,7 +20,7 @@ public class CloudInsightPluginHasConfigCondition extends AbstractJiraCondition{
 	}
 
 	@Override
-	public boolean shouldDisplay(User arg0, JiraHelper arg1) {
+	public boolean shouldDisplay(ApplicationUser arg0, JiraHelper arg1) {
 		return pluginConfigService.hasConfiguration();
 	}
 }

@@ -1,15 +1,14 @@
 package com.alertlogic.plugins.jira.cloudinsight.util;
 
-import com.atlassian.jira.blueprint.api.AddProjectHook;
-import com.atlassian.jira.blueprint.api.ConfigureData;
-import com.atlassian.jira.blueprint.api.ConfigureResponse;
-import com.atlassian.jira.blueprint.api.ValidateData;
-import com.atlassian.jira.blueprint.api.ValidateResponse;
+import com.atlassian.jira.project.template.hook.AddProjectHook;
+import com.atlassian.jira.project.template.hook.ConfigureResponse;
+import com.atlassian.jira.project.template.hook.ConfigureData;
+import com.atlassian.jira.project.template.hook.ValidateData;
+import com.atlassian.jira.project.template.hook.ValidateResponse;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.project.ProjectManager;
 import com.alertlogic.plugins.jira.cloudinsight.service.ScreenConfigService;
-
 /**
  * This Hook is for configure a new project with specific screens.
  */
@@ -21,7 +20,6 @@ public class CustomProjectAddProjectHook implements AddProjectHook
 	public CustomProjectAddProjectHook(
 			ScreenConfigService scs
 			) {
-
 		this.screenConfigService=scs;
 	}
 
@@ -49,4 +47,5 @@ public class CustomProjectAddProjectHook implements AddProjectHook
 
         return configureResponse;
     }
+
 }

@@ -130,7 +130,7 @@
 	</web-item>
 
 	<!-- Configuration of Servlets -->
-		<servlet name="ci.atlassianplugin.servlet.projectsetup.name" 
+	<servlet name="ci.atlassianplugin.servlet.projectsetup.name" 
 		i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
 		key="projectsetup-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.SetupProjectServlet">
@@ -330,11 +330,10 @@
         <label key="ci.atlassianplugin.project.template.name"/>
         <description key="ci.atlassianplugin.project.template.description"/>
         <longDescription key="ci.atlassianplugin.project.template.description.long"/>
-
+        <projectTypeKey>business</projectTypeKey>
         <infoPage soy-template="JIRA.Templates.ProjectTemplates.CI.renderCustomProjectTemplateExplanation" />
 
         <icon location="images/al-logo.png"/>
-        <backgroundIcon location="images/al-logo.png"/>
 
         <add-project>
             <hook class="com.alertlogic.plugins.jira.cloudinsight.util.CustomProjectAddProjectHook"/>
