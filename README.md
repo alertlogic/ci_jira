@@ -28,4 +28,4 @@ https://developer.atlassian.com/docs/getting-started/set-up-the-atlassian-plugin
 * `atlas-cli`: after `atlas-run` or `atlas-debug,` this command opens a Maven command line window: `pi` reinstalls the add-on into the running product instance
 * `atlas-help`: displays a description of all commands in the SDK.
 
-The MIT License (MIT), Copyright (c) 2016 - Alert Logic
+The BSD License (BSD), Copyright (c) 2016 - Alert Logic
