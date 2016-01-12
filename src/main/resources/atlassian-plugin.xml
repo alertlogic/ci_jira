@@ -334,6 +334,7 @@
         <infoPage soy-template="JIRA.Templates.ProjectTemplates.CI.renderCustomProjectTemplateExplanation" />
 
         <icon location="images/al-logo.png"/>
+		<backgroundIcon location="images/al-logo-background.png"/>
 
         <add-project>
             <hook class="com.alertlogic.plugins.jira.cloudinsight.util.CustomProjectAddProjectHook"/>
