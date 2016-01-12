@@ -340,7 +340,7 @@ AJS.$(document).ready(
 
 				AUIUtils.clearTable( "#dataTable" );
 
-				AJS.$("#ruleZeroState").hide();
+				AUIUtils.invisible("#ruleZeroState");
 				AJS.$("#ruleConfigurationLoading").show();
 
 				projectsAll.done(function( data ){
@@ -352,9 +352,9 @@ AJS.$(document).ready(
 						AJS.$("#ruleConfigurationLoading").hide();
 
 						if (data.length <= 0) {
-							AJS.$("#ruleZeroState").show();
+							AUIUtils.visible("#ruleZeroState");
 						} else {
-							AJS.$("#ruleZeroState").hide();
+							AUIUtils.invisible("#ruleZeroState");
 						}
 
 						for(var i = 0 ; i < data.length; i++)
@@ -424,7 +424,7 @@ AJS.$(document).ready(
 			 * Delete button
 			 */
 			Bootstrap.onView( "#delete-rule-button", function(){
-				AJS.$("#ruleZeroState").hide();
+				AUIUtils.invisible("#ruleZeroState");
 				AJS.$( "#delete-rule-button" ).prop('disabled', true);
 				AJS.$( "#delete-rule-button" ).click(function() {
 					self.confirmDelete();

@@ -190,9 +190,9 @@ AJS.$(document).ready(
 									self.updateTableHeader( remediationCount );
 
 									if (remediationCount <= 0) {
-										AJS.$("#div-zero-state").show();
+										AUIUtils.visible("#div-zero-state");
 									} else {
-										AJS.$("#div-zero-state").hide();
+										AUIUtils.invisible("#div-zero-state");
 									}
 
 									AJS.$("#remediationSyncLoading").hide();
@@ -213,7 +213,7 @@ AJS.$(document).ready(
 			self.loadAllRemediationsItems = function() {
 				AUIUtils.clearTable( "#dataTable" );
 				self.updateTableHeader( 0 );
-				AJS.$("#div-zero-state").hide();
+				AUIUtils.invisible("#div-zero-state");
 				AJS.$("#remediationSyncLoading").show();
 
 				if (currentEnvironment) {
@@ -512,10 +512,6 @@ AJS.$(document).ready(
 
 					self.isReadySaveRuleButton();
 				});
-			});
-
-			Bootstrap.onView("#div-zero-state",function(){
-				AJS.$("#div-zero-state").hide();
 			});
 
 			Bootstrap.onView("#select-group", function(){
