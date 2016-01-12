@@ -341,10 +341,7 @@ var AUIUtilsService = function() {
         var line = '';
 
         for(var idx in titles) {
-        //if( Array.isArray( titles ) ){
-            //for( idx = 0; idx < titles.length; idx++ ){
-                line += titles[idx]+',';
-            //}
+            line += titles[idx]+',';
         }
         return line +'\n';
     };
@@ -429,6 +426,24 @@ var AUIUtilsService = function() {
         });
 
         dialog.show();
+    };
+
+    /**
+     * Make it visible
+     */
+    self.visible = function( selector ) {
+        if(AJS.$(selector)){
+            AJS.$(selector).css("visibility", "visible");
+        }
+    };
+
+    /**
+     * Make it invisible
+     */
+    self.invisible = function( selector ) {
+        if(AJS.$(selector)){
+            AJS.$(selector).css("visibility", "hidden");
+        }
     };
 };
 /**
