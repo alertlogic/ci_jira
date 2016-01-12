@@ -256,7 +256,7 @@ AJS.$(document).ready(
 			self.confirmDelete = function() {
 				AUIUtils.confirmDialog(
 					"confirm-delete-dialog",
-					AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.delete.rule"),
+					AJS.I18n.getText("ci.partials.ruleconfiguration.js.msg.confirm.delete.rule"),
 					self.deleteRules );
 			};
 
