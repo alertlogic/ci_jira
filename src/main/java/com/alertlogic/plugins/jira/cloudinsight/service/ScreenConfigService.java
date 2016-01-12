@@ -10,11 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.atlassian.jira.avatar.Avatar;
-import com.atlassian.jira.bc.project.ProjectService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.config.ConstantsManager;
 import com.atlassian.jira.config.IssueTypeManager;
-import com.atlassian.jira.config.PriorityManager;
 import com.atlassian.jira.exception.CreateException;
 import com.atlassian.jira.issue.CustomFieldManager;
 import com.atlassian.jira.issue.IssueFieldConstants;
@@ -43,15 +41,12 @@ import com.atlassian.jira.issue.fields.screen.issuetype.IssueTypeScreenSchemeMan
 import com.atlassian.jira.issue.issuetype.IssueType;
 import com.atlassian.jira.issue.operation.IssueOperations;
 import com.atlassian.jira.issue.operation.ScreenableIssueOperation;
-import com.atlassian.jira.issue.priority.Priority;
 import com.atlassian.jira.project.Project;
-import com.atlassian.jira.project.ProjectCategory;
 import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.scheme.Scheme;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.sal.api.message.I18nResolver;
-import com.atlassian.webresource.api.assembler.PageBuilderService;
 
 /**
  * Create an screen and associate it to a project.
@@ -64,12 +59,10 @@ public class ScreenConfigService {
     private final FieldScreenSchemeManager fieldScreenSchemeManager;
     private final IssueTypeScreenSchemeManager issueTypeScreenSchemeManager;
     private final I18nResolver i18n;
-    private final PriorityManager priorityManager;
     private String GENERIC_NAME_SCREEN;
     private String REMEDIATION_ITEM_CUSTOM_FIELD_NAME;
 	private String REMEDIATION_ID_CUSTOM_FIELD_NAME;
 	private String GROUP_CUSTOM_FIELD_NAME;
-	private String CATEGORY_NAME;
 	private static final Logger log = LoggerFactory.getLogger(ScreenConfigService.class);
 	private FieldConfigSchemeManager  fieldConfigSchemeManager;
 
@@ -78,14 +71,11 @@ public class ScreenConfigService {
 	public ScreenConfigService(
 			CustomFieldManager customFieldManager,
 			FieldScreenManager fieldScreenManager,
-			ProjectService projectService,
 			FieldScreenSchemeManager fieldScreenSchemeManager,
 			IssueTypeScreenSchemeManager issueTypeScreenSchemeManager,
 			ConstantsManager constantsManager,
 			IssueTypeManager issueTypeManager,
 			I18nResolver i18n,
-			PriorityManager priorityManager,
-			PageBuilderService pageBuilderService,
 			FieldConfigSchemeManager  fieldConfigSchemeManager
 			) {
 		this.customFieldManager = customFieldManager;
@@ -95,7 +85,6 @@ public class ScreenConfigService {
 		this.constantsManager = constantsManager;
 		this.issueTypeManager = issueTypeManager;
 		this.i18n = i18n;
-		this.priorityManager = priorityManager;
 		this.fieldConfigSchemeManager = fieldConfigSchemeManager;
 	}
 
@@ -254,57 +243,13 @@ public class ScreenConfigService {
 	}
 
 	/**
-	 * Create or get a category
-	 * @return ProjectCategory
-	 */
-	public ProjectCategory createProjectCategory(){
-		ProjectManager projectManager = ComponentAccessor.getProjectManager();
-		ProjectCategory category = projectManager.getProjectCategoryObjectByName( CATEGORY_NAME );
-		if (category == null) {
-        	projectManager.createProjectCategory( CATEGORY_NAME, CATEGORY_NAME);
-            return category;
-        }
-        return null;
-	}
-
-	/**
-	 * Associate project to a category
-	 * @param Project project
-	 * @param ProjectCategory category
-	 */
-	public void associateCategoryProject(Project myProject){
-		ProjectManager projectManager = ComponentAccessor.getProjectManager();
-		ProjectCategory category = projectManager.getProjectCategoryObjectByName( CATEGORY_NAME );
-
-		if(category != null){
-			projectManager.setProjectCategory(myProject, category);
-		}
-	}
-
-	/**
 	 * Read the properties and assign it to constant variables
 	 */
 	public void assigValuesToVariables(){
 		REMEDIATION_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationId");
 		REMEDIATION_ITEM_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationItem");
 		GROUP_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.groupAssigned");
-		CATEGORY_NAME = i18n.getText("ci.constant.category");
 		GENERIC_NAME_SCREEN = i18n.getText("ci.constant.screen.name");
-	}
-
-	/**
-	 * Validates if the priority exists.
-	 * @param name	The name of the priority
-	 * @return	boolean	return true if exists
-	 */
-	public boolean existPriority(String name) {
-		List<Priority> prioritiesList = priorityManager.getPriorities();
-		for (Priority priority : prioritiesList) {
-			if(priority.getName().equals(name)){
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -617,11 +562,6 @@ public class ScreenConfigService {
 		//Creating issue type
 		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.issuetype") );
 		IssueTypeScreenScheme myIssueTypeScreenScheme = createIssueTypeScreenScheme( myScheme, myProject.getKey() );
-
-		// Set Project Category
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.category") );
-		createProjectCategory();
-		associateCategoryProject( myProject );
 
 		//Association to project
 		log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.project.screen") );
