@@ -3,6 +3,7 @@ package com.alertlogic.plugins.jira.cloudinsight.tasks;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -14,6 +15,7 @@ import com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig;
 import com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.util.TaskLogger;
+import com.atlassian.jira.issue.Issue;
 import com.atlassian.sal.api.scheduling.PluginJob;
 
 /**
@@ -45,7 +47,12 @@ public class AutoAssignTask implements PluginJob {
 	    		Date currentDate = new Date();
 	        	log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
 	        	monitor.setLastRun(currentDate);
-    			assingJob();
+    			
+	        	if( monitor.getPluginConfigService() != null ){
+	        		if( monitor.getPluginConfigService().hasConfiguration() ){
+	        			assingJob();
+	        		}
+	        	}
     		}
         }
 	}
@@ -304,7 +311,10 @@ public class AutoAssignTask implements PluginJob {
 	private void assignRemediation(JSONObject remediation, JSONObject remediationItem, JSONObject rule) 
 			throws Exception
 	{
-    	monitor.getJIRAService().createIssue(
+		
+		List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem( remediationItem.getString("key"), rule.getString("user"));
+		if( issues.size() == 0 ){
+		    monitor.getJIRAService().createIssue(
     			remediation.getString("name"),
     			remediation.getString("description"),
     			rule.getLong("project"),
@@ -313,6 +323,7 @@ public class AutoAssignTask implements PluginJob {
     			rule.getString("group"),
     			monitor.getJIRAService().getTextLevel(remediation.getInt("threat_level")),
     			rule.getString("user"));
+		}
 	}
 
 	/**
