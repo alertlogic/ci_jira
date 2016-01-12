@@ -188,7 +188,14 @@ AJS.$(document).ready(
 										);
 									}
 									self.updateTableHeader( remediationCount );
-									AUIUtils.loadingMsg( "#remediationSyncLoading", false );
+
+									if (remediationCount <= 0) {
+										AUIUtils.visible("#div-zero-state");
+									} else {
+										AUIUtils.invisible("#div-zero-state");
+									}
+
+									AJS.$("#remediationSyncLoading").hide();
 								}
 							}
 
@@ -206,7 +213,8 @@ AJS.$(document).ready(
 			self.loadAllRemediationsItems = function() {
 				AUIUtils.clearTable( "#dataTable" );
 				self.updateTableHeader( 0 );
-				AUIUtils.loadingMsg( "#remediationSyncLoading" , true );
+				AUIUtils.invisible("#div-zero-state");
+				AJS.$("#remediationSyncLoading").show();
 
 				if (currentEnvironment) {
 

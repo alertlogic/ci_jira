@@ -84,3 +84,12 @@
 .height-field-input{
     height: 2.1428571428571em;
 }
+
+.zero-state {
+    border: 2px dashed #d5d6d2;
+    color: #d5d6d2;
+    visibility: hidden;
+    padding: 15px 30px;
+    margin: 3px;
+    text-align: center;
+}
