@@ -178,6 +178,8 @@ var AssetDictionaryService = function() {
                 return gettext( "Asia Pacific (Sydney)" );
             case "sa-east-1":
                 return gettext( "South America (São Paulo)" );
+            case "ap-northeast-2":
+                return gettext( "Asia Pacific (Seoul)" );
             default:
                 return assetName;
         }

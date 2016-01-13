@@ -5,7 +5,7 @@ The Cloud Insight add-on for JIRA integrates Cloud Insight remediations as JIRA 
 
 ##Install the Add-on
 
-After you log into your JIRA account, perform the following steps to install the Cloud Insight add-on for JIRA:
+Make sure you have the **JIRA System Administrator permission** ( jira-system-administrators ) before installing the add-on, this permission enables the "Upload add-on" link. After you log into your JIRA account, perform the following steps to install the Cloud Insight add-on for JIRA:
 
 1.	Click the Settings icon, and then select "Add-ons."
 2.	In the left navigation pane, select "Manage add-ons."

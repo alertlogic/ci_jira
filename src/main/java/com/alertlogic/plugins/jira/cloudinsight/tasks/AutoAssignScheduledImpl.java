@@ -20,8 +20,8 @@ import org.slf4j.LoggerFactory;
 public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements LifecycleAware {
 	
     private final Logger logger = LoggerFactory.getLogger(AutoAssignScheduledImpl.class);
-    
-	public static final String KEY = AutoAssignScheduledImpl.class.getName() + ":instance";
+
+    public static final String KEY = AutoAssignScheduledImpl.class.getName() + ":instance";
     public static final String JOB_NAME = AutoAssignScheduledImpl.class.getName() + ":job";
 
 	public AutoAssignScheduledImpl(
@@ -33,6 +33,7 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
 			I18nResolver i18nResolver) 
 	{
 		super(pluginScheduler, pluginConfigService, aimsService, ruleConfigService,jiraService, i18nResolver);
+		this.interval = 186000L; //3 minutes
 	}
 
 	// declared by LifecycleAware

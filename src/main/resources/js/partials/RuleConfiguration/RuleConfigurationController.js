@@ -331,6 +331,7 @@ AJS.$(document).ready(
 					);
 				}
 			};
+
 			/**
 			 * Load all rules
 			 */
@@ -463,12 +464,26 @@ AJS.$(document).ready(
 			/**
 			 * Load the environments and call load rules
 			 */
-			environmentsService.listEnvironments( function( data ){
-				for (var i = 0; i < data.length; i++) {
-					environments[ data[i].id ] = data[i].name;
-				}
-				self.loadAllRules();
-			});
+			self.start = function() {
+				environments = [];
+				projects = [];
+				groups = [];
+				rules = [];
+
+				environmentsService.listEnvironments( function( data ){
+					for (var i = 0; i < data.length; i++) {
+						environments[ data[i].id ] = data[i].name;
+					}
+
+					self.loadAllRules();
+				});
+			};
+
+			self.start();
+
+			setInterval(function(){
+				ruleConfigurationController.start();
+			}, configService.timeRefresh );
 
 		});
 	}
