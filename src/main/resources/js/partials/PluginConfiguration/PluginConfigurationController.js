@@ -120,9 +120,7 @@ AJS.$( document ).ready( function() {
                 JIRA.Messages.showSuccessMsg(
                     AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.success")
                 );
-            });
-
-        deleteConfiguration.fail( function() {
+        }).fail( function() {
             JIRA.Messages.showSuccessMsg(
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.error")
             );
