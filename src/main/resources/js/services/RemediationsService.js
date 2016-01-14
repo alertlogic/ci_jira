@@ -192,6 +192,34 @@ var RemediationsService = function() {
     };
 
     /**
+     * Remove a remediation of my plan
+     */
+    self.removeFromMyPlan =  function( environment, remediationItemKey ) {
+
+        var urlBase = ciAIMSService.getSessionData().endpoint
+        +"/assets/"+configService.serviceVersion
+        +"/"+ciAIMSService.getSessionData().accountId
+        +"/environments/"+environment+"/assets";
+
+        var payload = {
+            "key": remediationItemKey,
+            "operation": "remove_asset",
+            "scope": "config",
+            "type": "remediation-item"
+        };
+
+        return jQuery.ajax({
+            type: "PUT",
+            url: urlBase,
+            dataType: 'json',
+            data: JSON.stringify(payload),
+            headers: {
+                "x-aims-auth-token":ciAIMSService.getSessionData().token
+            }
+        });
+    };
+
+    /**
      * Get a environment from a remedaition item
      * @param  {String} remediation item
      */

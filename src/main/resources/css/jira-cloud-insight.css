@@ -40,6 +40,12 @@
 }
 
 /* Remediations Syn Page */
+.button-x-delete{
+    color: gray;
+    font-size: x-small;
+    font-weight: bold;
+    padding: 5px;
+}
 .columnMedium{
     width:50px;
 }
