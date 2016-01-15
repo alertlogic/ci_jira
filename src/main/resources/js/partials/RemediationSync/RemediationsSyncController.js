@@ -239,6 +239,7 @@ AJS.$(document).ready(
 
 					self.refreshAfterFilterChange();
 				}
+				self.isReadySaveRuleButton();
 			};
 
 			/**
@@ -362,12 +363,11 @@ AJS.$(document).ready(
 									+displayName+"</div>"
 							},
 							{
-								data: "<div class='button-x-delete'>X</div>",
-								action: 'remediationsSyncController.removeFilter('+i+')'
+								data: "<div class='button-x-delete'>X</div>"
 							}
 						];
 
-						AUIUtils.createTableRow(tableBody,rowData);
+						AUIUtils.createTableRow(tableBody,rowData, "row-filter-selected", 'remediationsSyncController.removeFilter('+i+')' );
 					}
 				}
 			};
@@ -382,6 +382,7 @@ AJS.$(document).ready(
 
 					refreshAfterFilterChange();
 				}
+				self.isReadySaveRuleButton();
 			};
 
 			/**

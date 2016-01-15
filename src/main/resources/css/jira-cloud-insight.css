@@ -32,18 +32,33 @@
     text-align: left;
 }
 .table-div {
-    padding: 7px 5px 5px 7px;
+    padding: 6px 5px 3px 7px;
 }
 .table-head{
     text-align: left;
     padding-top: 7px;
 }
-
+.row-asset-selected{
+    cursor: pointer;
+}
+.row-asset-selected:hover{
+    background-color: #f6f6f6;
+    font-weight: bold;
+}
+.row-last-selected{
+    font-weight: bold;
+    text-decoration: underline;
+}
 /* Remediations Syn Page */
+.row-filter-selected{
+    cursor: pointer;
+}
+.row-filter-selected:hover{
+    font-weight: bold;
+}
 .button-x-delete{
     color: gray;
     font-size: x-small;
-    font-weight: bold;
     padding: 5px;
 }
 .columnMedium{
