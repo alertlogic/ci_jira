@@ -409,4 +409,71 @@ public class RemediationsService {
 
 		return remediations;
 	};
+
+    /**
+     * Search in a remediation description
+     * @param remediationsDescriptions
+     * @param remediationId
+     * @return
+     */
+    public String getRemediationsDescriptionsById(JSONObject remediationsDescriptions, String remediationId) {
+        if( remediationsDescriptions != null ){
+            JSONArray remediationsArray = remediationsDescriptions.getJSONArray("remediations");
+
+            for(int i = 0; i < remediationsArray.length(); i++)
+            {
+                JSONObject  remediation = remediationsArray.getJSONObject(i);
+
+                if(remediation.getString("id").equals(remediationId)){
+                    return remediation.getString("description");
+                }
+            }
+        }
+        return "";
+    };
+
+    /**
+     * Get the remediations description
+     * @return JSONObject with remediations descriptions
+     * @throws Exception
+     */
+    public JSONObject getRemediationsDescriptions() throws Exception {
+        JSONObject jsonResponse = this.aimsService.ciAuthentication();
+        String token = this.aimsService.getToken(jsonResponse);
+        String account = this.aimsService.getAccount(jsonResponse);
+        PluginConfig conf = this.pluginConfigService.getConfiguration();
+
+        ClientResponse response;
+
+        if ( token != null && account != null )
+        {
+            ClientConfig clientConfig = new DefaultClientConfig();
+            clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+
+            String urlBase = conf.getCiUrl()
+            +"/remediation/"+AIMSService.API_VERSION;
+            //+"?remediation_ids="+remediationsId;
+
+            System.out.println("URLBASE="+urlBase);
+
+            response = Client.create (clientConfig).
+                resource( urlBase ).
+                accept( "application/json" ).
+                type( "application/json" ).
+                header( "x-aims-auth-token" , token ).
+                get(ClientResponse.class);
+
+            if ( response.getStatus() == 200 ) {
+
+                JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
+                return jsonObj;
+
+            } else {
+                throw new Exception("Error getting remediations descriptions. Status Code ["+response.getStatus()+"]");
+            }
+
+        }
+        return null;
+    }
+
 }

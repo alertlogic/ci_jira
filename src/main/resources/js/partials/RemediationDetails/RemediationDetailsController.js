@@ -127,11 +127,18 @@ function remediationDetailsController( issueId ) {
                         }
                     }
                 };
-
+                /**
+                 * Mark a row as selected with css
+                 */
+                self.markRowAsSelected = function( assetKey ){
+                    AJS.$('tr[onclick]').removeClass('row-last-selected');
+                    AJS.$('tr[onclick="showAssetDetailHtml(\''+assetKey+'\')"]').addClass('row-last-selected');
+                }
                 /**
                 *Show the details of an asset
                 */
                 self.showAssetDetailHtml = function( assetKey ){
+                    self.markRowAsSelected( assetKey );
 
                     assetsService.byType(
                         remediationDetails.environment ,
@@ -173,24 +180,18 @@ function remediationDetailsController( issueId ) {
                         AUIUtils.addTableHeader( headerElementAsset, headerNameType, AJS.I18n.getText("ci.partials.remediationdetails.js.assets.column.type"));
                         AUIUtils.addTableHeader( headerElementAsset, headerNameAsset, AJS.I18n.getText("ci.partials.remediationdetails.js.assets.column.assets"));
 
-                        for (idxAsset in remediationDetails.assets.values)
+                        for (i in remediationDetails.assets.values)
                         {
                             var tableBody = AJS.$("#assetsTable tbody");
                             var rowData = [
                                 {
-                                    header: headerNameType,
-                                    style: 'row_pointer',
-                                    action: 'showAssetDetailHtml(\'' + idxAsset + '\')',
-                                    data: remediationDetails.assets.values[ idxAsset ].type
+                                    data: remediationDetails.assets.values[ i ].type
                                 },
                                 {
-                                    header: headerNameAsset,
-                                    style: 'row_pointer',
-                                    action: 'showAssetDetailHtml(\'' + idxAsset + '\')',
-                                    data: remediationDetails.assets.values[ idxAsset ].asset
+                                    data: remediationDetails.assets.values[ i ].asset
                                 }
                             ];
-                            AUIUtils.createTableRow( tableBody, rowData);
+                            AUIUtils.createTableRow( tableBody, rowData, "row-asset-selected", 'showAssetDetailHtml(\'' + i + '\')');
                         }
                     }
                 };
