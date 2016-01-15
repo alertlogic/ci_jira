@@ -239,6 +239,7 @@ AJS.$(document).ready(
 
 					self.refreshAfterFilterChange();
 				}
+				self.isReadySaveRuleButton();
 			};
 
 			/**
@@ -356,16 +357,17 @@ AJS.$(document).ready(
 
 						var rowData = [
 							{
-								header:"header-filter",
 								data: "<div class='filter-row "
 									+AUIUtils.getThreatLevelClass(selectedFilters[i].threat_level)
 									+"' >"
-									+displayName+"</div>",
-								action: 'remediationsSyncController.removeFilter('+i+')'
+									+displayName+"</div>"
+							},
+							{
+								data: "<div class='button-x-delete'>X</div>"
 							}
 						];
 
-						AUIUtils.createTableRow(tableBody,rowData);
+						AUIUtils.createTableRow(tableBody,rowData, "row-filter-selected", 'remediationsSyncController.removeFilter('+i+')' );
 					}
 				}
 			};
@@ -380,6 +382,7 @@ AJS.$(document).ready(
 
 					refreshAfterFilterChange();
 				}
+				self.isReadySaveRuleButton();
 			};
 
 			/**
@@ -657,6 +660,7 @@ AJS.$(document).ready(
 				var assignErroMessage = AJS.I18n.getText("ci.partials.remediationssync.js.msg.issues.assign.error");
 				var issueCreated = 0;
 				var issueNotCreated = 0;
+				var remediationItemRemoved = 0;
 				var remediationsDetails = plannedItems.map(function(elem){
 					return elem.properties.remediation_id;
 				}).join(",");
@@ -688,23 +692,47 @@ AJS.$(document).ready(
 								self.loadAllRemediationsItems();
 							}
 
-						}).error(function(data){
+
+						}).fail( function( jqXHR, textStatus, errorThrown){
 							issueNotCreated++;
 							JIRA.Messages.showErrorMsg(
 								"(" + issueNotCreated + " " + ofMsg + " " + plannedItems.length+") "+assignErroMessage);
 
+							var field = jiraService.Field().getFields().remediationItem;
+							var remediationItemKey = JSON.parse(this.data).fields[ field ];
+
+							remediationsService.removeFromMyPlan(
+								currentEnvironment,
+								remediationItemKey);
+
 							if ( (issueCreated+issueNotCreated)  === plannedItems.length ) {
 								self.loadAllRemediationsItems();
 							}
+
 						}).always(function(){
 							JIRA.Loading.hideLoadingIndicator();
 						});
 					}
 				}).fail( function( jqXHR, textStatus) {
+
 					JIRA.Messages.showWarningMsg(
 							'Error ('+jqXHR.status+'): '
 							+jqXHR.statusText);
 
+					for (var i = 0; i < plannedItems.length; i++) {
+						//remove remediations of my plan
+						remediationsService.removeFromMyPlan(
+							currentEnvironment,
+							plannedItems[i].key
+						).always(function(){
+
+							remediationItemRemoved++;
+
+							if ( remediationItemRemoved  === plannedItems.length ) {
+								self.loadAllRemediationsItems();
+							}
+						});
+					}
 					JIRA.Loading.hideLoadingIndicator();
 				});
 

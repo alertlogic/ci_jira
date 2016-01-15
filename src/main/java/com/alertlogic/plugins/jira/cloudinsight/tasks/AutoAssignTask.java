@@ -238,6 +238,8 @@ public class AutoAssignTask implements PluginJob {
 	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environment);
 	    	//Get all remediations based on the environment an the filter
 	    	JSONObject allRemediations = this.remediationsService.getAllRemediations(environment,filters);
+	    	//Get all remediations descritions
+	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions();
 	   	
 	    	JSONArray currentRemediations = getOpenRemediations(allRemediations,allRemediationsItems);
 	    	
@@ -255,11 +257,10 @@ public class AutoAssignTask implements PluginJob {
 	    		{
 	    			JSONObject remediationItem = plannedItems.getJSONObject(i);
 	    			JSONObject remediation = getRemediationData(currentRemediations,remediationItem);
-	    			assignRemediation(remediation,remediationItem,rule);
+	    			assignRemediation(remediation,remediationItem,rule,descriptions);
 	    		}
 	    		
 	    		return plannedItems.length();
-	    		
 	    	} else {
 	    		if (statusBeforeRun == TaskRuleExecutionState.ERROR) {
 	    			throw new Exception(monitor.getI18nResolver().getText("ci.job.autoassign.msg.blocked.error"));
@@ -306,17 +307,17 @@ public class AutoAssignTask implements PluginJob {
 	 * @param remediation		Reference to the remediation
 	 * @param remediationItem	Reference to the remediation item
 	 * @param rule				Reference to the rule information
+	 * @param descriptions      Reference to remediations descriptions
 	 * @throws Exception	If something fails in the assignation the exception should reach log
 	 */
-	private void assignRemediation(JSONObject remediation, JSONObject remediationItem, JSONObject rule) 
+	private void assignRemediation(JSONObject remediation, JSONObject remediationItem, JSONObject rule, JSONObject descriptions)
 			throws Exception
 	{
-		
 		List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem( remediationItem.getString("key"), rule.getString("user"));
 		if( issues.size() == 0 ){
 		    monitor.getJIRAService().createIssue(
     			remediation.getString("name"),
-    			remediation.getString("description"),
+    			this.remediationsService.getRemediationsDescriptionsById(descriptions, remediation.getString("remediation_id")),
     			rule.getLong("project"),
     			remediationItem.getString("key"),
     			remediation.getString("key"),

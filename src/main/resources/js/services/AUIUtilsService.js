@@ -148,10 +148,10 @@ var AUIUtilsService = function() {
     self.createTableRow = function( element, rowData, styleTr, actionTr ){
         var rowHtml = '<tr';
 
-        if( styleTr != undefined ){
+        if( styleTr ){
             rowHtml +=  ' class=\"' + styleTr + '\"';
         }
-        if( actionTr != undefined ){
+        if( actionTr ){
             rowHtml +=  ' onClick = \"' + actionTr + '\"';
         }
         rowHtml += '>';
