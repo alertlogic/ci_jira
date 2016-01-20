@@ -43,7 +43,7 @@ public class DisposeRemediationServlet extends HttpServlet{
     private void loadWebResources() {
     	String pluginKey = CommonJiraPluginUtils.getPluginKey(pluginRetrievalService);
 
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":jira-cloud-insight-resources");
+    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":disposeController");
     }
