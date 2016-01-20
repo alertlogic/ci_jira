@@ -42,7 +42,7 @@ public class RemediationsSyncServlet extends HttpServlet{
     private void loadWebResources() {
     	String pluginKey = CommonJiraPluginUtils.getPluginKey(pluginRetrievalService);
 
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":jira-cloud-insight-resources");
+    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
     	pageBuilderService.assembler().resources().requireWebResource("com.atlassian.auiplugin:aui-select2");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":remediationsSyncController");

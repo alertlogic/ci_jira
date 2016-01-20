@@ -21,19 +21,19 @@
 	</plugin-info>
 
 	<!-- add our i18n resource -->
-	<resource type="i18n" name="i18n" location="jira-cloud-insight" />
+	<resource type="i18n" name="i18n" location="cloud-insight-for-jira" />
 
 	<!-- add our web resources -->
-	<web-resource key="jira-cloud-insight-resources" name="jira-cloud-insight Web Resources">
+	<web-resource key="cloud-insight-for-jira-resources" name="Cloud Insight Web Resources">
 		<dependency>com.atlassian.auiplugin:ajs</dependency>
 		<dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
 		<dependency>com.atlassian.auiplugin:aui-select2</dependency>
 		<dependency>com.atlassian.auiplugin:dialog2</dependency>
 		<dependency>com.atlassian.auiplugin:ui-experimental-expander</dependency>
 		<dependency>jira.webresources:jquery-livestamp</dependency>
-		<resource type="download" name="jira-cloud-insight.css" location="/css/jira-cloud-insight.css" />
+		<resource type="download" name="cloud-insight-for-jira.css" location="/css/cloud-insight-for-jira.css" />
 		<resource type="download" name="images/" location="/images" />
-		<context>jira-cloud-insight</context>
+		<context>cloud-insight-for-jira</context>
 	</web-resource>
 
 	<!-- Used to get the plugins information -->
@@ -86,7 +86,7 @@
         <description>The add-on component that schedules the automatic assign CI issues.</description>
         <interface>com.atlassian.sal.api.lifecycle.LifecycleAware</interface>
     </component>
-    
+
     <component key="synchronizationTaskScheduler" class="com.alertlogic.plugins.jira.cloudinsight.tasks.SynchronizationScheduledImpl"
              system="true" public="true">
         <description>The add-on component that schedules the CI Synchronization of issues.</description>
@@ -130,12 +130,12 @@
 	</web-item>
 
 	<!-- Configuration of Servlets -->
-		<servlet name="ci.atlassianplugin.servlet.projectsetup.name" 
+    <servlet name="ci.atlassianplugin.servlet.projectsetup.name" 
 		i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
 		key="projectsetup-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.SetupProjectServlet">
 		<description>
-			projectsetup
+			Servlet that allow setting up a project
 		</description>
 		<url-pattern>/projectsetup</url-pattern>
 	</servlet>
@@ -145,7 +145,7 @@
 		key="plugin-configuration-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.PluginConfigurationServlet">
 		<description>
-			Plugin's Configuration for connecting with Cloud Insight
+			Add-on configuration for connecting with Cloud Insight
 		</description>
 		<url-pattern>/pluginconfiguration</url-pattern>
 	</servlet>
@@ -161,7 +161,7 @@
 
 	<!-- Dispose servlet -->
 	<servlet name="Dispose Servlet" i18n-name-key="dispose-servlet.name" key="dispose-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.DisposeRemediationServlet">
-    	<description key="dispose-remediation.description">Allow dispose a remediations</description>
+    	<description key="dispose-remediation.description">Allow dispose a remediation</description>
     	<url-pattern>/disposeremediationservlet</url-pattern>
   	</servlet>
 
@@ -169,7 +169,7 @@
 	<servlet name="Proxy Auth Servlet"
 		i18n-name-key="proxy-auth-servlet.name" key="proxy-auth-servlet"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CIProxyAuthServlet">
-    	<description key="proxy-auth-servlet.description">Allow authentication in CI</description>
+    	<description key="proxy-auth-servlet.description">Allow authentication in Cloud Insight</description>
     	<url-pattern>/proxyauthservlet</url-pattern>
   	</servlet>
 
@@ -202,8 +202,8 @@
         <resource type="download" name="DashboardService.js"            location="/js/services/DashboardService.js" />
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
-    	<resource type="download" name="RulesService.js"               location="/js/services/RulesService.js" />
-    	<resource type="download" name="jira-cloud-insight.css" 		location="/css/jira-cloud-insight.css" />
+        <resource type="download" name="RulesService.js"                location="/js/services/RulesService.js" />
+        <resource type="download" name="cloud-insight-for-jira.css" 	location="/css/cloud-insight-for-jira.css" />
     </web-resource>
 
 	<!-- Start of Javascript Page controllers -->
@@ -282,7 +282,7 @@
   	<component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>
 
 	<component key="event-listener" class="com.alertlogic.plugins.jira.cloudinsight.listener.IssueAsCompleteListener">
-	    <description>Mark as complete issue that has been closed - JIRA issue events.</description>
+	    <description>Mark as complete an issue that has been closed - JIRA issue events.</description>
 	</component>
 
   	<!--with transitions-all give the position in the issue-->
