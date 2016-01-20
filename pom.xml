@@ -3,13 +3,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alertlogic.plugins.jira.cloudinsight</groupId>
-    <artifactId>jira-cloud-insight</artifactId>
+    <artifactId>cloud-insight-for-jira</artifactId>
     <version>1.2-SNAPSHOT</version>
     <organization>
         <name>Alert logic</name>
         <url>https://www.alertlogic.com/</url>
     </organization>
-    <name>jira-cloud-insight</name>
+    <name>cloud-insight-for-jira</name>
     <description>
         The Cloud Insight add-on for Jira integrates Cloud Insight remediations as Jira issues, which allows you to configure, manage, and assign issues to Jira teams. Jira team members can use the add-on to review, and then dispose assigned remediations.
     </description>

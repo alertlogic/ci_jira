@@ -17,7 +17,6 @@ import com.google.common.collect.Maps;
  */
 public class CommonJiraPluginUtils {
 
-	public final static String PLUGIN_PROPERTIES_FILE = "jira-cloud-insight.properties";
 	public final static String PLUGIN_INFO_KEY_PARAM = "plugin-key";
 	public final static String UNAUTHORIZE_TEMPLATE = "/js/partials/Unauthorize/Unauthorize.vm";
 
