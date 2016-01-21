@@ -75,8 +75,8 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 
 			String status = issueEvent.getIssue().getStatusObject().getNameTranslation();
 
-			//validate the status be of close
-			if( status.equals(IssueFieldConstants.CLOSED_STATUS))
+			//validate the status be of close or resolved
+			if( status.equals(IssueFieldConstants.CLOSED_STATUS) || status.equals(IssueFieldConstants.RESOLVED_STATUS) )
 			{
 				try{
 					String environment = remediationItem.split("/")[2].split(":")[1];				
