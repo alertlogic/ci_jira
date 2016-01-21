@@ -237,6 +237,30 @@ var CIJIRAService = function() {
     self.Field = function() {
         return {
             /**
+            * Review if the customs field are stored in the local storage
+            * if not store the custom fields in local storage
+            */
+            configurate: function() {
+                if( storageService.getKey("field-remediation-item" ) == null ||
+                    storageService.getKey("field-remediation-id" ) == null ||
+                    storageService.getKey("field-group" ) == null
+                ){
+                    self.Field().getAll().done( function( fields ) {
+
+                        var fieldRemediationItem = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.remediationItem"), fields);
+                        var fieldRemediationId = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.remediationId"), fields);
+                        var fieldGroupAssigned = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.groupAssigned"), fields);
+
+                        if(fieldRemediationItem != null && fieldRemediationId != null)
+                        {
+                            storageService.storeKey("field-remediation-id", fieldRemediationId);
+                            storageService.storeKey("field-remediation-item", fieldRemediationItem);
+                            storageService.storeKey("field-group", fieldGroupAssigned);
+                        }
+                    });
+                }
+            },
+            /**
             * get fields
             */
             getFields: function() {
@@ -391,22 +415,10 @@ var CIJIRAService = function() {
 
 
     /**
-    * Explore the customs fields and store the names taht we need.
+    * Explore the customs fields and priorities then store the names that we need.
     */
     self.registerFilters = function(){
-        self.Field().getAll().done( function( fields ) {
-
-            var fieldRemediationItem = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.remediationItem"), fields);
-            var fieldRemediationId = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.remediationId"), fields);
-            var fieldGroupAssigned = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.groupAssigned"), fields);
-
-            if(fieldRemediationItem != null && fieldRemediationId != null)
-            {
-                storageService.storeKey("field-remediation-id", fieldRemediationId);
-                storageService.storeKey("field-remediation-item", fieldRemediationItem);
-                storageService.storeKey("field-group", fieldGroupAssigned);
-            }
-        });
+        self.Field().configurate();
 
         self.Priority().getAll().done( function( priorities ){
 
