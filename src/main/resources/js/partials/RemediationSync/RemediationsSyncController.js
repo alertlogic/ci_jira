@@ -603,6 +603,7 @@ AJS.$(document).ready(
 
 						var projectIsConfigured = jiraService.ConfigureProject(project);
 						projectIsConfigured.done(function(){
+							jiraService.Field().configurate();
 
 							jiraService.IssueType().getAll().success(function(data){
 
