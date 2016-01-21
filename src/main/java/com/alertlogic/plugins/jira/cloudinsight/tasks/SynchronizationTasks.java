@@ -106,7 +106,7 @@ public class SynchronizationTasks implements PluginJob {
 
 		try{
 			if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
-				if( statusJira.equals("Closed") ) {
+				if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
 					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
 
 					int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
@@ -121,7 +121,7 @@ public class SynchronizationTasks implements PluginJob {
 		    }
 			else{
 			    if ( statusCI.equals("disposed") || statusCI.equals("complete") || statusCI.equals("verified") ) {
-			    	if( !statusJira.equals("Closed") ){
+			    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
 			    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
 
 			    		int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
