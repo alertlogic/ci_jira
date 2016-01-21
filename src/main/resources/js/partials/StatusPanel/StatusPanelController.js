@@ -49,7 +49,7 @@ function statusController() {
 				self.syncronizeStatus = function() {
 
 					if ( status.ci === "planned" || status.ci === "incomplete" ) {
-						if( status.jira === "Closed"){
+						if( status.jira === "Closed" || status.jira === "Resolved"){
 							var transation = jiraService.Issue().doTransition( status.issueId, 're-open', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.open"));
 
 							transation.done(function() {
@@ -60,7 +60,7 @@ function statusController() {
 				    }
 
 				    if ( status.ci === "disposed" || status.ci == "complete" || status.ci === "verified" ) {
-				    	if( status.jira != "Closed"){
+				    	if( status.jira != "Closed" && status.jira != "Resolved"){
 					    	var transation = jiraService.Issue().doTransition( status.issueId, 'close', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
 
 					    	transation.done(function() {

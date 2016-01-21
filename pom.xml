@@ -89,7 +89,7 @@
             <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <!--is a client http -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -129,8 +129,7 @@
             <version>2.5.6.SEC02</version>
             <scope>provided</scope>
         </dependency>
-        
-        
+
         <!-- WIRED TEST RUNNER DEPENDENCIES -->
 
         <dependency>
@@ -175,7 +174,7 @@
             <version>1.8.5</version>
             <scope>test</scope>
         </dependency>
- 
+
         <!-- Google Collections, useful utilities for manipulating collections -->
         <!--dependency>
             <groupId>com.google.collections</groupId>
