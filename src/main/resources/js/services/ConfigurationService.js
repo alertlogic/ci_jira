@@ -12,6 +12,7 @@ var ConfigurationService = function() {
 
     self.serviceVersion = "v1";
     self.timeRefresh = 20000;//millisecond
+    self.timeWait = 20000;//millisecond
 
 };
 /**

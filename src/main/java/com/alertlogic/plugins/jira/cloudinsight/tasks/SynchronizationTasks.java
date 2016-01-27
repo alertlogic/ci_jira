@@ -15,6 +15,7 @@ import com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.sal.api.scheduling.PluginJob;
+import java.sql.Timestamp;
 
 /**
  *	The automatic synchronization task, this tasks query Cloud Insight for
@@ -27,6 +28,7 @@ public class SynchronizationTasks implements PluginJob {
 	private RemediationsService remediationsService;
 	private EnvironmentsService environmentsService;
 	private SynchronizationScheduledImpl monitor;
+	private long timeWait = 20000L;
 
 	@Override
 	public void execute(Map<String, Object> jobDataMap) {
@@ -93,6 +95,21 @@ public class SynchronizationTasks implements PluginJob {
 	}
 
 	/**
+	 * How many time passed since last updating
+	 * @param issue
+	 * @return
+	 */
+	private boolean skipSynchronization(Issue issue){
+		
+		long time = (new Date()).getTime() - issue.getUpdated().getTime();
+		
+		if( time < timeWait ){
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Synchronize the status between Cloud insight and jira,
 	 * can reopen issues that are close
 	 * can close issues that are open
@@ -103,39 +120,41 @@ public class SynchronizationTasks implements PluginJob {
 	 */
 	private void synchronizeStatus(Issue issue, String statusCI, SynchronizationScheduledImpl monitor ) {
 		String statusJira = issue.getStatusObject().getNameTranslation();
-
+		
 		try{
-			if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
-				if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
-					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
-
-					int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
-					monitor.getJIRAService().doTransitionIssue(
-							issue,
-							state,
-							issue.getProjectObject().getLeadUserName(),
-							monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.reopen")
-							);
-					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenreopen")  + issue.getKey());		
-					}
-		    }
-			else{
-			    if ( statusCI.equals("disposed") || statusCI.equals("complete") || statusCI.equals("verified") ) {
-			    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
-			    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
-
-			    		int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
+			if( !skipSynchronization( issue ) ){
+				if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
+					if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
+						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
+	
+						int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
 						monitor.getJIRAService().doTransitionIssue(
 								issue,
 								state,
 								issue.getProjectObject().getLeadUserName(),
-								monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.close")
-							);
-
-						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenclosed")  + issue.getKey());		
-					}
+								monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.reopen")
+								);
+						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenreopen")  + issue.getKey());		
+						}
 			    }
-	        }
+				else{
+				    if ( statusCI.equals("disposed") || statusCI.equals("complete") || statusCI.equals("verified") ) {
+				    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
+				    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
+	
+				    		int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
+							monitor.getJIRAService().doTransitionIssue(
+									issue,
+									state,
+									issue.getProjectObject().getLeadUserName(),
+									monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.close")
+								);
+	
+							log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenclosed")  + issue.getKey());		
+						}
+				    }
+		        }
+			}
 		}catch(Exception e){
 			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.status"));		
 			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.jirastatus") + statusJira);		
