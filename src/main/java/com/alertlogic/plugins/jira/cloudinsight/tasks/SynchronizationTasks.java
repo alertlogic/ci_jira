@@ -28,6 +28,7 @@ public class SynchronizationTasks implements PluginJob {
 	private RemediationsService remediationsService;
 	private EnvironmentsService environmentsService;
 	private SynchronizationScheduledImpl monitor;
+	private long timeWait = 20000L;
 
 	@Override
 	public void execute(Map<String, Object> jobDataMap) {
@@ -102,7 +103,7 @@ public class SynchronizationTasks implements PluginJob {
 		
 		long time = (new Date()).getTime() - issue.getUpdated().getTime();
 		
-		if( time < 20000 ){
+		if( time < timeWait ){
 			return true;
 		}
 		return false;

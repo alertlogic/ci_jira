@@ -52,7 +52,7 @@ function statusController() {
                     var time = (new Date()).getTime() - (new Date(status.issueUpdated)).getTime();
                     //wait when the issue was already updated
                     //it is to solve synchronizations problems
-                    if( time < 20000){
+                    if( time < configService.timeWait ){
                         return true;
                     }
 
