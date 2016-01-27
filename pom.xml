@@ -3,8 +3,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alertlogic.plugins.jira.cloudinsight</groupId>
-    <artifactId>cloud-insight-for-jira</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <artifactId>jira-cloud-insight</artifactId>
+    <version>7.1.2.1-SNAPSHOT</version>
     <organization>
         <name>Alert logic</name>
         <url>https://www.alertlogic.com/</url>
@@ -221,11 +221,11 @@
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
                     <instructions>
-                        <!-- OSGi instructions go here -->
-                        <Export-Package>
-                            com.alertlogic.plugins.jira.cloudinsight*;version="1.2"
-                        </Export-Package>
-                    </instructions>
+				    	<!-- OSGi instructions go here -->
+				    	<Export-Package>
+						    com.alertlogic.plugins.jira.cloudinsight*;version="7.1.2.1"
+						</Export-Package>
+				    </instructions>
                     <!-- Uncomment to install TestKit backdoor in JIRA. -->
                     <!--
                     <pluginArtifacts>
