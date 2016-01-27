@@ -12,7 +12,8 @@ function statusController() {
 					ci : '',
 					jira : '',
 					remediationKey: '',
-					issueId: ''
+					issueId: '',
+					issueUpdated: ''
 				};
 
 				/**
@@ -26,7 +27,7 @@ function statusController() {
 					remediationItem.done(function(remediationsItems){
 						if( remediationsItems.assets.length > 0){
 							status.ci = remediationsItems.assets[0][0].state;
-							self.syncronizeStatus();
+							self.synchronizeStatus();
 	                        self.printHtml();
 	                    }
 			        });
@@ -43,33 +44,51 @@ function statusController() {
                     }
 				};
 
-				/**
-				 * Syncronize status between jira and cloud insight
-				 */
-				self.syncronizeStatus = function() {
-
-					if ( status.ci === "planned" || status.ci === "incomplete" ) {
-						if( status.jira === "Closed" || status.jira === "Resolved"){
-							var transation = jiraService.Issue().doTransition( status.issueId, 're-open', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.open"));
-
-							transation.done(function() {
-								JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.open"));
-								JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
-							});
-						}
-				    }
-
-				    if ( status.ci === "disposed" || status.ci == "complete" || status.ci === "verified" ) {
-				    	if( status.jira != "Closed" && status.jira != "Resolved"){
-					    	var transation = jiraService.Issue().doTransition( status.issueId, 'close', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
-
-					    	transation.done(function() {
-					    		JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
-								JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
-							});
-						}
+                /**
+                 * How many time passed since last updating
+                 * @return boolean
+                 */
+                self.skipSynchronization = function(){
+                    var time = (new Date()).getTime() - (new Date(status.issueUpdated)).getTime();
+                    //wait when the issue was already updated
+                    //it is to solve synchronizations problems
+                    if( time < configService.timeWait ){
+                        return true;
                     }
-				}
+
+                    return false;
+                };
+
+				/**
+				 * Synchronize status between jira and cloud insight
+				 */
+                self.synchronizeStatus = function() {
+
+                    if( !self.skipSynchronization() ){
+
+                    	if ( status.ci === "planned" || status.ci === "incomplete" ) {
+                            if( status.jira === "Closed" || status.jira === "Resolved"){
+                                var transation = jiraService.Issue().doTransition( status.issueId, 're-open', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.open"));
+
+                                transation.done(function() {
+                                    JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.open"));
+                                    JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                });
+                            }
+                        }
+
+                        if ( status.ci === "disposed" || status.ci == "complete" || status.ci === "verified" ) {
+                           if( status.jira != "Closed" && status.jira != "Resolved"){
+                                var transation = jiraService.Issue().doTransition( status.issueId, 'close', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
+
+                                transation.done(function() {
+                                    JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
+                                    JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                });
+                            }
+                        }
+                    }
+                }
 
 				/**
 				 * Review that the issue has the minimun information to search in CI the remediation
@@ -112,6 +131,8 @@ function statusController() {
 
 					issue.success(function( issueData ) {
 						status.jira = issueData.fields.status.name;
+
+						status.issueUpdated = issueData.fields.updated;
 
 						if( self.isValidIssue( issueData ) )
 						{
