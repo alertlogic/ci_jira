@@ -232,6 +232,12 @@ function remediationDetailsController( issueId ) {
                             basicElement.append('<p><small>' + AUIUtils.htmlLize( remediationDetails.basic.values.description ) + '</small></p>');
                         }
                     }
+                    if( remediationDetails.assets.hasOwnProperty("created_on") ){
+                        basicElement.append("<p><small>"
+                                + AJS.I18n.getText("ci.partials.remediationdetails.js.remediation.updated")
+                                + remediationDetails.assets.created_on
+                                + "</p></small>");
+                    }
                 };
                 /**
                 *Print a html with the information of a remediation

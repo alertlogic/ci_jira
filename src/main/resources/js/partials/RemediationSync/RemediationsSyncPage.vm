@@ -91,11 +91,14 @@
                                 <th id="header-vulnerability">
                                     $i18n.getText('ci.partials.remediationssync.js.header.count')
                                 </th>
+                                <th id="header-created">
+                                    $i18n.getText('ci.partials.remediationssync.js.header.created')
+                                </th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
-	                
+
                     <div id="remediationSyncLoading" class="text-align-center">
                         $i18n.getText('ci.partials.remediationssync.vm.remediations.loading')
                     </div>
