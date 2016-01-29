@@ -11,14 +11,14 @@ var RemediationSupportService = function() {
 	self.getAssets = function( data, key ) {
         var targets = [];
         var threat_level;
-        var type;
+        var created_on;
 
         for (var i = 0; i < data.remediations.assets.length; i++ ) {
             if( data.remediations.assets[ i ].key === key ){
 
                 threat_level = data.remediations.assets[ i ].threat_level;
 
-                type = data.remediations.assets[ i ].target_asset_type ;
+                created_on = moment( data.remediations.assets[ i ].create_on ).format("MM/DD/YYYY h:mm:ss a");
 
                 for (var j = 0; j < data.remediations.assets[ i ].vulnerabilities.length; j++ ) {
 
@@ -49,7 +49,7 @@ var RemediationSupportService = function() {
             },
         	"values" : targets,
             "threat_level": threat_level,
-            "type": type
+            "created_on": created_on
         };
     };
 

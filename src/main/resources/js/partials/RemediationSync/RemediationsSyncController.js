@@ -85,35 +85,6 @@ AJS.$(document).ready(
 			};
 
 			/**
-			 * Create table header with total of remediations
-			 */
-			self.createTableHeader = function(total) {
-
-				var header = AJS.$("#dataTable thead tr");
-				AUIUtils.addTableHeader(header,"header-select","<input id='allCheck' class='check-input' type='checkbox'/>");
-
-				AUIUtils.addTableHeader(
-					header,
-					"header-description",
-					AJS.I18n.getText("ci.partials.remediationssync.js.header.steps")+" ("+total+")");
-				AUIUtils.addTableHeader(
-					header,
-					"header-vulnerability",
-					AJS.I18n.getText("ci.partials.remediationssync.js.header.count"));
-
-				AJS.$( "#allCheck" ).click(function(){
-					var checkedStatus = this.checked;
-					AJS.$( "#assign-button" ).prop('disabled', true);
-					AJS.$('#dataTable tbody tr').find('td:first :checkbox').each(function() {
-						AJS.$(this).prop('checked', checkedStatus);
-						if (AJS.$(this).prop('checked')) {
-							AJS.$( "#assign-button" ).prop('disabled', false);
-						}
-					});
-				});
-			};
-
-			/**
 			 * Update the total of remediations in the header
 			 */
 			self.updateTableHeader = function(total) {
@@ -486,6 +457,10 @@ AJS.$(document).ready(
 					{
 						header:"header-vulnerability",
 						data: remediation.vulnerabilities.length
+					},
+					{
+						header:"header-created",
+						data: moment( remediation.created_on ).format("MM/DD/YYYY")
 					}
 				];
 
