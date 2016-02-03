@@ -8,6 +8,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.IssueService.IssueResult;
@@ -325,5 +326,13 @@ public class JIRAService {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * Get the groups for an user
+	 * @return
+	 */
+	public Collection<Group> getGroupsForUser(String user){
+		return ComponentAccessor.getGroupManager().getGroupsForUser(user);
 	}
 }
