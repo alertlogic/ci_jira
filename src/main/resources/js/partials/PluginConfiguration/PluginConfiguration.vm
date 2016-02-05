@@ -7,60 +7,90 @@
         <div class="content-container">
             <div class="content-body">
                 <h1> $i18n.getText('ci.partials.pluginconfiguration.vm.title') </h1>
-                <div id="aui-message-bar"></div>
+                <div class="flatpack">
+                    <div id="aui-message-bar"></div>
 
-                <form id="configForm" method="post" class="aui">
+                    <form id="configForm" method="post" class="aui">
 
-                    <div class="field-group">
-                        <label for="url">
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.url')
-                            <span class="aui-icon icon-required"></span>
-                            <span class="content">required</span>
-                        </label>
-                        <input id="ciUrl" class="text long-field" type="text" name="ciUrl"
-                            #if ($ciUrl)
-                            value="$ciUrl"
+                        <div class="field-group">
+                            <label for="url">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.url')
+                                <span class="aui-icon icon-required"></span>
+                                <span class="content">required</span>
+                            </label>
+                            <input id="ciUrl" class="text long-field" type="text" name="ciUrl"
+                                #if ($ciUrl)
+                                value="$ciUrl"
+                                #end
+                            >
+                            <div class="description"> $i18n.getText('ci.partials.pluginconfiguration.vm.url.description') </div>
+                        </div>
+                        <div class="field-group">
+                            <label for="user">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.user')
+                                <span class="aui-icon icon-required"></span>
+                                <span class="content">required</span>
+                            </label>
+                            <input id="ciUser" class="text long-field" type="text" name="ciUser"
+                            #if ($ciUser)
+                            value="$ciUser"
                             #end
-                        >
-                        <div class="description"> $i18n.getText('ci.partials.pluginconfiguration.vm.url.description') </div>
+                            >
+                            <div class="description"> $i18n.getText('ci.partials.pluginconfiguration.vm.user.description') </div>
+                        </div>
+                        <div class="field-group">
+                            <label for="password">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.password')
+                                <span class="aui-icon icon-required"></span>
+                                <span class="content">required</span>
+                            </label>
+                            <input id="ciPassword" class="text long-field" type="password" name="ciPassword">
+                        </div>
+                        <div class="buttons-container">
+                            <button id="btnTest" class="aui-button test"  type="button">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.button.test')
+                            </button>
+                            <button id="btnSave" class="aui-button aui-button-primary" disabled type="button">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.button.save')
+                            </button>
+                            <button id="btnDelete" class="aui-button" type="button"
+                                #if (!$ciUrl)
+                                    disabled
+                                #end
+                            >
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.button.delete')
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h1> $i18n.getText('ci.partials.pluginconfiguration.vm.title.permission') </h1>
+                <div class="flatpack">
+                    $i18n.getText('ci.partials.pluginconfiguration.vm.group.select'):
+                    <select id="selectGroup" class="select-medium" size="1">
+                    </select>&nbsp;
+
+                    <button id="btnAddGroup" class="aui-button aui-button-primary">$i18n.getText('ci.partials.pluginconfiguration.vm.button.addpermision')</button>
+                    <button id="btnRemoveGroup" class="aui-button">$i18n.getText('ci.partials.pluginconfiguration.vm.button.removepermision')</button>
+
+                    <table class="aui" id="permissionTable">
+                        <thead>
+                            <tr>
+                                <th id="header-select">
+                                    <input id="allCheck" class="check-input" type="checkbox">
+                                </th>
+                                <th id="header-group">
+                                    $i18n.getText('ci.partials.pluginconfiguration.vm.header.group')
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div id="permissionZeroState" class="zero-state">
+                        $i18n.getText('ci.partials.pluginconfiguration.vm.permission.zero.state')
                     </div>
-                    <div class="field-group">
-                        <label for="user">
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.user')
-                            <span class="aui-icon icon-required"></span>
-                            <span class="content">required</span>
-                        </label>
-                        <input id="ciUser" class="text long-field" type="text" name="ciUser"
-                        #if ($ciUser)
-                        value="$ciUser"
-                        #end
-                        >
-                        <div class="description"> $i18n.getText('ci.partials.pluginconfiguration.vm.user.description') </div>
-                    </div>
-                    <div class="field-group">
-                        <label for="password">
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.password')
-                            <span class="aui-icon icon-required"></span>
-                            <span class="content">required</span>
-                        </label>
-                        <input id="ciPassword" class="text long-field" type="password" name="ciPassword">
-                    </div>
-                    <div class="buttons-container">
-                        <button id="btnTest" class="aui-button test"  type="button">
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.test')
-                        </button>
-                        <button id="btnSave" class="aui-button aui-button-primary" disabled type="button">
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.save')
-                        </button>
-                        <button id="btnDelete" class="aui-button" type="button"
-                            #if (!$ciUrl)
-                                disabled
-                            #end
-                        >
-                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.delete')
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </body>

@@ -1,8 +1,11 @@
 /**
  * User plugin configuration page Controller
  */
+var pluginConfigurationController;
+
 AJS.$( document ).ready( function() {
-    var self = this;
+    var self = pluginConfigurationController = this;
+    jiraService.startService();
 
     /**
      * Test if the credentials are correct
@@ -79,7 +82,7 @@ AJS.$( document ).ready( function() {
      * @param url         url end point of cloud insight
      */
     self.saveConfig = function( user, password, url){
-        jiraService.startService();
+
         jiraService.Configuration().save( user, password, url ).
         done( function() {
 
@@ -107,7 +110,7 @@ AJS.$( document ).ready( function() {
      * Delete the configuration stored
      */
     self.detele = function() {
-        jiraService.startService();
+
         jiraService.Configuration().deleteConf().
         done( function() {
                 ciAIMSService.destroySessionData();
@@ -175,4 +178,205 @@ AJS.$( document ).ready( function() {
             self.activeTestButton();
         });
     });
+
+    /* Permissions */
+    Bootstrap.onView("#selectGroup", function(){
+        if( typeof jQuery.fn.auiSelect2 == 'function') {
+            AJS.$( "#selectGroup" ).auiSelect2();
+        }
+    });
+
+    /**
+     * Adds the remediations item to the view.
+     * @param {Object} rule The refence to the item
+     */
+    self.addGroupToView = function( rule ) {
+        var tableBody = AJS.$("#permissionTable tbody");
+
+        var rowData = [
+            {
+                header: "header-select",
+                data: "<input type='checkbox' name='group' class='check-input' value='"
+                +rule.id+"' onclick='pluginConfigurationController.validateSelected()'/>"
+            },
+            {
+                header: "header-group",
+                data: rule.group,
+                style: 'row_pointer',
+            }
+        ];
+
+        AUIUtils.createTableRow( tableBody, rowData);
+    };
+
+    /**
+     * Load the permissions that are already configured
+     * @return {[type]} [description]
+     */
+    self.loadPermissions = function() {
+        AJS.$( "#btnAddGroup" ).prop('disabled', true);
+        AUIUtils.clearSelect("#selectGroup");
+        AUIUtils.clearTable("#permissionTable");
+        AJS.$( "#selectGroup" ).auiSelect2().val("");
+        permissionsService.getPermissions().done( function( data ){
+
+            if ( data.length <= 0) {
+                AUIUtils.visible("#permissionZeroState");
+            } else {
+                AUIUtils.invisible("#permissionZeroState");
+            }
+
+            for(var i = 0 ; i < data.length; i++)
+            {
+                self.addGroupToView( data[i] );
+            }
+
+            jiraService.Groups().getAll().done( function( dataGroups ){
+
+                var groups = [];
+
+                for(var i = 0 ; i < dataGroups.groups.length; i++)
+                {
+                    var push = true;
+                    for(var j = 0 ; j < data.length; j++)
+                    {
+                        if( dataGroups.groups[ i ].name === data[ j ].group ){
+                            push = false;
+                            break;
+                        }
+                    }
+
+                    if( push ){
+                        groups.push( dataGroups.groups[ i ] );
+                    }
+                }
+
+                if( groups.length > 0 ){
+                    AUIUtils.addOptions( "#selectGroup", groups, "name", "name" );
+                    AJS.$( "#selectGroup" ).triggerHandler("change");
+                    AJS.$( "#btnAddGroup" ).prop('disabled', false);
+                }
+            });
+        });
+    };
+
+    /**
+     * Add a group to the list with permissions
+     */
+    self.addGroup = function(){
+        var group = AJS.$( "#selectGroup" ).auiSelect2().val();
+
+        if( group != null){
+            var assign = permissionsService.assignPermission(group);
+
+            assign.done( function(){
+                JIRA.Messages.showSuccessMsg(
+                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.added"
+                ));
+                self.loadPermissions();
+            });
+
+            assign.fail( function(){
+                JIRA.Messages.showWarningMsg(
+                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.adding.error")
+                );
+            });
+        }
+    };
+
+    /**
+     * Shows a confirmation dialog before a group deletion
+     */
+    self.confirmDelete = function() {
+        AUIUtils.confirmDialog(
+            "confirmDeleteDialog",
+            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.remove.group"),
+            self.removeGroup );
+    };
+
+    /**
+     * Validates if there are selected groups to delete
+     * to enable the delete button.
+     */
+    self.validateSelected = function() {
+        AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
+
+        AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
+            if (AJS.$(this).prop('checked')) {
+                AJS.$( "#btnRemoveGroup" ).prop('disabled', false);
+            }
+        });
+    };
+
+    /**
+     * Remove the group selected of the permissions
+     */
+    self.removeGroup = function() {
+        var selectedGroupsID = [];
+        AJS.$('input[name="group"]:checked').each(function() {
+            selectedGroupsID.push(this.value);
+        });
+
+        var success = 0;
+        var error = 0;
+        var ofMsg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.of");
+
+        for( i = 0; i < selectedGroupsID.length ; i++ ){
+            JIRA.Loading.showLoadingIndicator();
+
+            var permissionPromise = permissionsService.deletePermission( selectedGroupsID[i] )
+            .done( function( data ){
+                success++;
+
+                JIRA.Messages.showSuccessMsg(
+                    "(" + success + " " + ofMsg + " " + selectedGroupsID.length+") "+
+                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.removed")
+                );
+            })
+            .fail( function( jqXHR, textStatus ){
+                error++;
+
+                JIRA.Messages.showErrorMsg(
+                    "(" + error + " " + ofMsg + " " + selectedGroupsID.length+") "+
+                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.removing.error")
+                );
+
+            })
+            .always(function(){
+                if( (success+error) === selectedGroupsID.length){
+                    self.loadPermissions();
+                    JIRA.Loading.hideLoadingIndicator();
+                }
+                self.validateSelected();
+            });
+        }
+    };
+
+    Bootstrap.onView('#btnAddGroup', function(){
+        AJS.$( "#btnAddGroup" ).prop('disabled', true);
+        AJS.$('#btnAddGroup').click( function() {
+            self.addGroup();
+        });
+    });
+
+    Bootstrap.onView('#btnRemoveGroup', function(){
+        AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
+        AJS.$('#btnRemoveGroup').click( function() {
+            self.confirmDelete();
+        });
+    });
+
+    Bootstrap.onView('#allCheck', function(){
+        AJS.$( "#allCheck" ).click(function(){
+            var checkedStatus = this.checked;
+            AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
+            AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
+                AJS.$(this).prop('checked', checkedStatus);
+                if (AJS.$(this).prop('checked')) {
+                    AJS.$( "#btnRemoveGroup" ).prop('disabled', false);
+                }
+            });
+        });
+    });
+    self.loadPermissions();
 });

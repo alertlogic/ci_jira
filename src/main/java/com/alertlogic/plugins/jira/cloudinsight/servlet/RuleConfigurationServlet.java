@@ -2,12 +2,10 @@
 package com.alertlogic.plugins.jira.cloudinsight.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -151,14 +149,6 @@ public class RuleConfigurationServlet extends HttpServlet{
     }
 
     /**
-     * Convert a inputstream in a string
-     */
-    public String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
-
-    /**
      * Create new rules or unblocked
      */
     @Override
@@ -172,7 +162,7 @@ public class RuleConfigurationServlet extends HttpServlet{
 		    }
     		try{
 	    		ServletInputStream inputStream = req.getInputStream();
-	    		String string = convertStreamToString(inputStream); 
+	    		String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
 	    		JSONObject jsonArray= new JSONObject(string);
 	    		String option = jsonArray.getString("option");
 	    		
@@ -268,7 +258,7 @@ public class RuleConfigurationServlet extends HttpServlet{
 		    }
     		try{
     			ServletInputStream inputStream = req.getInputStream();
-    			String string = convertStreamToString(inputStream);
+    			String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
     			JSONObject jsonArray= new JSONObject(string);
 
 	    		int id = (int) jsonArray.getInt("id");
