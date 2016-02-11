@@ -299,6 +299,10 @@ AJS.$( document ).ready( function() {
                     AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.adding.error")
                 );
             });
+
+            assign.always( function(){
+                AJS.$( '#allCheck' ).prop('checked', false);
+            });
         }
     };
 
@@ -317,6 +321,7 @@ AJS.$( document ).ready( function() {
      * to enable the delete button.
      */
     self.validateSelected = function() {
+
         AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
 
         AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
@@ -366,6 +371,7 @@ AJS.$( document ).ready( function() {
                     JIRA.Loading.hideLoadingIndicator();
                 }
                 self.validateSelected();
+                AJS.$( '#allCheck' ).prop('checked', false);
             });
         }
     };
@@ -418,10 +424,10 @@ AJS.$( document ).ready( function() {
         self.confirmDeleteGroup();
     });
 
-    AJS.$( "#allCheck" ).click(function(){
+    AJS.$( '#allCheck' ).click(function(){
         var checkedStatus = this.checked;
-        AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
-        AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
+        AJS.$( '#btnRemoveGroup' ).prop('disabled', true);
+        AJS.$( '#permissionTable tbody tr' ).find('td:first :checkbox').each(function() {
             AJS.$(this).prop('checked', checkedStatus);
             if (AJS.$(this).prop('checked')) {
                 AJS.$( "#btnRemoveGroup" ).prop('disabled', false);
