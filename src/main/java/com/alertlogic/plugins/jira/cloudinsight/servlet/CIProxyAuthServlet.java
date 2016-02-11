@@ -15,6 +15,7 @@ import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
+import com.sun.jersey.api.client.ClientHandlerException;
 
 /**
  * This servlet works as a proxy between Jira and CI,
@@ -28,12 +29,14 @@ public class CIProxyAuthServlet extends HttpServlet{
     private final UserManager userManager;
     private TemplateRenderer templateRenderer;
     private AIMSService aimsService;
+    private PluginConfigService pluginConfigService;
 
-    public CIProxyAuthServlet(UserManager userManager,TemplateRenderer templateRenderer,PluginConfigService pluginConfigService)
+    public CIProxyAuthServlet(UserManager userManager,TemplateRenderer templateRenderer,PluginConfigService pluginConfigService,AIMSService aimsService)
     {
         this.userManager = userManager;
         this.templateRenderer = templateRenderer;
-        this.aimsService = new AIMSService(pluginConfigService);
+        this.pluginConfigService = pluginConfigService;
+        this.aimsService = aimsService;
     }
 
     @Override
@@ -45,19 +48,31 @@ public class CIProxyAuthServlet extends HttpServlet{
 				CommonJiraPluginUtils.unauthorize(res, templateRenderer);
 				return;
 		    }
-
-			JSONObject ciResponse = aimsService.ciAuthentication();
-
-			if (ciResponse != null) {
-
-				res.setContentType("application/json");
-				PrintWriter out = res.getWriter();
-				out.print(ciResponse);
-				out.flush();
-
-			} else {
-				res.sendError(HttpServletResponse.SC_BAD_GATEWAY);
-			}
+    		
+    		if(!pluginConfigService.hasConfiguration()){
+    			res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+    		}
+    		else{
+    		
+	    		try{
+					JSONObject ciResponse = aimsService.ciAuthentication();
+		
+					if (ciResponse != null) {
+						res.setContentType("application/json");
+						PrintWriter out = res.getWriter();
+						out.print(ciResponse);
+						out.flush();
+		
+					} else {
+						res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+					}
+	    		} catch (ClientHandlerException exception){
+	    			//it happened when the server can not connect to the api
+	    			res.sendError(HttpServletResponse.SC_BAD_GATEWAY);
+	    		} catch (Exception exception) {
+	    			res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				}
+    		}
     	}
     }
 

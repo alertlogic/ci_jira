@@ -18,7 +18,7 @@ public class AIMSServiceTest {
 	@Before
     public void setUp() throws Exception
 	{
-		aimsService = new AIMSService(null);
+		aimsService = new AIMSService(null,null);
 		String json="{'authentication':{'user':{'id':'1'}, 'account':{'id':'2'},'token':'3'}}";
 		responseSuccess = new JSONObject(json);
 		responseError = null;
