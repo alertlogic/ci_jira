@@ -147,6 +147,16 @@ AJS.$( document ).ready( function() {
         AJS.$("#btnTest").prop( "disabled", false );
     };
 
+    /**
+     * Shows a confirmation dialog before the deletion of credentials
+     */
+    self.confirmDeleteCredentials = function() {
+        AUIUtils.confirmDialog(
+            "confirmDeleteDialogCredentials",
+            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.remove.credentials"),
+            self.detele );
+    };
+
     /* Events on buttons and fields */
     /* Test conection with cloud insight*/
     Bootstrap.onView('#btnTest', function(){
@@ -165,7 +175,7 @@ AJS.$( document ).ready( function() {
     /* Delete credentials */
     Bootstrap.onView('#btnDelete', function(){
         AJS.$('#btnDelete').click( function() {
-            self.detele();
+            self.confirmDeleteCredentials();
         });
     });
 
@@ -293,9 +303,9 @@ AJS.$( document ).ready( function() {
     };
 
     /**
-     * Shows a confirmation dialog before a group deletion
+     * Shows a confirmation dialog before a deletion of a group
      */
-    self.confirmDelete = function() {
+    self.confirmDeleteGroup = function() {
         AUIUtils.confirmDialog(
             "confirmDeleteDialog",
             AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.remove.group"),
@@ -405,7 +415,7 @@ AJS.$( document ).ready( function() {
 
     AJS.$( '#btnRemoveGroup' ).prop('disabled', true);
     AJS.$( '#btnRemoveGroup' ).click( function() {
-        self.confirmDelete();
+        self.confirmDeleteGroup();
     });
 
     AJS.$( "#allCheck" ).click(function(){
