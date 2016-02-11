@@ -3,7 +3,9 @@ package com.alertlogic.plugins.jira.cloudinsight.service;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
+import com.atlassian.sal.api.message.I18nResolver;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -16,19 +18,21 @@ public class AIMSService {
 
 	private static final Logger log = LoggerFactory.getLogger(AIMSService.class);
 	public static final String API_VERSION = "v1";
-
 	public PluginConfigService pluginConfigService;
+	private I18nResolver i18n;
 
-	public AIMSService( PluginConfigService pluginConfigService )
+	public AIMSService( PluginConfigService pluginConfigService, I18nResolver i18n )
 	{
 		this.pluginConfigService = pluginConfigService;
+		this.i18n = i18n;
 	}
 
 	/**
 	 * Authenticates to CI and return the data.
 	 * @return JSONObject	The response of the authentication with an extra endpoint data.
+	 * @throws Exception 
 	 */
-    public JSONObject ciAuthentication(){
+    public JSONObject ciAuthentication() throws Exception{
 
     	PluginConfig conf;
 
@@ -36,23 +40,29 @@ public class AIMSService {
 
      		conf = pluginConfigService.getConfiguration();
      		String authorizationHeader = "Basic "+ pluginConfigService.encode( conf.getCiUser() + ":" + pluginConfigService.decode( conf.getCiPassword() ) );
+     		
      		ClientResponse response = Client.create(new DefaultClientConfig()).
 	    		resource(conf.getCiUrl()+"/aims/"+API_VERSION+"/authenticate").accept("application/json").
 	    		type("application/json").
 	    		header("Authorization", authorizationHeader).
 	    		post(ClientResponse.class);
-
+     		
      		if ( response.getStatus() == 200 ) {
      			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
      			jsonObj.put("endpoint", conf.getCiUrl());
-     			log.debug("CI Plugin: the authentication is valid ");
+     			
+     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
      			return jsonObj;
+     		}
+     		else{
+     			log.error( i18n.getText("ci.service.aimsservice.msg.log.error.authentication.invalid") + response.getStatus() );
+     			throw new Exception( "Error in authetication " + response.getStatus());
      		}
 
      	} else {
-     		log.error("CI Plugin: Error retrieving plugin configuration");
+     		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
      	}
-
+     	
      	return null;
     }
 

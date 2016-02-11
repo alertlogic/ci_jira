@@ -15,7 +15,6 @@ import com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.sal.api.scheduling.PluginJob;
-import java.sql.Timestamp;
 
 /**
  *	The automatic synchronization task, this tasks query Cloud Insight for
@@ -65,33 +64,36 @@ public class SynchronizationTasks implements PluginJob {
 
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getAIMSService());
-
-		JSONObject environmentsAll = this.environmentsService.getAllEnvironments();
-		JSONArray environments = environmentsAll.getJSONArray("sources");
-		if (environments != null) {
-
-			for ( int i = 0; i < environments.length(); i++ ) {
-				JSONObject environment = environments.getJSONObject(i).getJSONObject("source");
-
-				if (environment != null) {
-
-					String envId = environment.getString("id");
-					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
-
-					try {
-						executeSynchronizeJob(monitor, envId);
-					} catch (Exception e) {
-						log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.executing.synchronizejob") + e.getMessage() );		
-						e.printStackTrace();
+		
+		try {
+			JSONObject environmentsAll = this.environmentsService.getAllEnvironments();
+			JSONArray environments = environmentsAll.getJSONArray("sources");
+			if (environments != null) {
+	
+				for ( int i = 0; i < environments.length(); i++ ) {
+					JSONObject environment = environments.getJSONObject(i).getJSONObject("source");
+	
+					if (environment != null) {
+	
+						String envId = environment.getString("id");
+						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
+	
+						try {
+							executeSynchronizeJob(monitor, envId);
+						} catch (Exception e) {
+							log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.executing.synchronizejob") + e.getMessage() );		
+							e.printStackTrace();
+						}
 					}
+	
 				}
-
+	
+			} else {
+				log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notenvironments"));		
 			}
-
-		} else {
-			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notenvironments"));		
+		} catch(Exception exception){
+			exception.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -174,45 +176,50 @@ public class SynchronizationTasks implements PluginJob {
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 
     	if (!environmentId.isEmpty()) {
-
-	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environmentId);
-
-	    	if ( allRemediationsItems.has("assets") ) {
-
-	    		JSONArray assets = allRemediationsItems.getJSONArray("assets");
-
-	    		if ( assets.length() != 0 ) {
-
-	    			for(int i = 0; i < assets.length(); i++)
-	    	    	{
-	    	    		for(int j = 0; j < assets.getJSONArray(i).length(); j++)
-	    	        	{
-	    	    			JSONObject remediationItem = assets.getJSONArray(i).getJSONObject(j);
-	    	    			if( remediationItem.has("state")  && remediationItem.has("key")){
-		    	    			String state = remediationItem.getString("state");
-		    	    			String key = remediationItem.getString("key");
-		    	    			String jiraUser = monitor.getPluginConfigService().getConfiguration().getJiraUser();
-		    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
-
-		    	    			List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);
-		    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue") + key);
-		    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.amount") + issues.size());
-		    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.cistate") + state);
-
-		    	    			for(int k=0; k<issues.size();k++){
-		    	    				synchronizeStatus( issues.get(k), state, monitor);
+    		try{
+    			
+		    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environmentId);
+	
+		    	if ( allRemediationsItems.has("assets") ) {
+	
+		    		JSONArray assets = allRemediationsItems.getJSONArray("assets");
+	
+		    		if ( assets.length() != 0 ) {
+	
+		    			for(int i = 0; i < assets.length(); i++)
+		    	    	{
+		    	    		for(int j = 0; j < assets.getJSONArray(i).length(); j++)
+		    	        	{
+		    	    			JSONObject remediationItem = assets.getJSONArray(i).getJSONObject(j);
+		    	    			if( remediationItem.has("state")  && remediationItem.has("key")){
+			    	    			String state = remediationItem.getString("state");
+			    	    			String key = remediationItem.getString("key");
+			    	    			String jiraUser = monitor.getPluginConfigService().getConfiguration().getJiraUser();
+			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
+	
+			    	    			List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);
+			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue") + key);
+			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.amount") + issues.size());
+			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.cistate") + state);
+	
+			    	    			for(int k=0; k<issues.size();k++){
+			    	    				synchronizeStatus( issues.get(k), state, monitor);
+			    	    			}
 		    	    			}
-	    	    			}
-	    	        	}
-	    	    	}
+		    	        	}
+		    	    	}
+	
+					} else {
+						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notassets") );	
+					}
 
-				} else {
-					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notassets") );	
+				} else{
+					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notremediations") );	
 				}
-
-			} else{
-				log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notremediations") );	
-			}
+		    	
+    		} catch(Exception exception) {
+	    		exception.printStackTrace();
+	    	}
     	}
 	}
 

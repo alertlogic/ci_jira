@@ -86,17 +86,24 @@ AJS.$( document ).ready( function() {
         jiraService.Configuration().save( user, password, url ).
         done( function() {
 
-                JIRA.Messages.showSuccessMsg(
-                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.success")
-                );
-
-                jiraService.AuthProxy().done(
-                    function(data) {
+                jiraService.AuthProxy()
+                .done(
+                    function() {
+                        JIRA.Messages.showSuccessMsg(
+                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.success")
+                        );
                         window.location = window.location.href;
-                    });
+                })
+                .fail(
+                    function( jqXHR ) {
+                        JIRA.Messages.showSuccessMsg(
+                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.errorserver")
+                        );
+                });
 
                 AJS.$('#btnDelete').prop('disabled', false);
 
+                self.testConectionFromServer();
             }).
         fail( function() {
                 JIRA.Messages.showSuccessMsg(
@@ -113,16 +120,17 @@ AJS.$( document ).ready( function() {
 
         jiraService.Configuration().deleteConf().
         done( function() {
-                ciAIMSService.destroySessionData();
-                AJS.$('#ciUser').val('');
-                AJS.$('#ciPassword').val('');
-                AJS.$('#ciUrl').val('');
+            ciAIMSService.destroySessionData();
+            AJS.$('#ciUser').val('');
+            AJS.$('#ciPassword').val('');
+            AJS.$('#ciUrl').val('');
 
-                self.activeTestButton();
+            self.activeTestButton();
 
-                JIRA.Messages.showSuccessMsg(
-                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.success")
-                );
+            JIRA.Messages.showSuccessMsg(
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.success")
+            );
+            self.testConectionFromServer();
         }).fail( function() {
             JIRA.Messages.showSuccessMsg(
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.error")
@@ -352,31 +360,64 @@ AJS.$( document ).ready( function() {
         }
     };
 
-    Bootstrap.onView('#btnAddGroup', function(){
-        AJS.$( "#btnAddGroup" ).prop('disabled', true);
-        AJS.$('#btnAddGroup').click( function() {
-            self.addGroup();
+    /**
+     * Test to connect using the servlet,
+     * in order to test that the server has a way to connect with the CI api.
+     */
+    self.testConectionFromServer = function() {
+        var promise = jiraService.AuthProxy();
+        var element = AJS.$( '#conectionStatus' );
+
+        element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.checking") );
+        element.removeClass('aui-lozenge-success aui-lozenge-error');
+
+        promise.done( function() {
+            element.html('Success');
+            element.addClass('aui-lozenge-success');
         });
+
+        promise.fail( function( jqXHR, textStatus, errorThrown ) {
+
+            switch( jqXHR.status ) {
+                case 412:
+                    element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.not.verified") );
+                    element.addClass('aui-lozenge');
+                    break;
+                case 502:
+                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.connection') );
+                    element.addClass('aui-lozenge-error');
+                    break;
+                case 401:
+                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.authentication') );
+                    element.addClass('aui-lozenge-error');
+                    break;
+            }
+        });
+    };
+
+    self.testConectionFromServer();
+
+    //active the actions in permmisions buttons
+    AJS.$( '#btnAddGroup' ).prop('disabled', true);
+    AJS.$( '#btnAddGroup' ).click( function() {
+        self.addGroup();
     });
 
-    Bootstrap.onView('#btnRemoveGroup', function(){
+    AJS.$( '#btnRemoveGroup' ).prop('disabled', true);
+    AJS.$( '#btnRemoveGroup' ).click( function() {
+        self.confirmDelete();
+    });
+
+    AJS.$( "#allCheck" ).click(function(){
+        var checkedStatus = this.checked;
         AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
-        AJS.$('#btnRemoveGroup').click( function() {
-            self.confirmDelete();
+        AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
+            AJS.$(this).prop('checked', checkedStatus);
+            if (AJS.$(this).prop('checked')) {
+                AJS.$( "#btnRemoveGroup" ).prop('disabled', false);
+            }
         });
     });
 
-    Bootstrap.onView('#allCheck', function(){
-        AJS.$( "#allCheck" ).click(function(){
-            var checkedStatus = this.checked;
-            AJS.$( "#btnRemoveGroup" ).prop('disabled', true);
-            AJS.$('#permissionTable tbody tr').find('td:first :checkbox').each(function() {
-                AJS.$(this).prop('checked', checkedStatus);
-                if (AJS.$(this).prop('checked')) {
-                    AJS.$( "#btnRemoveGroup" ).prop('disabled', false);
-                }
-            });
-        });
-    });
     self.loadPermissions();
 });

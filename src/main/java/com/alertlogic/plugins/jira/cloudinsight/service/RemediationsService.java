@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +38,9 @@ public class RemediationsService {
      * @param 	env				The Environment ID.
      * @param 	remediationItem	The Remediation Item Key.
      * @return	JSONObject 		Get the information of a remediation item.
-     * @throws 	JSONException	When parsing problems occurs.
+	 * @throws Exception 
      */
-    public JSONObject getRemediationItem(String env,String remediationItem) throws JSONException{
+    public JSONObject getRemediationItem(String env,String remediationItem) throws Exception{
 
     	PluginConfig conf = this.pluginConfigService.getConfiguration();
     	JSONObject jsonResponse = this.aimsService.ciAuthentication();
@@ -78,8 +77,9 @@ public class RemediationsService {
     /**
      * Get all the remediations items by environment
      * @param  {String} environment The environment to query
+     * @throws Exception 
      */
-    public JSONObject getAllRemediationsItemsByEnvironment(String env ) {
+    public JSONObject getAllRemediationsItemsByEnvironment(String env ) throws Exception {
     	JSONObject jsonResponse = this.aimsService.ciAuthentication();
     	String token = this.aimsService.getToken(jsonResponse);
     	String account = this.aimsService.getAccount(jsonResponse);
@@ -116,9 +116,9 @@ public class RemediationsService {
     /**
      * Get all the remediations for a specific environment.
      * CI return  remediations and the filters
-     * @throws UnsupportedEncodingException
+     * @throws Exception 
      */
-    public JSONObject getAllRemediations( String environment, JSONArray filters ) throws UnsupportedEncodingException {
+    public JSONObject getAllRemediations( String environment, JSONArray filters ) throws Exception {
     	JSONObject jsonResponse = this.aimsService.ciAuthentication();
     	String token = this.aimsService.getToken(jsonResponse);
     	String account = this.aimsService.getAccount(jsonResponse);
@@ -257,9 +257,9 @@ public class RemediationsService {
      * @param env				The environment
      * @param remediationItem	The remediation item id
      * @return Boolean			True if the remediation was completed.
-     * @throws JSONException	When parsing problems appears.
+     * @throws Exception 
      */
-    public Boolean markAsComplete(String env,String remediationItem) throws JSONException{
+    public Boolean markAsComplete(String env,String remediationItem) throws Exception{
 
     	PluginConfig conf = this.pluginConfigService.getConfiguration();
     	JSONObject authJsonResponse = this.aimsService.ciAuthentication();
@@ -342,8 +342,9 @@ public class RemediationsService {
      * @param env				The environment
      * @param remediationItem	The remediation item to undispose
      * @return	Boolean			True if the undipose call was successfull
+     * @throws Exception 
      */
-    public Boolean unDipose(String env,String remediationItem) throws JSONException{
+    public Boolean unDipose(String env,String remediationItem) throws Exception{
 
     	PluginConfig conf = this.pluginConfigService.getConfiguration();
     	JSONObject authJsonResponse = this.aimsService.ciAuthentication();
