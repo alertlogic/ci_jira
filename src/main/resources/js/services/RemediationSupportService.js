@@ -27,10 +27,10 @@ var RemediationSupportService = function() {
                     for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
 
                         var target = vulnerability.vinstances[ k ].target;
-
                         targets[ target.key ] = {
+                            "key": target.key,
                             "type": AUIUtils.getTypeFromKey( target.key ) ,
-                            "asset": target.name || "(unknown)"
+                            "asset": target.name || "(unknown)",
                         };
                     }
                 }
@@ -54,23 +54,121 @@ var RemediationSupportService = function() {
     };
 
     /*
-    * Return a object with vulnerabilities id that are in assets
+    * Return a object with vulnerabilities id, targets and vulnerability instances
     */
-    self.getVulnerabilitiesIdFromAssets = function( data, key ) {
+    self.getComplementVulnerabilityFromAssets = function( data, key ) {
         var vulnsAsset = {};
 
         for ( var i = 0; i < data.remediations.assets.length; i++ ) {
             if( data.remediations.assets[ i ].key === key ){
                 for ( j = 0; j < data.remediations.assets[ i ].vulnerabilities.length; j++ ) {
 
-                    var vulnerabilityId = data.remediations.assets[ i ].vulnerabilities[ j ].vulnerability_id;
-                    vulnsAsset[ vulnerabilityId ]  = vulnerabilityId;
+                    var vulnerability = data.remediations.assets[ i ].vulnerabilities[ j ];
+                    var targets = [];
+
+                    for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
+                        targets.push( vulnerability.vinstances[k].target.key )
+                    }
+
+                    vulnsAsset[ vulnerability.vulnerability_id ] = {
+                        'key': vulnerability.vulnerability_id,
+                        'assets': targets,
+                        'evidences': vulnerability.instances
+                    };
                 }
             }
         }
         return vulnsAsset;
     };
 
+    /*
+    * Return a object with affected asset id, vulnerabilities and vulnerability instances
+    */
+    self.getComplementTargetFromAssets = function( data, key ) {
+        var targets = {};
+        var vulnerabilities = {};
+        var instances = {};
+
+        for ( var i = 0; i < data.remediations.assets.length; i++ ) {
+            if( data.remediations.assets[ i ].key === key ){
+                for ( j = 0; j < data.remediations.assets[ i ].vulnerabilities.length; j++ ) {
+
+                    var vulnerability = data.remediations.assets[ i ].vulnerabilities[ j ];
+
+                    for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
+                        var targetKey = vulnerability.vinstances[ k ].target.key;
+
+                        if( !targets[ targetKey ] ){
+                            targets[ targetKey ] = {'key' : targetKey };
+                            vulnerabilities [ targetKey ] = [ vulnerability.vulnerability_id ];
+                            instances [ targetKey ] = [ vulnerability.vinstances[ k ].key ];
+                        }
+                        else{
+                            if( vulnerabilities [ targetKey ].indexOf( vulnerability.vulnerability_id ) === -1 ){
+                                vulnerabilities [ targetKey ].push ( vulnerability.vulnerability_id );
+                            }
+
+                            if( instances [ targetKey ].indexOf( vulnerability.vinstances[ k ].key ) === -1 ){
+                                instances [ targetKey ].push ( vulnerability.vinstances[ k ].key );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for(i in targets){
+            targets[ i ].evidences = instances [ i ];
+            targets[ i ].vulnerabilities = vulnerabilities [ i ];
+        }
+
+        return targets;
+    };
+
+    /*
+    * Return a object with vulnerabilities intances with vulnerabilities and assets
+    */
+    self.getComplementEvidencesFromAssets = function( data, key ) {
+        var targets = {};
+        var vulnerabilities = {};
+        var instances = {};
+
+        for ( var i = 0; i < data.remediations.assets.length; i++ ) {
+            if( data.remediations.assets[ i ].key === key ){
+                for ( j = 0; j < data.remediations.assets[ i ].vulnerabilities.length; j++ ) {
+
+                    var vulnerability = data.remediations.assets[ i ].vulnerabilities[ j ];
+
+                    for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
+                        var instanceKey = vulnerability.vinstances[ k ].key;
+
+                        if( !targets[ instanceKey ] ){
+                            instances [ instanceKey ] = {'key' : instanceKey };
+                            vulnerabilities [ instanceKey ] = [ vulnerability.vulnerability_id ];
+                            targets[ instanceKey ] = [ vulnerability.vinstances[ k ].target.key ];
+
+                        }
+                        else{
+                            if( vulnerabilities [ instanceKey ].indexOf( vulnerability.vulnerability_id ) === -1 ){
+                                vulnerabilities [ instanceKey ].push ( vulnerability.vulnerability_id );
+                            }
+
+                            if( instances [ instanceKey ].indexOf( vulnerability.vinstances[ k ].target.key ) === -1 ){
+                                instances [ instanceKey ].push ( vulnerability.vinstances[ k ].target.key );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for(i in instances){
+            instances[ i ].assets = targets [ i ];
+            instances[ i ].vulnerabilities = vulnerabilities [ i ];
+        }
+
+        return instances;
+    };
     /*
     * Return a object with titles and values of description of one remediation from assets
     * it is called when we can not found the descriptions
@@ -261,6 +359,38 @@ var RemediationSupportService = function() {
         return {
             "titles" : assetTitles,
             "values" : assetValues
+        };
+    };
+
+    /**
+     * Return an object with titles and values of assets afected of one remediation
+     * and bring the details
+     */
+    self.getEvidences = function( data ) {
+        var evidenceTitles = {
+            "key":  AJS.I18n.getText("ci.partials.remediationdetails.js.evidences.column.key"),
+            "details": AJS.I18n.getText("ci.partials.remediationdetails.js.evidences.column.details"),
+            "vulnerability_id": AJS.I18n.getText("ci.partials.remediationdetails.js.evidences.column.vulnerability")
+        };
+        var evidenceValues = [];
+
+        for (var i = 0; i < data.assets.length; i++ ) {
+
+            for (var j = 0; j < data.assets[ i ].length; j++ ) {
+                var vulnerabilityIntance = data.assets[ i ][ j ];
+
+                evidenceValues.push({
+                    'key' : vulnerabilityIntance.key,
+                    'details' : vulnerabilityIntance.details,
+                    'vulnerability_id' : vulnerabilityIntance.vulnerability_id
+                });
+
+            }
+        }
+
+        return {
+            "titles" : evidenceTitles,
+            "values" : evidenceValues
         };
     };
 

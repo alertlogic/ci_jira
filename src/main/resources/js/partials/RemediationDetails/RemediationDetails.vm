@@ -27,49 +27,43 @@
 			    	</div>
 					<div class="aui-tabs horizontal-tabs">
 						<ul class="tabs-menu">
-					        <li class="menu-item active-tab">
-					            <a href="#vulnerabilitiesTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.vulnerabilities.title')</a>
-					        </li>
-					        <li class="menu-item">
-					            <a href="#assetsTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.assets.title')</a>
+							<li class="menu-item active-tab">
+					            <a href="#detailsTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.details.title')</a>
 					        </li>
 					        <li class="menu-item">
 					            <a href="#filtersTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.filters.title')</a>
 					        </li>
 					    </ul>
-					    <div class="tabs-pane active-pane" id="vulnerabilitiesTab">
-					        <table class="aui" id="vulnerabilitiesTable">
-	                        	<thead><tr></tr></thead>
-	                        	<tbody></tbody>
-	                    	</table>
-					    </div>
-					    <div class="tabs-pane" id="assetsTab">
+
+					    <div class="tabs-pane active-pane" id="detailsTab">
 					    	<div class="aui-group">
-						    	<div class="aui-item">
-							        <table class="aui" id="assetsTable">
-			                        	<thead><tr></tr></thead>
-			                        	<tbody></tbody>
-			                    	</table>
-		                    	</div>
-		                    	<div class="aui-item">
-			                    	<table id="assetsTableDetails">
-			                    		<thead>
-			                    			<tr>
-			                    				<th class="table-head">$i18n.getText('ci.partials.remediationdetails.vm.assetdetails.property')</th>
-                                				<th class="table-head">$i18n.getText('ci.partials.remediationdetails.vm.assetdetails.value')</th>
-                            				</tr>
-			                    		</thead>
-			                        	<tbody>
-											<tr class="table-simple">
-			                    				<td>
-			                    					$i18n.getText('ci.partials.remediationdetails.vm.assetdetails.zero')
-			                    				</td>
-                            				</tr>
-			                        	</tbody>
-			                    	</table>
-		                    	</div>
-		                    </div>
-					    </div>
+	    						<div class="aui-item">
+	    							<div id="vulnerabilitiesTab">
+								        <table id="vulnerabilitiesTable" class="table-simple">
+				                        	<thead><tr></tr></thead>
+				                        	<tbody></tbody>
+				                    	</table>
+								    </div>
+								</div>
+								<div class="aui-item">
+									<div id="assetsTab">
+								        <table id="assetsTable" class="table-simple">
+				                        	<thead><tr></tr></thead>
+				                        	<tbody></tbody>
+				                    	</table>
+								    </div>
+								</div>
+								<div class="aui-item">
+									<div id="evidencesTab">
+							    	    <table id="evidencesTable" class="table-simple">
+				                        	<thead><tr></tr></thead>
+				                        	<tbody></tbody>
+				                    	</table>
+				                    </div>
+								</div>
+							</div>
+						</div>
+
 					    <div class="tabs-pane" id="filtersTab">
 					        <table class="aui" id="filtersTable">
 	                        	<thead><tr></tr></thead>

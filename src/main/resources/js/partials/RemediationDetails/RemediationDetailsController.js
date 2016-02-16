@@ -8,7 +8,7 @@ AJS.$(function () {
         ajaxOptions: JIRA.Dialogs.getDefaultAjaxOptions,
         onSuccessfulSubmit : JIRA.Dialogs.storeCurrentIssueIdOnSucessfulSubmit,
         issueMsg : 'thanks_issue_updated',
-        width: window.innerWidth*0.8
+        width: window.innerWidth*0.95
     });
 });
 /**
@@ -30,11 +30,25 @@ function remediationDetailsController( issueId ) {
                     },
                     vulnerabilities: {},
                     filters: {},
+                    evidences: {},
                     environment: null,
                     remediationId: null
                 };
+
+                var remediationComplements = {
+                    assets: {},
+                    vulnerabilities: {},
+                    evidences: {}
+                };
+
+                var lastElementSelected = {
+                    vulnerability:'',
+                    asset:'',
+                    evidence:''
+                };
+
                 /**
-                *Print a csv with the information of a remediation
+                * Print a csv with the information of a remediation
                 */
                 self.printCsv = function(){
                     JIRA.Loading.showLoadingIndicator();
@@ -54,6 +68,11 @@ function remediationDetailsController( issueId ) {
                     csv += AUIUtils.arrayToCsv( remediationDetails.filters.values , 'vertical');
                     csv += AUIUtils.csvNewLine();
 
+                    csv += AUIUtils.csvTitleFormat( AJS.I18n.getText("ci.partials.remediationdetails.js.csv.evidences.title") );
+                    csv += AUIUtils.csvHeaderFormat( remediationDetails.evidences.titles );
+                    csv += AUIUtils.arrayToCsv( remediationDetails.evidences.values , 'none');
+                    csv += AUIUtils.csvNewLine();
+
                     csv += AUIUtils.csvTitleFormat( AJS.I18n.getText("ci.partials.remediationdetails.js.csv.assets.title") );
 
                     //go for the details
@@ -62,10 +81,14 @@ function remediationDetailsController( issueId ) {
                     var assetsLength = Object.keys( remediationDetails.assets.values ).length ;
 
                     for( assetKey in remediationDetails.assets.values ){
+
                         assetsService.byType(
                             remediationDetails.environment,
                             AUIUtils.getTypeFromKey( assetKey ) ,
-                            assetKey
+                            [{
+                                key: AUIUtils.getTypeFromKey( assetKey )+'.key',
+                                value: assetKey
+                            }]
                         ).always(function( data ){
                             countResolve++;
 
@@ -88,13 +111,106 @@ function remediationDetailsController( issueId ) {
                 };
 
                 /**
-                *Insert table of vulnerabilities
+                 * Review if the key is already selected
+                 */
+                self.isUnSelected = function( key , value){
+
+                    if( lastElementSelected[ key ] === value){
+                        lastElementSelected[ key ]= '';
+                        return true;
+                    }
+                    else{
+                        lastElementSelected[ key ] = value;
+                        return false;
+                    }
+                }
+
+                /**
+                 * Review if a row sloud be shown or hide
+                 * @param  {string} key   element key
+                 * @param  {string} item filtered it can be  (vulnerabilities,evidences,assets)
+                 */
+                self.shoulBeFiltered = function( key, filter){
+
+                    if( lastElementSelected.vulnerability && filter != 'vulnerabilities'){
+                        if( remediationComplements.vulnerabilities[ lastElementSelected.vulnerability ][ filter ].indexOf( key ) == -1){
+                            return true
+                        }
+                    }
+                    if( lastElementSelected.evidence && filter != 'evidences'){
+                        if( remediationComplements.evidences[ lastElementSelected.evidence ][ filter ].indexOf( key ) == -1){
+                            return true
+                        }
+                    }
+                    if( lastElementSelected.asset && filter != 'assets'){
+                        if( remediationComplements.assets[ lastElementSelected.asset ][ filter ].indexOf( key ) == -1){
+                            return true
+                        }
+                    }
+                    return false;
+                };
+
+                /**
+                 * Filter the visual content
+                 */
+                self.filterVisualContent = function(){
+                    //filter by asset
+                    for( i in  remediationDetails.assets.values ){
+                        var elementBody = AJS.$( "#"+ AUIUtils.escapeSelector ( i ));
+                        if( self.shoulBeFiltered( i ,'assets' ) ){
+                            elementBody.addClass('table-simple-invisible');
+                        }else{
+                            elementBody.removeClass('table-simple-invisible');
+                        }
+                    }
+                    //filter by evidence
+                    for( i = 0; i< remediationDetails.evidences.values.length; i++ ){
+                        var elementBody = AJS.$( "#"+ AUIUtils.escapeSelector ( remediationDetails.evidences.values[ i ].key ));
+                        if( self.shoulBeFiltered(  remediationDetails.evidences.values[i].key ,'evidences' ) ){
+                            elementBody.addClass('table-simple-invisible');
+                        }else{
+                            elementBody.removeClass('table-simple-invisible');
+                        }
+                    }
+                    //filter by vulnerabilities
+                    for( i = 0; i< remediationDetails.vulnerabilities.values.length; i++ ){
+                        var elementBody = AJS.$( "#"+ AUIUtils.escapeSelector ( remediationDetails.vulnerabilities.values[ i ].id ));
+                        if( self.shoulBeFiltered(  remediationDetails.vulnerabilities.values[i].id ,'vulnerabilities' ) ){
+                            elementBody.addClass('table-simple-invisible');
+                        }else{
+                            elementBody.removeClass('table-simple-invisible');
+                        }
+                    }
+                };
+
+                /**
+                * Show the details of a vulnerability id
+                */
+                self.showVulnerabilityDetailHtml = function( vulnId ){
+                    AJS.$( '.detailsVulnerability').addClass('hidden');
+                    AJS.$( '#vulnerabilitiesTable .table-simple-visible > td').removeClass('table-simple-row-selected');
+
+                    if( !self.isUnSelected( 'vulnerability', vulnId ) )
+                    {
+
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( vulnId ) + " > td .detailsVulnerability " ).removeClass('hidden');
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( vulnId ) + " > td ").addClass("table-simple-row-selected");
+                    }
+                    self.filterVisualContent();
+                };
+
+                /**
+                * Insert table of vulnerabilities
                 */
                 self.buildVulnerabilityTable = function(){
+
                     if( remediationDetails.vulnerabilities.hasOwnProperty("titles") ){
+                        var labelImpact = AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.impact");
+                        var labelResolution = AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.resolution");
+
                         var headerName = remediationDetails.vulnerabilities.titles.description;
                         var headerElement = AJS.$("#vulnerabilitiesTable thead tr");
-                        AUIUtils.addTableHeader( headerElement, headerName, AJS.I18n.getText("ci.partials.remediationdetails.js.html.exposures.title")+" ( " + remediationDetails.vulnerabilities.values.length + " )");
+                        AUIUtils.addTableHeader( headerElement, headerName, AJS.I18n.getText("ci.partials.remediationdetails.js.html.exposures.title")+" ( " + remediationDetails.vulnerabilities.values.length + " )", 'table-simple-head');
 
                         for (idx in remediationDetails.vulnerabilities.values)
                         {
@@ -104,94 +220,117 @@ function remediationDetailsController( issueId ) {
 
                             var classCss = AUIUtils.getThreatLevelClass( vul.severity );
 
-                            html += "<div class='" + classCss + " vulnerabilities-row'>" + vul.description;
-                            html +=     "<div id='"+vul.id+"' class='aui-expander-content'>";
-                            html +=         "<p><strong>"+AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.impact");
-                            html +=            "</strong></p><span><small>" + vul.impact + "</small></span>";
-                            html +=         "<p><strong>"+AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.resolution");
-                            html +=         "</strong></p><span><small>" + vul.resolution + "</small></span>";
+                            html += "<div>" ;
+                            html +=     "<div class='" + classCss + " vulnerabilities-row'>"+ vul.description + "</div>";
+                            html +=     "<div class='detailsVulnerability hidden'>";
+                            html +=         "<p><strong>"+ labelImpact +"</strong></p>";
+                            html +=            "<span><small>" + vul.impact + "</small></span>";
+                            html +=         "<p><strong>"+ labelResolution + "</strong></p>";
+                            html +=         "<span><small>" + vul.resolution + "</small></span>";
                             html +=     "</div>";
-                            html +=     "<a data-replace-text='" + AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.less") + "' class='aui-expander-trigger' aria-controls='" + vul.id + "'> "
-                            html +=      AJS.I18n.getText("ci.partials.remediationdetails.js.html.vulnerabilities.expander.more");
-                            html +=      "</a>";
                             html += "</div>";
 
                             var rowData = [
                                 {
-                                    header: headerName,
-                                    data: html
+                                    data: html,
+                                    style: 'table-simple-row',
+                                    action: 'showVulnerabilityDetailHtml(\'' + vul.id + '\')'
                                 }
                             ];
 
-                            AUIUtils.createTableRow( tableBody, rowData );
+                            AUIUtils.createTableRow( tableBody, rowData, 'table-simple-visible', null, vul.id );
                         }
                     }
+
                 };
+
                 /**
-                 * Mark a row as selected with css
-                 */
-                self.markRowAsSelected = function( assetKey ){
-                    AJS.$('tr[onclick]').removeClass('row-last-selected');
-                    AJS.$('tr[onclick="showAssetDetailHtml(\''+assetKey+'\')"]').addClass('row-last-selected');
-                }
-                /**
-                *Show the details of an asset
+                * Show the details of an asset
                 */
                 self.showAssetDetailHtml = function( assetKey ){
-                    self.markRowAsSelected( assetKey );
+                    AJS.$( '#assetsTable .table-simple-visible > td').removeClass('table-simple-row-selected');
+                    AJS.$( '.detailsAsset > ul > li').remove();
+                    AJS.$( '.detailsAsset > ul').remove();
 
-                    assetsService.byType(
-                        remediationDetails.environment ,
-                        AUIUtils.getTypeFromKey( assetKey ) ,
-                        assetKey
-                    )
-                    .done( function( data ){
+                    if( !self.isUnSelected( 'asset', assetKey ) )
+                    {
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( assetKey ) + " > td ").addClass("table-simple-row-selected");
 
-                        if( data.assets.length > 0 ){
-                            var tableBody = AJS.$("#assetsTableDetails tbody");
+                        assetsService.byType(
+                            remediationDetails.environment ,
+                            AUIUtils.getTypeFromKey( assetKey ),
+                            [{
+                                key: AUIUtils.getTypeFromKey( assetKey )+'.key',
+                                value: assetKey
+                            }]
+                        )
+                        .done( function( data ){
 
-                            AUIUtils.clearTable( "#assetsTableDetails" );
-                            var asset = remediationSupportService.getAssetsDetailsByType( data.assets[0], remediationDetails.assets.values ).values[0];
+                            if( data.assets.length > 0 ){
+                                var elementBody = AJS.$( "#"+ AUIUtils.escapeSelector ( assetKey ) + " > td .detailsAsset" );
+                                var asset = remediationSupportService.getAssetsDetailsByType(
+                                    data.assets[0],
+                                    remediationDetails.assets.values ).values[0];
 
-                            for (property in asset)
-                            {
-                                var rowData = [
-                                    {
-                                        data: "<div class='table-div'>" + assetDictionaryService.getCaption(property) +"</div>"
-                                    },
-                                    {
-                                        data: "<div class='table-div'>" + asset[ property ] + "</div>"
-                                    }
-                                ];
-                                AUIUtils.createTableRow( tableBody, rowData, "table-simple" );
+                                var html  = "<ul>";
+                                for (property in asset)
+                                {
+                                    html +=  "<li><strong>"+ assetDictionaryService.getCaption(property) +"</strong> : "+ asset[ property ] + "</li>";
+                                }
+                                html  += "</ul>";
+                                elementBody.append( html );
                             }
-                        }
-                    });
+                        });
+                    }
+                    self.filterVisualContent();
                 };
 
                 /**
-                *Insert table of assets
+                * Show the details of a vulnerability id
+                */
+                self.showEvidenceDetailHtml = function( evidenceId ){
+                    AJS.$( '.detailsEvidenceBody').addClass('hidden');
+                    AJS.$( '.detailsEvidenceHead').removeClass('hidden');
+                    AJS.$( '#evidencesTable > .table-simple-visible').removeClass('table-simple-invisible');
+                    AJS.$( '#evidencesTable .table-simple-visible > td').removeClass('table-simple-row-selected');
+
+                    if( !self.isUnSelected( 'evidence', evidenceId ) )
+                    {
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( evidenceId ) + " > td .detailsEvidenceBody " ).removeClass('hidden');
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( evidenceId ) + " > td .detailsEvidenceHead " ).addClass('hidden');
+                        AJS.$( "#"+ AUIUtils.escapeSelector ( evidenceId ) + " > td ").addClass("table-simple-row-selected");
+                    }
+                    self.filterVisualContent();
+                };
+
+                /**
+                * Insert table of assets
                 */
                 self.buildAssetsTable = function(){
                     if( remediationDetails.assets.hasOwnProperty("titles") ){
-                        var headerNameType = remediationDetails.assets.titles.type;
                         var headerNameAsset = remediationDetails.assets.titles.asset;
                         var headerElementAsset = AJS.$("#assetsTable thead tr");
-                        AUIUtils.addTableHeader( headerElementAsset, headerNameType, AJS.I18n.getText("ci.partials.remediationdetails.js.assets.column.type"));
-                        AUIUtils.addTableHeader( headerElementAsset, headerNameAsset, AJS.I18n.getText("ci.partials.remediationdetails.js.assets.column.assets"));
+                        var assetsLength = Object.keys( remediationDetails.assets.values ).length ;
+                        AUIUtils.addTableHeader( headerElementAsset,
+                            headerNameAsset,
+                            AJS.I18n.getText("ci.partials.remediationdetails.js.assets.column.assets") + " ( " +assetsLength + " )",
+                            'table-simple-head');
 
                         for (i in remediationDetails.assets.values)
                         {
+                            var target = remediationDetails.assets.values[ i ];
+                            var html = "<div>" +target.asset ;
+                            html +=        "<div class='detailsAsset'></div>";
+                            html +=    "</div>";
+
                             var tableBody = AJS.$("#assetsTable tbody");
                             var rowData = [
                                 {
-                                    data: remediationDetails.assets.values[ i ].type
-                                },
-                                {
-                                    data: remediationDetails.assets.values[ i ].asset
+                                    data: html,
+                                    style: 'table-simple-row'
                                 }
                             ];
-                            AUIUtils.createTableRow( tableBody, rowData, "row-asset-selected", 'showAssetDetailHtml(\'' + i + '\')');
+                            AUIUtils.createTableRow( tableBody, rowData, 'table-simple-visible', 'showAssetDetailHtml(\'' + i + '\')', target.key);
                         }
                     }
                 };
@@ -205,13 +344,13 @@ function remediationDetailsController( issueId ) {
                         var headerElementFilter = AJS.$("#filtersTable thead tr");
                         AUIUtils.addTableHeader( headerElementFilter, headerNameFilter, AJS.I18n.getText("ci.partials.remediationdetails.js.html.filters.title") );
 
-                        for (idx in remediationDetails.filters.values)
+                        for (i in remediationDetails.filters.values)
                         {
                             var tableBody = AJS.$("#filtersTable tbody");
                             var rowData = [
                                 {
                                     header: headerNameFilter,
-                                    data: "<div>" + remediationDetails.filters.values[ idx ].type + " : " + remediationDetails.filters.values[ idx ].filter + "</div>"
+                                    data: "<div>" + remediationDetails.filters.values[ i ].type + " : " + remediationDetails.filters.values[ i ].filter + "</div>"
                                 }
                             ];
 
@@ -219,8 +358,41 @@ function remediationDetailsController( issueId ) {
                         }
                     }
                 };
+
                 /**
-                *Insert table of details
+                * Insert table of evidence
+                */
+                self.buildEvidencesTable = function(){
+
+                    if( remediationDetails.evidences.hasOwnProperty("titles") ){
+                        var headerElement = AJS.$("#evidencesTable thead tr");
+                        AUIUtils.addTableHeader( headerElement, '', AJS.I18n.getText("ci.partials.remediationdetails.js.html.evidence.title")+" ( " + remediationDetails.evidences.values.length + " )", 'table-simple-head');
+
+                        for (i in remediationDetails.evidences.values)
+                        {
+                            var tableBody = AJS.$("#evidencesTable tbody");
+                            var evidence = remediationDetails.evidences.values[ i ];
+
+                            var html = "<div>" ;
+                                html +=     "<div class='detailsEvidenceHead'>"+  evidence.details.substring(0,30) + "...</div>";
+                                html +=     "<div class='detailsEvidenceBody hidden'>";
+                                html +=          evidence.details ;
+                                html +=     "</div>";
+                                html += "</div>";
+
+                            var rowData = [
+                                {
+                                    data: html,
+                                    style: 'table-simple-row'
+                                }
+                            ];
+                            AUIUtils.createTableRow( tableBody, rowData, 'table-simple-visible', 'showEvidenceDetailHtml(\''+evidence.key+'\')', evidence.key );
+                        }
+                    }
+                };
+
+                /**
+                * Insert table of details
                 */
                 self.buildDetails = function(){
                     var basicElement = AJS.$("#detailsPanel");
@@ -258,6 +430,8 @@ function remediationDetailsController( issueId ) {
 
                     //filters
                     self.buildFiltersTable();
+
+                    self.buildEvidencesTable();
                 };
 
                 /**
@@ -265,8 +439,8 @@ function remediationDetailsController( issueId ) {
                 */
                 self.loadDetailsFromCI = function(  remediationKey, remediationItemKey ){
                     var environment = remediationsService.getEnvironmentFromRemediationItem( remediationItemKey );
-                    var remediationId =  AUIUtils.getLastDetailFromKey( remediationKey );
-                    var arrayVulnsFromAssets = [];
+                    var remediationId = AUIUtils.getLastDetailFromKey( remediationKey );
+                    var arrayComplementsFromAssets = [];
                     remediationDetails.environment = environment;
                     remediationDetails.remediationId = remediationId;
 
@@ -275,6 +449,18 @@ function remediationDetailsController( issueId ) {
                     var description = remediationsService.getRemediationById( remediationId );
                     var vulnerabilitiesDetails = remediationsService.getVulnerabilityDetailsByRemediationId( remediationId );
                     var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( environment, remediationKey );
+
+                    var optionsEvidence =[
+                        {
+                            key: 'vulnerability.deleted_on',
+                            value: 0
+                        },
+                        {
+                            key: 'vulnerability.remediation_id',
+                            value: remediationId
+                        }
+                    ];
+                    var vulnerabilitiesEvidence = assetsService.byType( environment ,'vulnerability', optionsEvidence);
 
                     description.done( function( descriptionData ) {
                         remediationDetails.basic = remediationSupportService.getDescription ( descriptionData );
@@ -297,25 +483,35 @@ function remediationDetailsController( issueId ) {
 
                     assetsAffected.done( function( assetsData ) {
                         remediationDetails.assets = remediationSupportService.getAssets ( assetsData , remediationKey );
-                        arrayVulnsFromAssets = remediationSupportService.getVulnerabilitiesIdFromAssets( assetsData, remediationKey );
+                        remediationComplements.vulnerabilities = remediationSupportService.getComplementVulnerabilityFromAssets( assetsData, remediationKey );
+                        remediationComplements.assets = remediationSupportService.getComplementTargetFromAssets( assetsData, remediationKey );
+                        remediationComplements.evidences = remediationSupportService.getComplementEvidencesFromAssets( assetsData, remediationKey );
                     });
+
                     assetsAffected.fail( function() {
                         self.showError( '#assetsTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.assets.notfound") );
+                        self.showError( '#vulnerabilitiesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.vulnerabilities.notfound") );
+                    });
+
+                    vulnerabilitiesEvidence.done( function( evidenceData ) {
+                        remediationDetails.evidences = remediationSupportService.getEvidences( evidenceData );
+                    });
+
+                    vulnerabilitiesDetails.fail( function() {
                         self.showError( '#vulnerabilitiesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.vulnerabilities.notfound") );
                     });
 
                     //whatever
                     filters.always(function(){
                         description.always(function(){
-                            assetsAffected.always(function(){
-                                vulnerabilitiesDetails.done( function( vulnsData ) {
-                                    remediationDetails.vulnerabilities = remediationSupportService.getVulnerabilitiesDetails ( vulnsData , arrayVulnsFromAssets );
-                                });
-                                vulnerabilitiesDetails.fail( function() {
-                                    self.showError( '#vulnerabilitiesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.vulnerabilities.notfound") );
-                                });
-                                vulnerabilitiesDetails.always(function(){
-                                    self.printHtmlDetails();
+                            vulnerabilitiesEvidence.always(function(  evidenceData ){
+                                assetsAffected.always(function( assetsData ){
+                                    vulnerabilitiesDetails.done( function( vulnsData ) {
+                                        remediationDetails.vulnerabilities = remediationSupportService.getVulnerabilitiesDetails ( vulnsData , remediationComplements.vulnerabilities );
+                                    });
+                                    vulnerabilitiesDetails.always(function(){
+                                        self.printHtmlDetails();
+                                    });
                                 });
                             });
                         });
