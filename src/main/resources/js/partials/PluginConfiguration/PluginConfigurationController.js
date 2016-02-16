@@ -83,6 +83,8 @@ AJS.$( document ).ready( function() {
      */
     self.saveConfig = function( user, password, url){
 
+        ciAIMSService.destroySessionData();
+
         jiraService.Configuration().save( user, password, url ).
         done( function() {
 
@@ -131,6 +133,7 @@ AJS.$( document ).ready( function() {
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.success")
             );
             self.testConectionFromServer();
+
         }).fail( function() {
             JIRA.Messages.showSuccessMsg(
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.error")
