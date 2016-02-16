@@ -379,11 +379,13 @@ var RemediationSupportService = function() {
             for (var j = 0; j < data.assets[ i ].length; j++ ) {
                 var vulnerabilityIntance = data.assets[ i ][ j ];
 
-                evidenceValues.push({
-                    'key' : vulnerabilityIntance.key,
-                    'details' : vulnerabilityIntance.details,
-                    'vulnerability_id' : vulnerabilityIntance.vulnerability_id
-                });
+                if( vulnerabilityIntance.hasOwnProperty('details') && vulnerabilityIntance.details != ''){
+                    evidenceValues.push({
+                        'key' : vulnerabilityIntance.key,
+                        'details' : vulnerabilityIntance.details,
+                        'vulnerability_id' : vulnerabilityIntance.vulnerability_id
+                    });
+                }
 
             }
         }
