@@ -142,7 +142,7 @@ var RemediationSupportService = function() {
                     for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
                         var instanceKey = vulnerability.vinstances[ k ].key;
 
-                        if( !targets[ instanceKey ] ){
+                        if( !instances[ instanceKey ] ){
                             instances [ instanceKey ] = {'key' : instanceKey };
                             vulnerabilities [ instanceKey ] = [ vulnerability.vulnerability_id ];
                             targets[ instanceKey ] = [ vulnerability.vinstances[ k ].target.key ];
@@ -153,8 +153,8 @@ var RemediationSupportService = function() {
                                 vulnerabilities [ instanceKey ].push ( vulnerability.vulnerability_id );
                             }
 
-                            if( instances [ instanceKey ].indexOf( vulnerability.vinstances[ k ].target.key ) === -1 ){
-                                instances [ instanceKey ].push ( vulnerability.vinstances[ k ].target.key );
+                            if( targets [ instanceKey ].indexOf( vulnerability.vinstances[ k ].target.key ) === -1 ){
+                                targets [ instanceKey ].push ( vulnerability.vinstances[ k ].target.key );
                             }
                         }
                     }
@@ -277,7 +277,7 @@ var RemediationSupportService = function() {
     self.getVulnerabilitiesDetails = function( dataVuln , vulnFromAssets) {
         var vulns = [];
         for ( var i = 0; i < dataVuln.vulnerabilities.length; i++ ) {
-             if( vulnFromAssets[ dataVuln.vulnerabilities[i].id ] ){
+            if( vulnFromAssets[ dataVuln.vulnerabilities[i].id ] ){
                 //Search if the vulnerability exist on the assets
                 var vuln = {
                     "id": dataVuln.vulnerabilities[ i ].id,
@@ -366,7 +366,7 @@ var RemediationSupportService = function() {
      * Return an object with titles and values of assets afected of one remediation
      * and bring the details
      */
-    self.getEvidences = function( data ) {
+    self.getEvidences = function( data, instancesFromAssets ) {
         var evidenceTitles = {
             "key":  AJS.I18n.getText("ci.partials.remediationdetails.js.evidences.column.key"),
             "details": AJS.I18n.getText("ci.partials.remediationdetails.js.evidences.column.details"),
@@ -379,7 +379,9 @@ var RemediationSupportService = function() {
             for (var j = 0; j < data.assets[ i ].length; j++ ) {
                 var vulnerabilityIntance = data.assets[ i ][ j ];
 
-                if( vulnerabilityIntance.hasOwnProperty('details') && vulnerabilityIntance.details != ''){
+                if( vulnerabilityIntance.hasOwnProperty('details') &&
+                    vulnerabilityIntance.details != '' &&
+                    instancesFromAssets[ vulnerabilityIntance.key ] ){
                     evidenceValues.push({
                         'key' : vulnerabilityIntance.key,
                         'details' : vulnerabilityIntance.details,

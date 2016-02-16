@@ -133,18 +133,24 @@ function remediationDetailsController( issueId ) {
                 self.shoulBeFiltered = function( key, filter){
 
                     if( lastElementSelected.vulnerability && filter != 'vulnerabilities'){
-                        if( remediationComplements.vulnerabilities[ lastElementSelected.vulnerability ][ filter ].indexOf( key ) == -1){
-                            return true
+                        if( remediationComplements.vulnerabilities.hasOwnProperty( lastElementSelected.vulnerability ) ){
+                            if( remediationComplements.vulnerabilities[ lastElementSelected.vulnerability ][ filter ].indexOf( key ) == -1){
+                                return true
+                            }
                         }
                     }
                     if( lastElementSelected.evidence && filter != 'evidences'){
-                        if( remediationComplements.evidences[ lastElementSelected.evidence ][ filter ].indexOf( key ) == -1){
-                            return true
+                        if( remediationComplements.evidences.hasOwnProperty( lastElementSelected.evidence ) ){
+                            if( remediationComplements.evidences[ lastElementSelected.evidence ][ filter ].indexOf( key ) == -1){
+                                return true
+                            }
                         }
                     }
                     if( lastElementSelected.asset && filter != 'assets'){
-                        if( remediationComplements.assets[ lastElementSelected.asset ][ filter ].indexOf( key ) == -1){
-                            return true
+                        if( remediationComplements.assets.hasOwnProperty( lastElementSelected.asset ) ){
+                            if( remediationComplements.assets[ lastElementSelected.asset ][ filter ].indexOf( key ) == -1){
+                                return true
+                            }
                         }
                     }
                     return false;
@@ -491,21 +497,26 @@ function remediationDetailsController( issueId ) {
                     assetsAffected.fail( function() {
                         self.showError( '#assetsTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.assets.notfound") );
                         self.showError( '#vulnerabilitiesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.vulnerabilities.notfound") );
-                    });
-
-                    vulnerabilitiesEvidence.done( function( evidenceData ) {
-                        remediationDetails.evidences = remediationSupportService.getEvidences( evidenceData );
+                        self.showError( '#evidencesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.evidences.notfound") );
                     });
 
                     vulnerabilitiesDetails.fail( function() {
                         self.showError( '#vulnerabilitiesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.vulnerabilities.notfound") );
                     });
 
+                    vulnerabilitiesEvidence.fail( function() {
+                        self.showError( '#evidencesTab', AJS.I18n.getText("ci.partials.remediationdetails.js.error.evidences.notfound") );
+                    });
+
                     //whatever
                     filters.always(function(){
                         description.always(function(){
-                            vulnerabilitiesEvidence.always(function(  evidenceData ){
-                                assetsAffected.always(function( assetsData ){
+                            assetsAffected.always(function( assetsData ){
+                                vulnerabilitiesEvidence.done( function( evidenceData ) {
+                                    remediationDetails.evidences = remediationSupportService.getEvidences( evidenceData , remediationComplements.evidences  );
+                                });
+
+                                vulnerabilitiesEvidence.always(function(  evidenceData ){
                                     vulnerabilitiesDetails.done( function( vulnsData ) {
                                         remediationDetails.vulnerabilities = remediationSupportService.getVulnerabilitiesDetails ( vulnsData , remediationComplements.vulnerabilities );
                                     });

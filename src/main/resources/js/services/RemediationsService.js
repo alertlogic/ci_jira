@@ -240,7 +240,8 @@ var RemediationsService = function() {
         +"/assets/"+configService.serviceVersion
         +"/"+ciAIMSService.getSessionData().accountId
         +"/environments/"+environment
-        +"/remediations?key="+remediationId;
+        +"/remediations?key="+remediationId
+        +"&scope=true";
 
         return jQuery.ajax({
             type: "GET",
