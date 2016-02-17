@@ -59,6 +59,7 @@
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig</entity>
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Filter</entity>
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig</entity>
+		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Permission</entity>
 	</ao>
 
 	<component-import key="ao" name="Active Objects service"
@@ -181,6 +182,14 @@
     	<url-pattern>/ruleconfigurationservlet</url-pattern>
   	</servlet>
 
+    <!-- Permission configuration servlet -->
+    <servlet name="Permission Configuration Servlet"
+        i18n-name-key="ci.atlassianplugin.servlet.permission.name" key="permission-configuration-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.PermissionConfigurationServlet">
+        <description key="ci.atlassianplugin.servlet.permission.description">Permissions configuration</description>
+        <url-pattern>/permissionservlet</url-pattern>
+    </servlet>
+
 	<!-- JS Services -->
     <web-resource key="ciServices" name="CIServices" >
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
@@ -203,6 +212,7 @@
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
         <resource type="download" name="RulesService.js"                location="/js/services/RulesService.js" />
+        <resource type="download" name="PermissionsService.js"              location="/js/services/PermissionsService.js" />
         <resource type="download" name="cloud-insight-for-jira.css" 	location="/css/cloud-insight-for-jira.css" />
     </web-resource>
 
@@ -278,6 +288,8 @@
 
 	<component key="rule-configuration-service" name="Rule Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService" />
 
+	<component key="permission-configuration-service" name="Permission Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.PermissionService" />
+
 	<!-- Listeners -->
   	<component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>
 
@@ -292,6 +304,7 @@
 		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
 		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
 		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
+		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightUserHasPermissionCondition"/>
 		</conditions>
     	<link linkId="dispose_remediation">/plugins/servlet/disposeremediationservlet?id=${issue.id}</link>
     	<styleClass>issueaction-dispose</styleClass>

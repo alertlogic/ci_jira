@@ -145,7 +145,7 @@ var AUIUtilsService = function() {
      * @param  {Object} rowData The header data
      * @param  {Object} styleTr Style
      */
-    self.createTableRow = function( element, rowData, styleTr, actionTr ){
+    self.createTableRow = function( element, rowData, styleTr, actionTr, idTr){
         var rowHtml = '<tr';
 
         if( styleTr ){
@@ -153,6 +153,9 @@ var AUIUtilsService = function() {
         }
         if( actionTr ){
             rowHtml +=  ' onClick = \"' + actionTr + '\"';
+        }
+        if( idTr ){
+            rowHtml +=  ' id = \"' + idTr + '\"';
         }
         rowHtml += '>';
 
@@ -444,6 +447,10 @@ var AUIUtilsService = function() {
         if(AJS.$(selector)){
             AJS.$(selector).css("visibility", "hidden");
         }
+    };
+
+    self.escapeSelector = function( id ){
+        return id.replace(/\//g,'\\/');
     };
 };
 /**

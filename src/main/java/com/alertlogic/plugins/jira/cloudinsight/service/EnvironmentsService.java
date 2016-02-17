@@ -1,6 +1,5 @@
 package com.alertlogic.plugins.jira.cloudinsight.service;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +29,9 @@ public class EnvironmentsService {
 	/**
 	 * Return the environments
 	 * @return
-	 * @throws JSONException
+	 * @throws Exception 
 	 */
-	public JSONObject getAllEnvironments() throws JSONException{
+	public JSONObject getAllEnvironments() throws Exception{
 		PluginConfig conf = this.pluginConfigService.getConfiguration();
     	JSONObject jsonResponse = this.aimsService.ciAuthentication();
     	String token = this.aimsService.getToken(jsonResponse);

@@ -1,7 +1,9 @@
 package com.alertlogic.plugins.jira.cloudinsight.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Scanner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,4 +89,14 @@ public class CommonJiraPluginUtils {
         Map<String, Object> context = Maps.newHashMap();
         templateRenderer.render(UNAUTHORIZE_TEMPLATE, context, res.getWriter());
 	}
+
+    /**
+     * Convert a inputstream in a string
+     * @param InputStream
+     * @return String
+     */
+    public static String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
 }
