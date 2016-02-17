@@ -15,6 +15,10 @@
     cursor: pointer;
 }
 
+#header-select{
+    width: 20px;
+}
+
 /* Remedaition details */
 .vulnerabilities-row{
 	padding-left: 10px;
@@ -27,28 +31,26 @@
     text-align: right;
 }
 
-.table-simple {
-    padding: 7px 10px;
+.table-simple{
+    width: 100%
+}
+.table-simple-head{
     text-align: left;
+    padding: 7px 10px 7px 10px;
 }
-.table-div {
-    padding: 6px 5px 3px 7px;
-}
-.table-head{
+.table-simple-row {
+    padding: 7px 10px 7px 10px;
     text-align: left;
-    padding-top: 7px;
-}
-.row-asset-selected{
+    border: 4px solid #f3f3f3;
     cursor: pointer;
 }
-.row-asset-selected:hover{
-    background-color: #f6f6f6;
-    font-weight: bold;
+.table-simple-row-selected {
+    border: 4px solid #535353;
 }
-.row-last-selected{
-    font-weight: bold;
-    text-decoration: underline;
+.table-simple-invisible {
+    display:none;
 }
+
 /* Remediations Syn Page */
 .row-filter-selected{
     cursor: pointer;
@@ -79,7 +81,7 @@
 }
 .check-input{
     margin: 0 auto;
-    height: 100%
+    height: 100%;
 }
 .remediation-row{
     padding: 5px;
@@ -113,4 +115,14 @@
     padding: 15px 30px;
     margin: 3px;
     text-align: center;
+}
+
+/* Configuration add-on */
+.flatpack {
+    padding: 10px;
+    border: 1px solid;
+    border-color: #cccccc;
+    border-radius: 2px;
+    margin-bottom: 5px;
+    margin-top: 15px;
 }

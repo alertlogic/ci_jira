@@ -10,7 +10,7 @@ var AssetsService = function() {
      * @param  {String} assets type
      * @param  {String} asset key
      */
-    self.byType =  function( environment, assetType, optionalKeys ) {
+    self.byType =  function( environment, assetType, optionals) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
@@ -23,8 +23,8 @@ var AssetsService = function() {
             'reduce': true
         };
 
-        if(optionalKeys != undefined){
-            params[assetType+".key"]=optionalKeys;
+        for( i = 0 ; i < optionals.length; i++ ){
+            params[ optionals[ i ].key ] = optionals[ i ].value;
         }
 
         return jQuery.ajax({

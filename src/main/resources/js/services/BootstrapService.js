@@ -32,13 +32,22 @@ var BootstrapService = function() {
                     AJS.$(".content-container").hide();
                 });
 
-                if (jqXHR.status !== 502) {
-                    JIRA.Messages.showWarningMsg(
-                        'Error ('+jqXHR.status+'):'+
-                        AJS.I18n.getText("ci.atlassianplugin.boostrap.msg.autherror"));
-                } else {
+                switch( jqXHR.status ) {
+                case 412:
                     JIRA.Messages.showWarningMsg(AJS.I18n.getText("ci.atlassianplugin.boostrap.msg.noconfig"));
+                    break;
+                case 502:
+                    JIRA.Messages.showWarningMsg(
+                            'Error ('+jqXHR.status+'):'+
+                            AJS.I18n.getText("ci.atlassianplugin.boostrap.msg.connectionerror"));
+                    break;
+                case 401:
+                    JIRA.Messages.showWarningMsg(
+                            'Error ('+jqXHR.status+'):'+
+                            AJS.I18n.getText("ci.atlassianplugin.boostrap.msg.autherror"));
+                    break;
                 }
+
             });
 
         } else {
