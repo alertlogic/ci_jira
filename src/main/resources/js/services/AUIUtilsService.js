@@ -450,7 +450,13 @@ var AUIUtilsService = function() {
     };
 
     self.escapeSelector = function( id ){
-        return id.replace(/\//g,'\\/');
+        id = id.replace(/\//g,'\\/');
+        id = id.replace(/\@/g,'\\@');
+        id = id.replace(/\./g,'\\.');
+        id = id.replace(/\'/g,"\\'");
+        id = id.replace(/\"/g,'\\"');
+
+        return id;
     };
 };
 /**
