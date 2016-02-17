@@ -5,9 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Filter;
+import com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig;
+import com.alertlogic.plugins.jira.cloudinsight.tasks.TaskRuleExecutionState;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.IssueService.IssueResult;
@@ -329,5 +334,30 @@ public class JIRAService {
 	 */
 	public Collection<Group> getGroupsForUser(String user){
 		return ComponentAccessor.getGroupManager().getGroupsForUser(user);
+	}
+	
+
+	/**
+	 * Get the all groups
+	 * This function was introduce because the api not support get all groups
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public JSONObject getGroups(){
+		 
+		Collection<Group> groups = ComponentAccessor.getGroupManager().getAllGroups();
+		JSONArray groupsArray  =  new JSONArray();
+		JSONObject groupsJSON  =  new JSONObject();
+		 
+		for( Group group: groups ){
+			JSONObject obj  =  new JSONObject();
+			obj.put("name",group.getName());
+			
+			groupsArray.put ( obj );
+		}
+		
+		groupsJSON.put("groups", groupsArray);
+
+		return groupsJSON;
 	}
 }

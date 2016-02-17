@@ -190,6 +190,14 @@
         <url-pattern>/permissionservlet</url-pattern>
     </servlet>
 
+    <servlet name="Groups servlet"
+        i18n-name-key="ci.atlassianplugin.servlet.groups" key="groups-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.JiraProxiGroupsServlet">
+        <description key="ci.atlassianplugin.servlet.groups.description">Groups servlet</description>
+        <url-pattern>/groupsservlet</url-pattern>
+    </servlet>
+
+
 	<!-- JS Services -->
     <web-resource key="ciServices" name="CIServices" >
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
