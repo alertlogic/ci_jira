@@ -55,11 +55,12 @@ var CIJIRAService = function() {
              * @param password    password of cloud insight
              * @param url         url end point of cloud insight
              **/
-            save: function( ciUser, ciPassword, ciUrl ) {
+            save: function( ciUser, ciUrl, ciAccessKeyId, ciSecretKey ) {
                 var data = {
                     "ciUser": ciUser,
-                    "ciPassword": ciPassword,
-                    "ciUrl": ciUrl
+                    "ciUrl": ciUrl,
+                    "ciAccessKeyId": ciAccessKeyId,
+                    "ciSecretKey": ciSecretKey
                 };
                 return jQuery.ajax({
                     type: "POST",

@@ -61,6 +61,48 @@ var CIAIMSService = function() {
             endpoint:   storageService.getKey("ci-endpoint")
         };
     };
+
+    /**
+     * Create an access key
+     */
+    self.createAccessKey = function( urlEndPoint, userId, accountId, token){
+
+        var urlBase = urlEndPoint
+        +"/aims/" + configService.serviceVersion
+        +"/" + accountId
+        +"/users/" + userId
+        +"/access_keys";
+
+        return AJS.$.ajax({
+            type: "POST",
+            url: urlBase,
+            dataType: 'json',
+            headers: {
+                "x-aims-auth-token":token
+            }
+        });
+    };
+
+    /**
+     * Delete an access key
+     */
+    self.deleteAccessKey = function( accessKeyId ){
+
+        var urlBase =  ciAIMSService.getSessionData().endpoint
+        +"/aims/" + configService.serviceVersion
+        +"/" + ciAIMSService.getSessionData().accountId
+        +"/users/" + ciAIMSService.getSessionData().userId
+        +"/access_keys/" + accessKeyId;
+
+        return AJS.$.ajax({
+            type: "DELETE",
+            url: urlBase,
+            dataType: 'json',
+            headers: {
+                "x-aims-auth-token": ciAIMSService.getSessionData().token
+            }
+        });
+    };
 };
 /**
  * Creates the service instance.

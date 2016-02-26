@@ -45,7 +45,7 @@ public class PluginConfigService
     /**
      * Creates or updates the configuration, return the configuration reference object
      */
-    public PluginConfig createOrUpdateConfiguration(String jiraUser,String ciUser, String ciPassword,String ciUrl)
+    public PluginConfig createOrUpdateConfiguration(String jiraUser,String ciUser ,String ciUrl, String ciAccessKeyId, String ciSecretKey)
     {
     	PluginConfig conf;
 
@@ -58,8 +58,10 @@ public class PluginConfigService
     	}
         conf.setJiraUser(jiraUser);
         conf.setCiUser(ciUser);
-        conf.setCiPassword(ciPassword);
         conf.setCiUrl(ciUrl);
+        conf.setCiAccessKeyId(ciAccessKeyId);
+        conf.setCiSecretKey(ciSecretKey);
+
         conf.save();
 
         return conf;
