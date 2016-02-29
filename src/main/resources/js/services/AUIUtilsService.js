@@ -449,6 +449,9 @@ var AUIUtilsService = function() {
         }
     };
 
+    /**
+    * Escape the special characters in a selector
+    * */
     self.escapeSelector = function( id ){
         id = id.replace(/\//g,'\\/');
         id = id.replace(/\@/g,'\\@');
@@ -457,6 +460,23 @@ var AUIUtilsService = function() {
         id = id.replace(/\"/g,'\\"');
 
         return id;
+    };
+
+    /**
+     * Get the url to reset password based on the API url.
+     * @return string url endpoint reset passwor
+     */
+    this.getResetPasswordUrl = function( url ) {
+
+        var domain = url.split(".");
+
+        var tld  = domain[domain.length-1];
+
+        if ( tld === "uk" ) {
+            return configService.url.uk;
+        } else {
+            return configService.url.us;
+        }
     };
 };
 /**
