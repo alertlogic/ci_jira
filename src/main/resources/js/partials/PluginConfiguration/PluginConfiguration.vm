@@ -63,6 +63,17 @@
                                     </label>
                                     <input id="ciPassword" class="text long-field" type="password" name="ciPassword">
                                 </div>
+                                #if ($ciAccessKeyId)
+                                <div class="field-group">
+                                    <label for="accessKeyId">
+                                        $i18n.getText('ci.partials.pluginconfiguration.vm.accesskeyid')
+                                    </label>
+                                    <input id="ciAccessKeyId" class="text long-field"
+                                        value = "$ciAccessKeyId"
+                                        disabled
+                                    >
+                                </div>
+                                #end
                                 <div class="buttons-container">
                                     <button id="btnTest" class="aui-button test"  type="button">
                                         $i18n.getText('ci.partials.pluginconfiguration.vm.button.test')

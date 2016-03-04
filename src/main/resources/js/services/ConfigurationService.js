@@ -14,6 +14,11 @@ var ConfigurationService = function() {
     self.timeRefresh = 20000;//millisecond
     self.timeWait = 20000;//millisecond
 
+    self.url = {
+    	uk : 'https://console.cloudinsight.alertlogic.co.uk/#/password/reset/expired',
+    	us : 'https://console.cloudinsight.alertlogic.com/#/password/reset/expired'
+    };
+
 };
 /**
  * Creates the service instance.

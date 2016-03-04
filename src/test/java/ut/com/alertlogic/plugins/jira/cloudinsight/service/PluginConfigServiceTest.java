@@ -25,7 +25,8 @@ public class PluginConfigServiceTest {
     private PluginConfigService pluginConfigService;
 
     private String ciUser = "ci test";
-    private String ciPassword = "ci test";
+    private String ciAccessKeyId = "123";
+    private String ciSecretKey = "123";
     private String ciUrl = "http://test.com";
     private String jiraUser = "jira test";
 
@@ -45,7 +46,7 @@ public class PluginConfigServiceTest {
 
         assertEquals(0, activeObject.find(PluginConfig.class).length);
 
-        PluginConfig add = pluginConfigService.createOrUpdateConfiguration(jiraUser, ciUser, ciPassword, ciUrl);
+        PluginConfig add = pluginConfigService.createOrUpdateConfiguration(jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
         assertFalse(add.getID() == 0);
 
         activeObject.flushAll();
@@ -55,7 +56,8 @@ public class PluginConfigServiceTest {
         assertEquals(ciUser, pluginConfig[0].getCiUser());
         assertEquals(jiraUser, pluginConfig[0].getJiraUser());
         assertEquals(ciUrl, pluginConfig[0].getCiUrl());
-        assertFalse(ciPassword.equals(""));
+        assertEquals(ciAccessKeyId, pluginConfig[0].getCiAccessKeyId());
+        assertEquals(ciSecretKey, pluginConfig[0].getCiSecretKey());
      }
 
     @SuppressWarnings("unchecked")
@@ -67,9 +69,10 @@ public class PluginConfigServiceTest {
 
         final PluginConfig pluginConfig = activeObject.create(PluginConfig.class);
         pluginConfig.setCiUser(ciUser);
-        pluginConfig.setCiPassword(ciPassword);
         pluginConfig.setCiUrl(ciUrl);
         pluginConfig.setJiraUser(jiraUser);
+        pluginConfig.setCiAccessKeyId(ciAccessKeyId);
+        pluginConfig.setCiSecretKey(ciSecretKey);
         pluginConfig.save();
 
         activeObject.flushAll();
@@ -88,9 +91,10 @@ public class PluginConfigServiceTest {
 
         final PluginConfig pluginConfig = activeObject.create(PluginConfig.class);
         pluginConfig.setCiUser(ciUser);
-        pluginConfig.setCiPassword(ciPassword);
         pluginConfig.setCiUrl(ciUrl);
         pluginConfig.setJiraUser(jiraUser);
+        pluginConfig.setCiAccessKeyId(ciAccessKeyId);
+        pluginConfig.setCiSecretKey(ciSecretKey);
         pluginConfig.save();
 
         activeObject.flushAll();

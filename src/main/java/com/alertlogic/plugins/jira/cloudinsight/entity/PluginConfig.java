@@ -17,9 +17,12 @@ public interface PluginConfig extends Entity
     public void setCiUser(String ciUser);
     public String getCiUser();
 
-    public void setCiPassword(String ciPassword);
-    public String getCiPassword();
-
     public void setCiUrl(String ciUrl);
     public String getCiUrl();
+
+    public void setCiAccessKeyId(String ciAccessKeyId);
+    public String getCiAccessKeyId();
+
+    public void setCiSecretKey(String setCiSecretKey);
+    public String getCiSecretKey();
 }

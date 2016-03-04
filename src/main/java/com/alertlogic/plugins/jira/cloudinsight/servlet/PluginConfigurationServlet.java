@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import org.json.JSONObject;
 
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
+import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
 import com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService;
@@ -37,14 +38,16 @@ public class PluginConfigurationServlet extends HttpServlet{
 
     private final PluginConfigService pluginConfigService;
     private final UserManager userManager;
+    private final AIMSService aIMSService;
 
-    public PluginConfigurationServlet(TemplateRenderer templateRenderer, PageBuilderService pageBuilderService, PluginRetrievalService pluginRetrievalService, PluginConfigService pluginConfigService, UserManager userManager)
+    public PluginConfigurationServlet(TemplateRenderer templateRenderer, PageBuilderService pageBuilderService, PluginRetrievalService pluginRetrievalService, PluginConfigService pluginConfigService, UserManager userManager, AIMSService aIMSService)
     {
         this.pluginConfigService = checkNotNull(pluginConfigService);
         this.userManager = checkNotNull(userManager);
         this.templateRenderer = templateRenderer;
         this.pageBuilderService = pageBuilderService;
         this.pluginRetrievalService = pluginRetrievalService;
+        this.aIMSService = aIMSService;
     }
 
     /**
@@ -75,6 +78,7 @@ public class PluginConfigurationServlet extends HttpServlet{
             if (pluginConfigService.hasConfiguration()) {
                 context.put( "ciUser", pluginConfigService.getConfiguration().getCiUser());
                 context.put( "ciUrl", pluginConfigService.getConfiguration().getCiUrl());
+                context.put( "ciAccessKeyId", pluginConfigService.getConfiguration().getCiAccessKeyId());
             }
 
             templateRenderer.render(CONFIG_BROWSER_TEMPLATE, context, res.getWriter());
@@ -99,10 +103,15 @@ public class PluginConfigurationServlet extends HttpServlet{
 
                 String jiraUser = userManager.getRemoteUsername(req);
                 String ciUser = req.getParameter("ciUser");
-                String ciPassword = req.getParameter("ciPassword");
                 String ciUrl = req.getParameter("ciUrl");
+                String ciAccessKeyId = req.getParameter("ciAccessKeyId");
+                String ciSecretKey = req.getParameter("ciSecretKey");
 
-                PluginConfig pluginConfig = pluginConfigService.createOrUpdateConfiguration(jiraUser, ciUser, ciPassword, ciUrl);
+                if(pluginConfigService.hasConfiguration()){
+                	aIMSService.deleteAccessKeyId();
+                }
+
+                PluginConfig pluginConfig = pluginConfigService.createOrUpdateConfiguration(jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
 
                 if( pluginConfig != null ){
                     res.setContentType("application/json");
@@ -130,6 +139,11 @@ public class PluginConfigurationServlet extends HttpServlet{
             //load resources and show template
             loadWebResources();
 
+            //if exist configuration delete the access key
+            if(pluginConfigService.hasConfiguration()){
+            	aIMSService.deleteAccessKeyId();
+            }
+
             if( pluginConfigService.deleteConfiguration() ){
                 res.setContentType("application/json");
                 JSONObject obj=new JSONObject();
@@ -139,6 +153,7 @@ public class PluginConfigurationServlet extends HttpServlet{
             else{
                 res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
+
         }
     }
 }
