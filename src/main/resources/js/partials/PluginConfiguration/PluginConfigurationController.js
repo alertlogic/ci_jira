@@ -7,6 +7,8 @@ AJS.$( document ).ready( function() {
     var self = pluginConfigurationController = this;
     jiraService.startService();
 
+    var ciResponseTest = '';
+
     /**
      * Test if the credentials are correct
      * @param user        user of cloud insight
@@ -55,7 +57,9 @@ AJS.$( document ).ready( function() {
 
         var test = self.testCICredentials( user, password, urlBase );
 
-        test.done( function() {
+        test.done( function( data ) {
+            ciResponseTest = data;
+
             AJS.messages.success("#aui-message-bar", {
                 title: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.success.connection.title") ,
                 fadeout: true,
@@ -66,11 +70,24 @@ AJS.$( document ).ready( function() {
             AJS.$("#btnTest").prop( "disabled", true );
         });
 
-        test.fail( function() {
+        test.fail( function( jqXHR ) {
+            ciResponseTest = '';
+            var msg = '';
+
+            switch( jqXHR.status ) {
+                case 401:
+                    msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.connection.unauthorized.body")
+                    break;
+                case 400:
+                    msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.connection.password_expired.body")
+                    msg +="<a href="+AUIUtils.getResetPasswordUrl(url)+">"+AUIUtils.getResetPasswordUrl(url)+"</a>";
+                    break;
+            };
+
             AJS.messages.error("#aui-message-bar", {
                 title: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.connection.title"),
                 fadeout: true,
-                body: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.connection.body")
+                body: msg
             });
         });
     };
@@ -78,41 +95,76 @@ AJS.$( document ).ready( function() {
     /**
      * Save a configuration
      * @param user        user of cloud insight
-     * @param password    password of cloud insight
      * @param url         url end point of cloud insight
      */
-    self.saveConfig = function( user, password, url){
+
+    self.saveConfig = function( user, url){
 
         ciAIMSService.destroySessionData();
 
-        jiraService.Configuration().save( user, password, url ).
-        done( function() {
+        //generate keys
+        var generateAccessKey = ciAIMSService.createAccessKey( url, ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token);
 
-                jiraService.AuthProxy()
-                .done(
-                    function() {
+        generateAccessKey.done(function( data ){
+            JIRA.Messages.showSuccessMsg(
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.success")
+            );
+
+            jiraService.Configuration().save( user, url, data.access_key_id, btoa( data.secret_key) ).
+                done( function() {
+
+                        jiraService.AuthProxy()
+                        .done(
+                            function() {
+                                JIRA.Messages.showSuccessMsg(
+                                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.success")
+                                );
+                                window.location = window.location.href;
+                        })
+                        .fail(
+                            function( jqXHR ) {
+                                JIRA.Messages.showErrorMsg(
+                                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.errorserver")
+                                );
+                        });
+
+                        AJS.$('#btnDelete').prop('disabled', false);
+
+                        self.testConectionFromServer();
+                    }).
+                fail( function() {
+                    //Si no hay suficientes decirles q borren uno
                         JIRA.Messages.showSuccessMsg(
-                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.success")
+                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.error")
                         );
-                        window.location = window.location.href;
-                })
-                .fail(
-                    function( jqXHR ) {
-                        JIRA.Messages.showSuccessMsg(
-                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.errorserver")
-                        );
-                });
+            });
 
-                AJS.$('#btnDelete').prop('disabled', false);
+        });
 
-                self.testConectionFromServer();
-            }).
-        fail( function() {
-                JIRA.Messages.showSuccessMsg(
-                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.error")
-                );
-            }
-        );
+        generateAccessKey.fail(
+            function( jqXHR ) {
+                var msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.default");
+
+                switch( jqXHR.status ) {
+                    case 400:
+                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.limit_exceded");
+                        break;
+                    case 401:
+                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.unauthorized");
+                        break;
+                    case 403:
+                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.forbidden");
+                        break;
+                    case 404:
+                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.not_found");
+                        break;
+                    case 410:
+                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.gone");
+                        break;
+                };
+
+                JIRA.Messages.showErrorMsg( msg );
+        });
     };
 
     /**
@@ -127,6 +179,8 @@ AJS.$( document ).ready( function() {
             AJS.$('#ciPassword').val('');
             AJS.$('#ciUrl').val('');
 
+            AJS.$('#ciAccessKeyId').val('');
+
             self.activeTestButton();
 
             JIRA.Messages.showSuccessMsg(
@@ -135,7 +189,7 @@ AJS.$( document ).ready( function() {
             self.testConectionFromServer();
 
         }).fail( function() {
-            JIRA.Messages.showSuccessMsg(
+            JIRA.Messages.showErrorMsg(
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.error")
             );
         });
@@ -171,7 +225,7 @@ AJS.$( document ).ready( function() {
     /* Save the credential*/
     Bootstrap.onView('#btnSave', function(){
         AJS.$('#btnSave').click( function() {
-            self.saveConfig( AJS.$('#ciUser').val(), btoa( AJS.$('#ciPassword').val() ), AJS.$('#ciUrl').val());
+            self.saveConfig( AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
         });
     });
 
@@ -298,7 +352,7 @@ AJS.$( document ).ready( function() {
             });
 
             assign.fail( function(){
-                JIRA.Messages.showWarningMsg(
+                JIRA.Messages.showErrorMsg(
                     AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.group.adding.error")
                 );
             });

@@ -197,7 +197,6 @@
         <url-pattern>/groupsservlet</url-pattern>
     </servlet>
 
-
 	<!-- JS Services -->
     <web-resource key="ciServices" name="CIServices" >
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
@@ -230,7 +229,6 @@
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-        <context>atl.admin</context>
         <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
     </web-resource>
 
@@ -276,7 +274,6 @@
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-        <context>atl.admin</context>
     </web-resource>
     <!-- End of page controllers -->
 

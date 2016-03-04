@@ -1,5 +1,9 @@
 package com.alertlogic.plugins.jira.cloudinsight.service;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +12,11 @@ import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.json.JSONConfiguration;
 
 /**
  * This class is for the communication with the API of Cloud Insight
@@ -39,18 +47,20 @@ public class AIMSService {
      	if ( pluginConfigService.hasConfiguration() ) {
 
      		conf = pluginConfigService.getConfiguration();
-     		String authorizationHeader = "Basic "+ pluginConfigService.encode( conf.getCiUser() + ":" + pluginConfigService.decode( conf.getCiPassword() ) );
-     		
-     		ClientResponse response = Client.create(new DefaultClientConfig()).
-	    		resource(conf.getCiUrl()+"/aims/"+API_VERSION+"/authenticate").accept("application/json").
-	    		type("application/json").
-	    		header("Authorization", authorizationHeader).
-	    		post(ClientResponse.class);
-     		
+
+
+     		Client client = Client.create(new DefaultClientConfig());
+     		client.addFilter( new HTTPBasicAuthFilter(conf.getCiAccessKeyId(), pluginConfigService.decode( conf.getCiSecretKey()) ));
+
+     		WebResource resource = client.resource(conf.getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
+	    	resource.accept("application/json").type("application/json");
+
+     		ClientResponse response = resource.post(ClientResponse.class);
+
      		if ( response.getStatus() == 200 ) {
      			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
      			jsonObj.put("endpoint", conf.getCiUrl());
-     			
+
      			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
      			return jsonObj;
      		}
@@ -64,6 +74,48 @@ public class AIMSService {
      	}
      	
      	return null;
+    }
+
+	/**
+	 * Delete access key
+	 * @return boolean Return if the operation was successfull
+	 * @throws Exception
+	 */
+    public boolean deleteAccessKeyId()  {
+
+    	PluginConfig conf = pluginConfigService.getConfiguration();
+    	String accessKeyId = conf.getCiAccessKeyId();
+
+    	try {
+	    	JSONObject authJsonResponse = this.ciAuthentication();
+	    	String token = getToken(authJsonResponse);
+	    	String account = getAccount(authJsonResponse);
+	    	String user = getUserId(authJsonResponse);
+
+	    	ClientResponse responseDelete;
+	     	if ( token != null && account != null && user != null) {
+
+	     		ClientConfig clientConfig = new DefaultClientConfig();
+
+	     		responseDelete = Client.create (clientConfig).
+	     			resource( conf.getCiUrl() + "/aims/v1/" + account + "/users/" + user + "/access_keys/" + accessKeyId).
+	     			accept( "application/json" ).
+		    		type( "application/json" ).
+		    		header( "x-aims-auth-token" , token ).
+	     			delete(ClientResponse.class);
+
+	     		if( responseDelete.getStatus() == 204 ){
+	     			return true;
+				}
+	     		else {
+					return false;
+				}
+	     	}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+
+     	return false;
     }
 
     /**

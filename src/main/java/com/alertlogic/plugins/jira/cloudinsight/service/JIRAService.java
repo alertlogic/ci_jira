@@ -14,6 +14,7 @@ import com.alertlogic.plugins.jira.cloudinsight.entity.Filter;
 import com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig;
 import com.alertlogic.plugins.jira.cloudinsight.tasks.TaskRuleExecutionState;
 import com.atlassian.crowd.embedded.api.Group;
+import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.IssueService.IssueResult;
 import com.atlassian.jira.bc.issue.IssueService.TransitionValidationResult;
@@ -335,7 +336,6 @@ public class JIRAService {
 	public Collection<Group> getGroupsForUser(String user){
 		return ComponentAccessor.getGroupManager().getGroupsForUser(user);
 	}
-	
 
 	/**
 	 * Get the all groups
