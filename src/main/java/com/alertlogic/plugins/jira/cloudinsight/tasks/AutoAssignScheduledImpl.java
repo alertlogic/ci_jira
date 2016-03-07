@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
@@ -30,9 +31,10 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
 			AIMSService aimsService,
 			RuleConfigService ruleConfigService,
 			JIRAService jiraService,
-			I18nResolver i18nResolver) 
+			I18nResolver i18nResolver,
+			CredentialService credentialService) 
 	{
-		super(pluginScheduler, pluginConfigService, aimsService, ruleConfigService,jiraService, i18nResolver);
+		super(pluginScheduler, pluginConfigService, aimsService, ruleConfigService,jiraService, i18nResolver, credentialService);
 		this.interval = 186000L; //3 minutes
 	}
 

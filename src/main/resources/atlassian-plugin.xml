@@ -56,6 +56,7 @@
 		<description>
 		The module configuring the Active Objects service used by this plugin
 		</description>
+		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Credential</entity>
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig</entity>
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Filter</entity>
 		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig</entity>
@@ -141,7 +142,7 @@
 		<url-pattern>/projectsetup</url-pattern>
 	</servlet>
 
-	<servlet name="ci.atlassianplugin.servlet.pluginconfiguration.name" 
+	<servlet name="ci.atlassianplugin.servlet.pluginconfiguration.name"
 		i18n-name-key="ci.atlassianplugin.servlet.pluginconfiguration.name"
 		key="plugin-configuration-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.PluginConfigurationServlet">
@@ -149,6 +150,15 @@
 			Add-on configuration for connecting with Cloud Insight
 		</description>
 		<url-pattern>/pluginconfiguration</url-pattern>
+	</servlet>
+
+	<!-- Credentials servlet -->
+	<servlet name="ci.atlassianplugin.servlet.credential.name"
+		i18n-name-key="ci.atlassianplugin.servlet.credential.name"
+		key="credential-servlet-key"
+		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CredentialServlet">
+		<description key="ci.atlassianplugin.servlet.credential.description"></description>
+		<url-pattern>/credentialservlet</url-pattern>
 	</servlet>
 
 	<!-- Remediations Sync Servlet Controls the Remediations Sync Page -->
@@ -212,7 +222,8 @@
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
         <resource type="download" name="RulesService.js"                location="/js/services/RulesService.js" />
-        <resource type="download" name="PermissionsService.js"              location="/js/services/PermissionsService.js" />
+        <resource type="download" name="PermissionsService.js"          location="/js/services/PermissionsService.js" />
+        <resource type="download" name="CredentialsService.js"          location="/js/services/CredentialsService.js" />
         <resource type="download" name="cloud-insight-for-jira.css" 	location="/css/cloud-insight-for-jira.css" />
     </web-resource>
 
@@ -287,6 +298,8 @@
 	<component key="rule-configuration-service" name="Rule Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService" />
 
 	<component key="permission-configuration-service" name="Permission Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.PermissionService" />
+
+	<component key="credential-configuration-service" name="Credential Service" class="com.alertlogic.plugins.jira.cloudinsight.service.CredentialService" />
 
 	<!-- Listeners -->
   	<component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>

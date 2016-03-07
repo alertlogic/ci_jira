@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
@@ -30,9 +31,10 @@ public class SynchronizationScheduledImpl extends AbstractTaskMonitor implements
 			AIMSService aimsService,
 			RuleConfigService ruleConfigService, 
 			JIRAService jiraService,
-			I18nResolver i18nResolver) 
+			I18nResolver i18nResolver,
+			CredentialService credentialService) 
 	{
-		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver);
+		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver, credentialService);
 	}
 
 	// declared by LifecycleAware

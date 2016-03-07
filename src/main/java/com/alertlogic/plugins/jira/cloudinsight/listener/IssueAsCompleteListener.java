@@ -78,10 +78,11 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 			//validate the status be of close or resolved
 			if( status.equals(IssueFieldConstants.CLOSED_STATUS) || status.equals(IssueFieldConstants.RESOLVED_STATUS) )
 			{
+				String reporter = issueEvent.getIssue().getReporterUser().getName();
 				try{
 					String environment = remediationItem.split("/")[2].split(":")[1];				
 
-					if (remediationService.markAsComplete( environment, remediationItem ))
+					if (remediationService.markAsComplete( environment, remediationItem, reporter))
 					{	
 						log.debug("CI Plugin: adding comment to issue");
 						String commentMsg = i18nResolver.getText("ci.listener.markascomplete.msg.success");
@@ -89,7 +90,7 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 	
 					} else {
 	
-						JSONObject remediationsItemResponse = remediationService.getRemediationItem( environment, remediationItem);
+						JSONObject remediationsItemResponse = remediationService.getRemediationItem( environment, remediationItem, reporter);
 				    	String remediationStatus = remediationService.getStatusRemediationItem( remediationsItemResponse, remediationItem );
 	
 				    	if(!remediationStatus.equals("disposed"))
@@ -107,27 +108,7 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 					e.printStackTrace();
 				}
 
-			} /*else {
-
-				//If the issue is reopened then perform the undispose operation in CI.
-				if ( status.equals(IssueFieldConstants.REOPENED_STATUS) )
-				{
-					if (ci.unDipose(environment, remediationItem)){
-
-						log.debug("CI Plugin: adding comment to issue");
-						String commentMsg = i18nResolver.getText("ci.listener.undispose.msg.success");
-						jiraService.commentIssue(issueEvent.getIssue(), issueEvent.getUser(), commentMsg);
-
-					} else {
-
-						log.debug("CI Plugin: adding comment to issue");
-						String commentMsg = i18nResolver.getText("ci.listener.undispose.msg.error");
-						jiraService.commentIssue(issueEvent.getIssue(), issueEvent.getUser(), commentMsg);
-
-					}
-				}
-
-			}*/
+			}
 
 		} catch(Exception e) {
 			log.error(e.toString());

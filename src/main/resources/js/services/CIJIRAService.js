@@ -58,9 +58,6 @@ var CIJIRAService = function() {
             save: function( ciUser, ciUrl, ciAccessKeyId, ciSecretKey ) {
                 var data = {
                     "ciUser": ciUser,
-                    "ciUrl": ciUrl,
-                    "ciAccessKeyId": ciAccessKeyId,
-                    "ciSecretKey": ciSecretKey
                 };
                 return jQuery.ajax({
                     type: "POST",

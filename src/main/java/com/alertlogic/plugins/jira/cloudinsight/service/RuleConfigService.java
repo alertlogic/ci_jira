@@ -313,7 +313,6 @@ public class RuleConfigService {
         return rulesArray;
     }
 
-
     /**
      * Get the rules from active object
      * @return JSONArray with the rules configured on active objects

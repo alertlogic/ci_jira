@@ -49,13 +49,18 @@ public class CIProxyAuthServlet extends HttpServlet{
 				return;
 		    }
     		
-    		if(!pluginConfigService.hasConfiguration()){
+    		String user = req.getParameter("ciUser");
+    		if( user == null ){
+    			user = userManager.getRemoteUsername(req);
+    		}
+    		
+    		if(!pluginConfigService.hasConfiguration(user)){
     			res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
     		}
     		else{
     		
 	    		try{
-					JSONObject ciResponse = aimsService.ciAuthentication();
+					JSONObject ciResponse = aimsService.ciAuthentication(user);
 		
 					if (ciResponse != null) {
 						res.setContentType("application/json");

@@ -3,6 +3,7 @@ package com.alertlogic.plugins.jira.cloudinsight.tasks;
 import java.util.Date;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
@@ -21,6 +22,7 @@ public abstract class AbstractTaskMonitor {
 	protected JIRAService jiraService;
 	protected I18nResolver i18nResolver;
 	protected PluginScheduler pluginScheduler;
+	protected CredentialService credentialService;
 
     //Attributes that could change the implementation class
     protected long interval = 62000L;    // default job interval (1 minute)
@@ -32,7 +34,8 @@ public abstract class AbstractTaskMonitor {
 		AIMSService aimsService,
 		RuleConfigService ruleConfigService,
 		JIRAService jiraService, 
-		I18nResolver i18nResolver) 
+		I18nResolver i18nResolver,
+		CredentialService credentialService) 
     {
         this.setPluginScheduler(pluginScheduler);
         this.pluginConfigService = pluginConfigService;
@@ -40,6 +43,7 @@ public abstract class AbstractTaskMonitor {
         this.ruleConfigService = ruleConfigService;
         this.jiraService = jiraService;
         this.i18nResolver = i18nResolver;
+        this.credentialService = credentialService;
     }
 
     public PluginConfigService getPluginConfigService() {
@@ -56,6 +60,10 @@ public abstract class AbstractTaskMonitor {
 
 	public JIRAService getJIRAService() {
 		return jiraService;
+	}
+	
+	public CredentialService getCredentialService() {
+		return credentialService;
 	}
 	
     public void setLastRun(Date lastRun) {

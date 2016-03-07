@@ -8,6 +8,7 @@ AJS.$( document ).ready( function() {
     jiraService.startService();
     var ciResponseTest = '';
 
+    var credentials = {};
     /**
      * Test if the credentials are correct
      * @param user        user of cloud insight
@@ -108,10 +109,10 @@ AJS.$( document ).ready( function() {
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.success")
             );
 
-            jiraService.Configuration().save( user, url, data.access_key_id, btoa( data.secret_key) ).
+            credentialsService.createCredential( user, url, data.access_key_id, btoa( data.secret_key) ).
                 done( function() {
 
-                        jiraService.AuthProxy()
+                        /*jiraService.AuthProxy()
                         .done(
                             function() {
                                 JIRA.Messages.showSuccessMsg(
@@ -124,17 +125,16 @@ AJS.$( document ).ready( function() {
                                 JIRA.Messages.showErrorMsg(
                                     AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.errorserver")
                                 );
-                        });
+                        });*/
 
                         AJS.$('#btnDelete').prop('disabled', false);
 
                         self.testConectionFromServer();
                     }).
                 fail( function() {
-                    //Si no hay suficientes decirles q borren uno
-                        JIRA.Messages.showSuccessMsg(
-                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.error")
-                        );
+                    JIRA.Messages.showSuccessMsg(
+                        AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.error")
+                    );
             });
 
         });
@@ -166,9 +166,9 @@ AJS.$( document ).ready( function() {
     };
 
     /**
-     * Delete the configuration stored
+     * Delete the credential stored
      */
-    self.detele = function() {
+    self.deteleCredential = function() {
 
         jiraService.Configuration().deleteConf().
         done( function() {
@@ -208,47 +208,103 @@ AJS.$( document ).ready( function() {
         AUIUtils.confirmDialog(
             "confirmDeleteDialogCredentials",
             AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.remove.credentials"),
-            self.detele );
+            self.deteleCredential );
     };
+
+    self.loadCredentialInForm = function( id ){
+        AJS.$('#id').val( credentials[ id ].id );
+        AJS.$('#ciUser').val( credentials[ id ].ciUser );
+        AJS.$('#ciPassword').val( '' );
+        AJS.$('#ciUrl').val( credentials[ id ].ciUrl );
+        AJS.$('#ciAccessKeyId').val( credentials[ id ].ciAccessKeyId );
+    };
+
+    /**
+     * Adds the credential item to the view.
+     * @param {Object} credential The refence to the item
+     */
+    self.addCredentialToView = function( credential ) {
+        var tableBody = AJS.$("#credentialsTable tbody");
+        var action = "pluginConfigurationController.loadCredentialInForm(" + credential.id + ")" ;
+
+        var rowData = [
+            {
+                header: "header-ci-user",
+                data: credential.ciUser,
+                style: 'row_pointer',
+                action: action
+            },
+            {
+                header: "header-ci-url",
+                data: credential.ciUrl,
+                style: 'row_pointer',
+                action: action
+            }
+        ];
+
+        AUIUtils.createTableRow( tableBody, rowData);
+    };
+
+    /**
+     * Load all credentials stored
+     */
+    self.loadCredentials = function() {
+        var credentialsAll = credentialsService.getCredentials();
+
+        AUIUtils.clearTable( "#credentialsTable" );
+
+        AUIUtils.invisible("#credentialZeroState");
+        AJS.$("#credentialLoading").show();
+
+        credentialsAll.done(function( data ){
+
+            if (data.length <= 0) {
+                AUIUtils.visible("#credentialZeroState");
+            } else {
+                AUIUtils.invisible("#credentialZeroState");
+            }
+
+            for(var i = 0 ; i < data.length; i++)
+            {
+                credentials[ data[i].id ] =  data[i];
+                self.addCredentialToView( data[i] );
+            }
+        });
+    };
+
+    self.loadCredentialDialog = function() {
+        AJS.$("#credential-crud-dialog").show();
+        self.loadCredentials();
+    }
 
     /* Events on buttons and fields */
     /* Test conection with cloud insight*/
-    Bootstrap.onView('#btnTest', function(){
-        AJS.$('#btnTest').click( function() {
-            self.testConfig( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
-        });
+    AJS.$('#btnTest').click( function() {
+        self.testConfig( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
     });
-
-    /* Save the credential*/
-    Bootstrap.onView('#btnSave', function(){
-        AJS.$('#btnSave').click( function() {
-            self.saveConfig( AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
-        });
+    /* Save the credential */
+    AJS.$('#btnSave').click( function() {
+        self.saveConfig( AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
     });
-
     /* Delete credentials */
-    Bootstrap.onView('#btnDelete', function(){
-        AJS.$('#btnDelete').click( function() {
-            self.confirmDeleteCredentials();
-        });
+    AJS.$( "#btnDelete" ).click( function() {
+        self.confirmDeleteCredentials();
+    });
+    /* Active test button if the user is typing */
+    AJS.$( "#ciUser" ).keyup(function() {
+        self.activeTestButton();
     });
 
-    Bootstrap.onView("#ciUser", function(){
-        AJS.$( "#ciUser" ).keyup(function() {
-            self.activeTestButton();
-        });
+    AJS.$( "#ciPassword" ).keyup(function() {
+        self.activeTestButton();
     });
 
-    Bootstrap.onView("#ciPassword", function(){
-        AJS.$( "#ciPassword" ).keyup(function() {
-            self.activeTestButton();
-        });
+    AJS.$( "#ciUrlEndPoint" ).keyup(function() {
+        self.activeTestButton();
     });
 
-    Bootstrap.onView("#ciUrlEndPoint", function(){
-        AJS.$( "#ciUrlEndPoint" ).keyup(function() {
-            self.activeTestButton();
-        });
+    AJS.$( "#btnCredential" ).click( function() {
+        self.loadCredentialDialog();
     });
 
     /* Permissions */

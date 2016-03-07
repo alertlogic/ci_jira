@@ -1,14 +1,11 @@
 package com.alertlogic.plugins.jira.cloudinsight.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
+import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -16,7 +13,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
-import com.sun.jersey.api.json.JSONConfiguration;
 
 /**
  * This class is for the communication with the API of Cloud Insight
@@ -40,25 +36,25 @@ public class AIMSService {
 	 * @return JSONObject	The response of the authentication with an extra endpoint data.
 	 * @throws Exception 
 	 */
-    public JSONObject ciAuthentication() throws Exception{
+    public JSONObject ciAuthentication(String jiraUser) throws Exception{
 
     	PluginConfig conf;
 
-     	if ( pluginConfigService.hasConfiguration() ) {
+     	if ( pluginConfigService.hasConfiguration( jiraUser ) ) {
 
-     		conf = pluginConfigService.getConfiguration();
+     		conf = pluginConfigService.getConfiguration( jiraUser );
 
      		Client client = Client.create(new DefaultClientConfig());
-     		client.addFilter( new HTTPBasicAuthFilter(conf.getCiAccessKeyId(), pluginConfigService.decode( conf.getCiSecretKey()) ));
+     		client.addFilter( new HTTPBasicAuthFilter(conf.getCredential().getCiAccessKeyId(), CommonJiraPluginUtils.decode( conf.getCredential().getCiSecretKey() )) );
 
-     		WebResource resource = client.resource(conf.getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
+     		WebResource resource = client.resource(conf.getCredential().getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
 	    	resource.accept("application/json").type("application/json");
 
      		ClientResponse response = resource.post(ClientResponse.class);
 
      		if ( response.getStatus() == 200 ) {
      			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
-     			jsonObj.put("endpoint", conf.getCiUrl());
+     			jsonObj.put("endpoint", conf.getCredential().getCiUrl());
 
      			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
      			return jsonObj;
@@ -80,13 +76,13 @@ public class AIMSService {
 	 * @return boolean Return if the operation was successfull
 	 * @throws Exception
 	 */
-    public boolean deleteAccessKeyId()  {
+    public boolean deleteAccessKeyId(String jiraUser)  {
 
-    	PluginConfig conf = pluginConfigService.getConfiguration();
-    	String accessKeyId = conf.getCiAccessKeyId();
+    	PluginConfig conf = pluginConfigService.getConfiguration( jiraUser );
+    	String accessKeyId = conf.getCredential().getCiAccessKeyId();
 
     	try {
-	    	JSONObject authJsonResponse = this.ciAuthentication();
+	    	JSONObject authJsonResponse = this.ciAuthentication( jiraUser );
 	    	String token = getToken(authJsonResponse);
 	    	String account = getAccount(authJsonResponse);
 	    	String user = getUserId(authJsonResponse);
@@ -97,7 +93,7 @@ public class AIMSService {
 	     		ClientConfig clientConfig = new DefaultClientConfig();
 
 	     		responseDelete = Client.create (clientConfig).
-	     			resource( conf.getCiUrl() + "/aims/v1/" + account + "/users/" + user + "/access_keys/" + accessKeyId).
+	     			resource( conf.getCredential().getCiUrl() + "/aims/v1/" + account + "/users/" + user + "/access_keys/" + accessKeyId).
 	     			accept( "application/json" ).
 		    		type( "application/json" ).
 		    		header( "x-aims-auth-token" , token ).

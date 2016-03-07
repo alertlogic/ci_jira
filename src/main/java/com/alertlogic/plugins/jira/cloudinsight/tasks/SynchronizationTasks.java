@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService;
 import com.atlassian.jira.issue.Issue;
@@ -48,25 +50,34 @@ public class SynchronizationTasks implements PluginJob {
 	        	monitor.setLastRun(currentDate);
 
 	        	if( monitor.getPluginConfigService() != null ){
-	        		if( monitor.getPluginConfigService().hasConfiguration() ){
-	    	        	synchronizeJob(monitor);
-	        		}
+	        		searchCredentialsToSynchronization();
 	        	}
     		}
         }
 	}
-
+	
+	/**
+	 * Search the credential for star the synchronization proccess
+	 */
+    private void searchCredentialsToSynchronization(){
+    	Credential[] credentials = monitor.getCredentialService().getCredentials();
+    	
+    	for( int  i = 0; i < credentials.length; i++){
+    		synchronizeJob(monitor, credentials[i].getJiraUser());	
+    	}
+    }
+    
 	/**
 	 * The main job, starts all the tasks required for the job.
 	 * @param monitor	Object	Reference to the tasks monitor object.
 	 */
-	private void synchronizeJob(SynchronizationScheduledImpl monitor) {
+	private void synchronizeJob(SynchronizationScheduledImpl monitor, String jiraUser) {
 
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 		
 		try {
-			JSONObject environmentsAll = this.environmentsService.getAllEnvironments();
+			JSONObject environmentsAll = this.environmentsService.getAllEnvironments(jiraUser);
 			JSONArray environments = environmentsAll.getJSONArray("sources");
 			if (environments != null) {
 	
@@ -79,7 +90,7 @@ public class SynchronizationTasks implements PluginJob {
 						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
 	
 						try {
-							executeSynchronizeJob(monitor, envId);
+							executeSynchronizeJob(monitor, envId, jiraUser);
 						} catch (Exception e) {
 							log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.executing.synchronizejob") + e.getMessage() );		
 							e.printStackTrace();
@@ -172,13 +183,13 @@ public class SynchronizationTasks implements PluginJob {
 	 * @param monitor
 	 * @param environmentId
 	 */
-	private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId) {
+	private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId, String jiraUser) {
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 
     	if (!environmentId.isEmpty()) {
     		try{
     			
-		    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environmentId);
+		    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environmentId, jiraUser);
 	
 		    	if ( allRemediationsItems.has("assets") ) {
 	
@@ -194,7 +205,6 @@ public class SynchronizationTasks implements PluginJob {
 		    	    			if( remediationItem.has("state")  && remediationItem.has("key")){
 			    	    			String state = remediationItem.getString("state");
 			    	    			String key = remediationItem.getString("key");
-			    	    			String jiraUser = monitor.getPluginConfigService().getConfiguration().getJiraUser();
 			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
 	
 			    	    			List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);

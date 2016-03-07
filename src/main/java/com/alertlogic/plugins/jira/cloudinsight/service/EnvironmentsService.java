@@ -31,9 +31,9 @@ public class EnvironmentsService {
 	 * @return
 	 * @throws Exception 
 	 */
-	public JSONObject getAllEnvironments() throws Exception{
-		PluginConfig conf = this.pluginConfigService.getConfiguration();
-    	JSONObject jsonResponse = this.aimsService.ciAuthentication();
+	public JSONObject getAllEnvironments(String jiraUser) throws Exception{
+		PluginConfig conf = this.pluginConfigService.getConfiguration(jiraUser);
+    	JSONObject jsonResponse = this.aimsService.ciAuthentication(jiraUser);
     	String token = this.aimsService.getToken(jsonResponse);
     	String account = this.aimsService.getAccount(jsonResponse);
 
@@ -45,7 +45,7 @@ public class EnvironmentsService {
      		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
      		responseGetEnvironments = Client.create (clientConfig).
-     			resource( conf.getCiUrl() + "/sources/v1/" + account +  "/sources?source.type=environment").
+     			resource( conf.getCredential().getCiUrl() + "/sources/v1/" + account +  "/sources?source.type=environment").
      			accept( "application/json" ).
 	    		type( "application/json" ).
 	    		header( "x-aims-auth-token" , token ).

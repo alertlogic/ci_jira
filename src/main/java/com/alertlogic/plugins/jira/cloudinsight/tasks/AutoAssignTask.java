@@ -49,9 +49,9 @@ public class AutoAssignTask implements PluginJob {
 	        	monitor.setLastRun(currentDate);
     			
 	        	if( monitor.getPluginConfigService() != null ){
-	        		if( monitor.getPluginConfigService().hasConfiguration() ){
+	        		//if( monitor.getPluginConfigService().hasConfiguration() ){
 	        			assingJob();
-	        		}
+	        		//}
 	        	}
     		}
         }
@@ -227,6 +227,7 @@ public class AutoAssignTask implements PluginJob {
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
 		
     	String environment = rule.getString("environment");
+    	String jiraUser = rule.getString("user");
 
     	if (!environment.isEmpty()) 
     	{
@@ -235,18 +236,18 @@ public class AutoAssignTask implements PluginJob {
 	    	JSONArray filtersString = rule.getJSONArray("filtersString");
 	    	
 	    	//Get all remediation items for the configures environment in the rule
-	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment(environment);
+	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environment, jiraUser);
 	    	//Get all remediations based on the environment an the filter
-	    	JSONObject allRemediations = this.remediationsService.getAllRemediations(environment,filters);
+	    	JSONObject allRemediations = this.remediationsService.getAllRemediations( environment, filters, jiraUser);
 	    	//Get all remediations descritions
-	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions();
+	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions(jiraUser);
 	   	
 	    	JSONArray currentRemediations = getOpenRemediations(allRemediations,allRemediationsItems);
 	    	
 	    	if (currentRemediations.length() > 0) {
 	    		
 	    		JSONArray remediationKeys = this.remediationsService.getRemediationsKeys(currentRemediations);
-	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString);
+	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString, jiraUser);
 	    		
 	    		if (plannedItems.length() <= 0) {
 	    			throw new Exception(currentRemediations.length()+" "+monitor.getI18nResolver().getText("ci.job.autoassign.msg.plannederror"));

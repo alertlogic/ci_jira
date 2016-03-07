@@ -399,6 +399,7 @@ public class ScreenConfigService {
 			fieldsCreateScreen[5] = remediationItemCustomField.getId();//250 characters is the limit
 			fieldsCreateScreen[6] = remediationIdCustomField.getId();
 			fieldsCreateScreen[7] = groupCustomField.getId();
+			//fieldsCreateScreen[8] = IssueFieldConstants.CREATOR;
 
 		} catch (Exception e) {
 			e.printStackTrace();

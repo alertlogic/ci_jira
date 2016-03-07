@@ -1,11 +1,13 @@
 package com.alertlogic.plugins.jira.cloudinsight.service;
 
+import net.java.ao.Query;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.atlassian.activeobjects.external.ActiveObjects;
-import com.sun.jersey.core.util.Base64;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,43 +26,20 @@ public class PluginConfigService
     }
 
     /**
-     * This function decode a string encoded as base 64.
-     * @param encodedText	The string to encode
-     * @return	String		The decoded string
-     */
-    public String decode(String encodedText) {
-    	byte[] decodedBytes = Base64.decode(encodedText);
-    	return new String(decodedBytes);
-    }
-
-    /**
-     * This function encode a string on base 64
-     * @param text		The text to encode
-     * @return	String	The encoded string
-     */
-    public String encode(String text) {
-    	return new String(Base64.encode(text.getBytes()));
-    }
-
-    /**
      * Creates or updates the configuration, return the configuration reference object
      */
-    public PluginConfig createOrUpdateConfiguration(String jiraUser,String ciUser ,String ciUrl, String ciAccessKeyId, String ciSecretKey)
+    public PluginConfig createOrUpdateConfiguration(String jiraUser, Credential credential)
     {
     	PluginConfig conf;
-
-    	if ( hasConfiguration() ) {
-    		conf = getConfiguration();
+    	if ( hasConfiguration( jiraUser ) ) {
+    		conf = getConfiguration( jiraUser );
     		log.debug("CI Plugin: updating configuration on active objects");
     	}else{
     		conf = activeObjects.create( PluginConfig.class);
     		log.debug("CI Plugin: creating configuration on active objects");
     	}
         conf.setJiraUser(jiraUser);
-        conf.setCiUser(ciUser);
-        conf.setCiUrl(ciUrl);
-        conf.setCiAccessKeyId(ciAccessKeyId);
-        conf.setCiSecretKey(ciSecretKey);
+        conf.setCredential(credential);
 
         conf.save();
 
@@ -70,9 +49,10 @@ public class PluginConfigService
     /**
      * Get the configuration store as an active object
      */
-    public PluginConfig getConfiguration()
+    public PluginConfig getConfiguration( String jiraUser )
     {
-    	PluginConfig[]  configArray = activeObjects.find(PluginConfig.class);
+    	PluginConfig[]  configArray = activeObjects.find( PluginConfig.class, Query.select().where( "JIRA_USER = ?", jiraUser) );
+
     	if (configArray.length > 0) {
     		return configArray[0];
     	}
@@ -82,18 +62,18 @@ public class PluginConfigService
     /**
      * Returns true if has a configuration.
      */
-    public boolean hasConfiguration()
+    public boolean hasConfiguration( String jiraUser )
     {
-    	return (activeObjects.count(PluginConfig.class) > 0);
+    	return (activeObjects.count( PluginConfig.class, Query.select().where("JIRA_USER = ?", jiraUser )) > 0);
     }
 
     /**
      * Get the configuration store as an active object.
      */
-    public Boolean deleteConfiguration()
+    public Boolean deleteConfiguration( String jiraUser )
     {
     	try{
-    		PluginConfig[]  configArray = activeObjects.find(PluginConfig.class);
+    		PluginConfig[]  configArray = activeObjects.find( PluginConfig.class, Query.select().where("JIRA_USER = ?", jiraUser));
 
     		if (configArray.length > 0) {
 	    		activeObjects.delete(configArray);
