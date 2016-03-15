@@ -49,9 +49,7 @@ public class AutoAssignTask implements PluginJob {
 	        	monitor.setLastRun(currentDate);
     			
 	        	if( monitor.getPluginConfigService() != null ){
-	        		//if( monitor.getPluginConfigService().hasConfiguration() ){
-	        			assingJob();
-	        		//}
+	        		assingJob();
 	        	}
     		}
         }
@@ -224,7 +222,7 @@ public class AutoAssignTask implements PluginJob {
 	private int executeJob(String ruleName, JSONObject rule, int statusBeforeRun) throws Exception 
 	{
 		//Create the instance of the service
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
 		
     	String environment = rule.getString("environment");
     	String jiraUser = rule.getString("user");

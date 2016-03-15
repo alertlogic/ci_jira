@@ -29,7 +29,6 @@
 		<dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
 		<dependency>com.atlassian.auiplugin:aui-select2</dependency>
 		<dependency>com.atlassian.auiplugin:dialog2</dependency>
-		<dependency>com.atlassian.auiplugin:ui-experimental-expander</dependency>
 		<dependency>jira.webresources:jquery-livestamp</dependency>
 		<resource type="download" name="cloud-insight-for-jira.css" location="/css/cloud-insight-for-jira.css" />
 		<resource type="download" name="images/" location="/images" />
@@ -233,7 +232,6 @@
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-        <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
     </web-resource>
 
     <!-- Remediation Details Servlet -->
@@ -261,16 +259,14 @@
             <transformer key="jsI18n"/>
         </transformation>
     	<resource type="download" name="DisposeController.js" location="/js/partials/Dispose/DisposeController.js"/>
-    	<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
   	</web-resource>
 
-  	<web-resource name="StatusPanelController" key="StatusPanelController">
+  	<web-resource name="StatusPanelController" key="statusPanelController">
     	<context>atl.general</context>
     	<transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
     	<resource type="download" name="StatusPanelController.js" location="/js/partials/StatusPanel/StatusPanelController.js"/>
-    	<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
   	</web-resource>
 
   	<web-resource key="ruleConfigurationController" name="RuleConfigurationController" >
@@ -301,6 +297,8 @@
 
 	<component key="credential-configuration-service" name="Credential Service" class="com.alertlogic.plugins.jira.cloudinsight.service.CredentialService" />
 
+	<component key="rest-util" name="Utility Service" class="com.alertlogic.plugins.jira.cloudinsight.util.RestUtil" />
+
 	<!-- Listeners -->
   	<component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>
 
@@ -314,7 +312,6 @@
     	<conditions type="AND">
 		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
 		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
 		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightUserHasPermissionCondition"/>
 		</conditions>
     	<link linkId="dispose_remediation">/plugins/servlet/disposeremediationservlet?id=${issue.id}</link>
@@ -326,7 +323,6 @@
     	<conditions type="AND">
 		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
 		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
 		</conditions>
     	<link linkId="remediation_details_link">/plugins/servlet/remediationdetailsservlet?id=${issue.id}
     	</link>
@@ -370,7 +366,6 @@
 		<resource name="view" type="velocity" location="/js/partials/StatusPanel/StatusPanel.vm"/>
 		<conditions type="AND">
 			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
 		</conditions>
 	</web-panel>
 
@@ -380,7 +375,6 @@
             <transformer key="jsI18n"/>
         </transformation>
     	<resource type="download" name="RemediationDetailsController.js" location="/js/partials/RemediationDetails/RemediationDetailsController.js"/>
-    	<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
   	</web-resource>
 
 </atlassian-plugin>

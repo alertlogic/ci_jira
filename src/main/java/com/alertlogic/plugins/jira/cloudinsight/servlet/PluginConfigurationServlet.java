@@ -5,18 +5,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 
 import org.json.JSONObject;
 
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
-
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
-
 import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
 import com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService;
 import com.atlassian.sal.api.user.UserManager;
@@ -61,7 +61,8 @@ public class PluginConfigurationServlet extends HttpServlet{
 
         pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
         pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
-        pageBuilderService.assembler().resources().requireWebResource(pluginKey+":pluginConfigurationController");
+        pageBuilderService.assembler().resources().requireWebResource("com.atlassian.auiplugin:aui-select2");
+    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":pluginConfigurationController");
     }
 
     @Override
@@ -77,13 +78,7 @@ public class PluginConfigurationServlet extends HttpServlet{
             //load resources and show template
             loadWebResources();
             Map<String, Object> context = Maps.newHashMap();
-            String jiraUser = userManager.getRemoteUsername(req);
             
-            if (pluginConfigService.hasConfiguration(jiraUser)) {
-            	//PluginConfig pluginConf = pluginConfigService.getConfiguration(jiraUser);
-                //context.put( "ciCredentialCiUser", pluginConf.getCredential().getCiUser());
-            }
-
             templateRenderer.render(CONFIG_BROWSER_TEMPLATE, context, res.getWriter());
         }
     }
@@ -101,23 +96,52 @@ public class PluginConfigurationServlet extends HttpServlet{
             //load resources and show template
             loadWebResources();
 
-            //store if has data
-            if( req.getParameterMap().size() > 0) {
+        	String jiraUser = userManager.getRemoteUsername(req);
+    		JSONObject confObject = pluginConfigService.getConfigurationByUserJSON(jiraUser);
+    		
+    		res.setContentType("application/json");
+            PrintWriter out = res.getWriter();
+            
+    		if(confObject!=null){
+	            out.print(confObject.toString());
+	            out.flush();
+        	}
+        	else{
+        		out.print("{}");
+	            out.flush();
+        	}            
+        }
+    }
+    
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
+    {
+        if (userManager != null) {
+            //validation user permissions
+            if (!CommonJiraPluginUtils.isAnAuthorizedJiraAdministrator(req, userManager)) {
+                CommonJiraPluginUtils.unauthorize(res, templateRenderer);
+                return;
+            }
 
-                String jiraUser = userManager.getRemoteUsername(req);
-                String ciUser = req.getParameter("ciUser");
-                Credential credential = credentialService.getCredential(ciUser);
-                PluginConfig pluginConfig = pluginConfigService.createOrUpdateConfiguration(jiraUser, credential);
-
-                if( pluginConfig != null ){
-                    res.setContentType("application/json");
-                    JSONObject obj=new JSONObject();
-                    obj.put("success", "true");
-                    res.getWriter().write(obj.toString());
-                }
-                else{
-                    res.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                }
+            //load resources and show template
+            loadWebResources();
+            String jiraUser = userManager.getRemoteUsername(req);
+            ServletInputStream inputStream = req.getInputStream();
+    		String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
+    		JSONObject jsonArray= new JSONObject(string);
+    		int idCredential = jsonArray.getInt("idCredential");
+    		
+    		Credential credential = credentialService.getCredentialById(idCredential);
+            PluginConfig pluginConfig = pluginConfigService.createOrUpdateConfiguration(jiraUser, credential);
+            
+            if( pluginConfig != null ){
+                res.setContentType("application/json");
+                JSONObject obj=new JSONObject();
+                obj.put("success", "true");
+                res.getWriter().write(obj.toString());
+            }
+            else{
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
             }
         }
     }

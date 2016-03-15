@@ -81,7 +81,7 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 				String reporter = issueEvent.getIssue().getReporterUser().getName();
 				try{
 					String environment = remediationItem.split("/")[2].split(":")[1];				
-
+					log.debug("CI Plugin: Reporter : "+reporter);
 					if (remediationService.markAsComplete( environment, remediationItem, reporter))
 					{	
 						log.debug("CI Plugin: adding comment to issue");

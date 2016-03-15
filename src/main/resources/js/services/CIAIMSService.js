@@ -8,12 +8,13 @@ var CIAIMSService = function() {
      * Saves the session data into the local storage.
      * @param  {Object} data The session data
      */
-    self.saveSessionData = function( data ) {
+    self.saveSessionData = function( data , user ) {
         storageService.storeKey("ci-session-token",data.authentication.token);
         storageService.storeKey("ci-session-expiration",data.authentication.token_expiration);
         storageService.storeKey("ci-account-id",data.authentication.account.id);
         storageService.storeKey("ci-user-id",data.authentication.user.id);
         storageService.storeKey("ci-endpoint",data.endpoint);
+        storageService.storeKey("jira-user",user);
     };
 
     /**
@@ -25,6 +26,7 @@ var CIAIMSService = function() {
         storageService.removeKey("ci-account-id");
         storageService.removeKey("ci-user-id");
         storageService.removeKey("ci-endpoint");
+        storageService.removeKey("jira-user");
 
         storageService.removeKey("field-remediation-item");
         storageService.removeKey("field-remediation-id");
@@ -37,6 +39,7 @@ var CIAIMSService = function() {
      * @return {Boolean} Return true if the user has a valid CI token.
      */
     self.isLoggedIn = function() {
+
         if (self.getSessionData().expiration) {
             var currentDate = new Date();
             var expirationTime = new Date(self.getSessionData().expiration * 1000);
@@ -58,7 +61,8 @@ var CIAIMSService = function() {
             accountId:  storageService.getKey("ci-account-id"),
             userId:     storageService.getKey("ci-user-id"),
             expiration: storageService.getKey("ci-session-expiration"),
-            endpoint:   storageService.getKey("ci-endpoint")
+            endpoint:   storageService.getKey("ci-endpoint"),
+            jiraUser:      storageService.getKey("ci-email")
         };
     };
 
@@ -103,6 +107,20 @@ var CIAIMSService = function() {
             }
         });
     };
+
+    /**
+     * Checks if the user that we have in the localstorage
+     * is the same user that is login
+     * @return {Boolean} Return true if the user is valid.
+     */
+    self.isSameUser = function( user ) {
+
+        if (self.getSessionData().jiraUser == user) {
+            return true;
+        }
+        return false;
+    };
+
 };
 /**
  * Creates the service instance.

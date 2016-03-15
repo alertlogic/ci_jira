@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
-import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService;
 import com.atlassian.jira.issue.Issue;
@@ -73,8 +72,8 @@ public class SynchronizationTasks implements PluginJob {
 	 */
 	private void synchronizeJob(SynchronizationScheduledImpl monitor, String jiraUser) {
 
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
-		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getAIMSService());
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
+		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
 		
 		try {
 			JSONObject environmentsAll = this.environmentsService.getAllEnvironments(jiraUser);
@@ -184,7 +183,7 @@ public class SynchronizationTasks implements PluginJob {
 	 * @param environmentId
 	 */
 	private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId, String jiraUser) {
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService());
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
 
     	if (!environmentId.isEmpty()) {
     		try{

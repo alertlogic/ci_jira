@@ -11,6 +11,7 @@ import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.scheduling.PluginScheduler;
@@ -32,9 +33,10 @@ public class SynchronizationScheduledImpl extends AbstractTaskMonitor implements
 			RuleConfigService ruleConfigService, 
 			JIRAService jiraService,
 			I18nResolver i18nResolver,
-			CredentialService credentialService) 
+			CredentialService credentialService,
+			RestUtil restUtilService) 
 	{
-		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver, credentialService);
+		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver, credentialService, restUtilService);
 	}
 
 	// declared by LifecycleAware

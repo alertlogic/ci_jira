@@ -9,14 +9,14 @@ var CredentialsService = function() {
      * Inits the url base host variables for the service.
      */
     self.getUrlBaseHost = function() {
-        return AJS.params.baseURL + "/plugins/servlet/";
+        return AJS.params.baseURL + "/plugins/servlet/credentialservlet";
     };
 
     /**
      * Get Credential
      */
     self.getCredentials = function() {
-        var urlProxyServlet = self.getUrlBaseHost() + 'credentialservlet';
+        var urlProxyServlet = self.getUrlBaseHost();
 
         return jQuery.ajax({
             type: "GET",
@@ -32,9 +32,10 @@ var CredentialsService = function() {
      * @param AccessKeyId  access key to authenticate cloud insight
      * @param SecretKey    secret access key
     */
-    self.createCredential = function( ciUser, ciUrl, ciAccessKeyId, ciSecretKey ) {
+    self.createCredential = function( idCredential, ciUser, ciUrl, ciAccessKeyId, ciSecretKey ) {
         var urlProxyServlet = self.getUrlBaseHost();
         var data = {
+            "idCredential": idCredential,
             "ciUser": ciUser,
             "ciUrl": ciUrl,
             "ciAccessKeyId": ciAccessKeyId,

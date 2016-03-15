@@ -11,10 +11,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
-import com.sun.jersey.api.client.Client;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -27,47 +25,13 @@ public class RemediationsService {
 
 	public PluginConfigService pluginConfigService;
 	public AIMSService aimsService;
-
-	private String token;
-	private String urlEndPoint;
-	private String userId;
-
-	public RemediationsService( PluginConfigService pluginConfigService, AIMSService aimsService )
+	private RestUtil restUtil;
+	
+	public RemediationsService( PluginConfigService pluginConfigService, AIMSService aimsService, RestUtil restUtil )
 	{
 		this.pluginConfigService = pluginConfigService;
 		this.aimsService = aimsService;
-	}
-	
-	public void setupAuthetication(String jiraUser) throws Exception{
-		PluginConfig conf = this.pluginConfigService.getConfiguration( jiraUser );
-    	JSONObject jsonResponse = this.aimsService.ciAuthentication( jiraUser );
-    	String account = this.aimsService.getAccount( jsonResponse );
-    	this.token = this.aimsService.getToken( jsonResponse );
-    	this.userId = this.aimsService.getUserId( jsonResponse );
-    	this.urlEndPoint = getUrlBase( conf.getCredential().getCiUrl(), account);
-	}
-	
-	public WebResource getWebResource(String urlBase, String token) throws Exception{
-    	
-    	ClientConfig clientConfig = new DefaultClientConfig();
- 		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-
- 		Client client = Client.create( clientConfig );
- 		
- 		WebResource webResource = client.resource( urlBase );
- 		webResource.accept( "application/json" ).type( "application/json" ).header( "x-aims-auth-token", token );
- 		
- 		return webResource;
-    }
-	
-	public String getUrlBase(String urlEndPoint, String account) throws Exception{
-		
-    	if ( urlEndPoint != null && account != null ) 
-     	{
-    		return urlEndPoint + "/assets/" + AIMSService.API_VERSION + '/' + account + "/environments/";
-     	}
- 
-    	return null;
+		this.restUtil = restUtil;
 	}
 	
 	/**
@@ -79,14 +43,14 @@ public class RemediationsService {
      */
     public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser) throws Exception{
 
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset;
     	ClientResponse responseGetRemediationItem;
     	
      	if ( urlBase != null && remediationItem != null) 
      	{
-     		urlBase += urlBase+ env + "/assets?asset_types=remediation-item&remediation-item.key="+remediationItem+"&optional=remediation-item";
-     		responseGetRemediationItem = getWebResource( urlBase, jiraUser ).get(ClientResponse.class);
+     		urlBase += env + "/assets?asset_types=remediation-item&remediation-item.key="+remediationItem+"&optional=remediation-item";
+     		responseGetRemediationItem = restUtil.get(urlBase);
 
      		if ( responseGetRemediationItem.getStatus() == 200 )
      		{
@@ -94,26 +58,27 @@ public class RemediationsService {
      			return jsonObj;
      		}
      		else{
-     			log.error("CI Plugin:We could not find the remediation");
+     			log.error("CI Plugin:We could not find the remediation"+urlBase);
      			log.error("CI Plugin: " +responseGetRemediationItem.getStatus() );
      		}
      	}
      	return null;
     }
-    
+
     /**
      * Get all the remediations items by environment
      * @param  {String} environment The environment to query
      * @throws Exception 
      */
-    public JSONObject getAllRemediationsItemsByEnvironment(String env, String jiraUser ) throws Exception {
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
+    public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser ) throws Exception {
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset;
     	ClientResponse responseGetRemediationItem;
 
      	if ( urlBase != null ) {
      		urlBase += env + "/assets?asset_types=remediation-item&reduce=true&remediation-item.deleted_on=0";
-     		responseGetRemediationItem = getWebResource( urlBase, jiraUser ).get(ClientResponse.class);
+     	
+     		responseGetRemediationItem = restUtil.get(urlBase);
 
      		if( responseGetRemediationItem.getStatus() == 200 ){
      			JSONObject jsonObj = new JSONObject( responseGetRemediationItem.getEntity(String.class) );
@@ -132,20 +97,17 @@ public class RemediationsService {
      * @throws Exception 
      */
     public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser ) throws Exception {
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset ;
     	ClientResponse response;
 
      	if ( urlBase != null )
      	{
      		urlBase += environment + "/remediations";
-  
 	        String filterStringParams = getFilterStringParams(filters);
      		urlBase += filterStringParams;
      		
-     		System.out.println("URLBASE="+urlBase);
-     		
-     		response = getWebResource( urlBase, jiraUser ).get(ClientResponse.class);
+     		response = restUtil.get( urlBase );
 
      		if ( response.getStatus() == 200 ) {
 
@@ -207,22 +169,21 @@ public class RemediationsService {
 	 * @throws Exception 
      */
     public JSONArray planRemediations( String environment, JSONArray remediationsKeys, JSONArray filters, String jiraUser) throws Exception {
-
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset;
 
         JSONObject payload = new JSONObject();
         payload.put( "operation", "plan_remediations");
         payload.put( "remediations", remediationsKeys);
         payload.put( "filters", filters);
-        payload.put( "user_id", this.userId );
+        payload.put( "user_id", restUtil.userId );
 
     	ClientResponse responseRemediationItem;
 
      	if ( urlBase != null ) {
 
-     		urlBase += environment + "/remediations";
-     		responseRemediationItem = getWebResource( urlBase, jiraUser ).put(ClientResponse.class, payload.toString());
+     		urlBase += environment + "/assets";
+     		responseRemediationItem = restUtil.put( urlBase, payload.toString());
 
      		if ( responseRemediationItem.getStatus() == 201 )
      		{
@@ -235,7 +196,6 @@ public class RemediationsService {
 
      	return null;
     }
-    
 
     /**
      * This method mark as complete a remediation in CI.
@@ -245,12 +205,8 @@ public class RemediationsService {
      * @throws Exception 
      */
     public Boolean markAsComplete(String env,String remediationItem, String jiraUser) throws Exception{
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
-    	//PluginConfig conf = this.pluginConfigService.getConfiguration();
-    	//JSONObject authJsonResponse = this.aimsService.ciAuthentication();
-    	//String token = this.aimsService.getToken(authJsonResponse);
-    	//String account = this.aimsService.getAccount(authJsonResponse);
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset;
     	
     	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
     	String status = getStatusRemediationItem( remediationsItemResponse , remediationItem);
@@ -265,11 +221,12 @@ public class RemediationsService {
      		data.put("remediation_items", Arrays.asList( remediationItem));
      		
      		urlBase += env + "/assets";
-     		responseMarkasComplete = getWebResource( urlBase, this.token ).put(ClientResponse.class, data);
+     		
+     		responseMarkasComplete = restUtil.put( urlBase, data);
 
      		log.debug("CI Plugin: Mark as complete status CI : "+responseMarkasComplete.getStatus());
 
-     		if( responseMarkasComplete.getStatus() == 404 ){
+     		if( responseMarkasComplete.getStatus() != 201 ){
      			log.debug("Response : "+responseMarkasComplete);
      			log.debug("Data : "+data);
      			log.debug("Url : "+urlBase);
@@ -325,13 +282,9 @@ public class RemediationsService {
      * @throws Exception 
      */
     public Boolean unDipose(String env,String remediationItem, String jiraUser) throws Exception{
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointAsset;
     	
-    	//PluginConfig conf = this.pluginConfigService.getConfiguration();
-    	//JSONObject authJsonResponse = this.aimsService.ciAuthentication();
-    	//String token = this.aimsService.getToken(authJsonResponse);
-    	//String account = this.aimsService.getAccount(authJsonResponse);
     	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
     	String status = getStatusRemediationItem( remediationsItemResponse, remediationItem );
 
@@ -343,22 +296,12 @@ public class RemediationsService {
      		data.put("operation", "undispose_remediations");
      		data.put("remediation_items", Arrays.asList( remediationItem));
 
-     		//ClientConfig clientConfig = new DefaultClientConfig();
-     		//clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-
-     		/*responseUndispose = Client.create (clientConfig).
-     			resource( conf.getCiUrl() + "/assets/v1/" + account + "/environments/" + env + "/assets").
-     			accept( "application/json" ).
-	    		type( "application/json" ).
-	    		header( "x-aims-auth-token" , token ).
-     			put(ClientResponse.class, data);*/
      		urlBase += env + "/assets";
-     		responseUndispose = getWebResource( urlBase, this.token ).put(ClientResponse.class, data);
-
+     		responseUndispose = restUtil.put(urlBase, data );
 
      		log.debug("CI Plugin: Undipose status CI : "+responseUndispose.getStatus());
 
-     		if( responseUndispose.getStatus() == 404 ){
+     		if( responseUndispose.getStatus() != 201 ){
      			log.debug("Response : "+responseUndispose);
      			log.debug("Data : "+data);
      			log.debug("Url : "+urlBase);
@@ -424,12 +367,8 @@ public class RemediationsService {
      * @throws Exception
      */
     public JSONObject getRemediationsDescriptions(String jiraUser) throws Exception {
-    	setupAuthetication( jiraUser );
-    	String urlBase = this.urlEndPoint;
-        //JSONObject jsonResponse = this.aimsService.ciAuthentication();
-        //String token = this.aimsService.getToken(jsonResponse);
-        //String account = this.aimsService.getAccount(jsonResponse);
-        //PluginConfig conf = this.pluginConfigService.getConfiguration();
+    	restUtil.setupAuthetication( jiraUser );
+    	String urlBase = restUtil.urlEndPointRemediation;
 
         ClientResponse response;
 
@@ -438,16 +377,7 @@ public class RemediationsService {
             ClientConfig clientConfig = new DefaultClientConfig();
             clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 
-            urlBase = "/remediation/"+AIMSService.API_VERSION;
-
-            System.out.println("URLBASE="+urlBase);
-
-            response = Client.create (clientConfig).
-                resource( urlBase ).
-                accept( "application/json" ).
-                type( "application/json" ).
-                header( "x-aims-auth-token" , token ).
-                get(ClientResponse.class);
+            response = restUtil.get( urlBase );
 
             if ( response.getStatus() == 200 ) {
 

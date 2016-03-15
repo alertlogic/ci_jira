@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
+import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.atlassian.activeobjects.external.ActiveObjects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,16 +30,21 @@ public class CredentialService
     /**
      * Creates or updates the configuration, return the configuration reference object
      */
-    public Credential createOrUpdateCredential(String jiraUser, String ciUser, String ciUrl, String ciAccessKeyId, String ciSecretKey)
+    public Credential createOrUpdateCredential(int idCredential, String jiraUser, String ciUser, String ciUrl, String ciAccessKeyId, String ciSecretKey)
     {
     	Credential credential;
 
-    	if ( hasConfiguration( ciUser ) ) {
-    		credential = getCredential( ciUser );
+    	if ( hasCredentials( ciUser ) ) {
+    		credential = getCredentialByUser( ciUser );
     		log.debug("CI Plugin: updating configuration on active objects");
     	}else{
-    		credential = activeObjects.create( Credential.class);
-    		log.debug("CI Plugin: creating configuration on active objects");
+    		if( idCredential != -1 ){
+    			credential = getCredentialById( idCredential );
+    		}
+    		else{
+	    		credential = activeObjects.create( Credential.class);
+	    		log.debug("CI Plugin: creating configuration on active objects");
+	    	}
     	}
     	credential.setJiraUser(jiraUser);
     	credential.setCiUser(ciUser);
@@ -54,9 +60,21 @@ public class CredentialService
     /**
      * Get the configuration store as an active object
      */
-    public Credential getCredential(String ciUser)
+    public Credential getCredentialByUser(String ciUser)
     {
     	Credential[]  configArray = activeObjects.find( Credential.class, Query.select().where("CI_USER = ?", ciUser ) );
+    	if (configArray.length > 0) {
+    		return configArray[0];
+    	}
+    	return null;
+    }
+    
+    /**
+     * Get the configuration store as an active object
+     */
+    public Credential getCredentialById(int id)
+    {
+    	Credential[]  configArray = activeObjects.find( Credential.class, Query.select().where("ID = ?", id ) );
     	if (configArray.length > 0) {
     		return configArray[0];
     	}
@@ -78,18 +96,40 @@ public class CredentialService
     /**
      * Returns true if the user has a credential.
      */
-    public boolean hasConfiguration(String ciUser)
+    public boolean hasCredentials(String user)
     {
-    	return (activeObjects.count( Credential.class, Query.select().where("CI_USER = ?", ciUser ) ) > 0);
+    	return (activeObjects.count( Credential.class, Query.select().where("CI_USER = ?", user ) ) > 0);
+    }
+    
+    /**
+     * Review if exists some configuration that are using the credential  
+     * @param id credential
+     * @return boolean
+     */
+    public boolean canBeDeleted(int id){
+    	try{
+	    	Credential credential = getCredentialById(id);
+	    	PluginConfig[] configs = credential.getPluginConfigs();
+	    	
+	    	if(configs.length > 0){
+	    		return false;
+	    	}
+	    	return true;
+    	}
+    	catch(Exception e){
+    		log.error("CI Plugin: " + e.toString());
+			e.printStackTrace();
+		}
+    	return false;
     }
 
     /**
      * Delete the configuration store as an active object.
      */
-    public Boolean deleteCredential(String ciUser)
+    public Boolean deleteCredential(int id)
     {
     	try{
-    		Credential credentialsArray = getCredential(ciUser);
+    		Credential credentialsArray = getCredentialById(id);
 
     		if (credentialsArray != null ) {
 	    		activeObjects.delete( credentialsArray );

@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -24,7 +23,6 @@ import com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
-import com.google.common.collect.Maps;
 
 /**
  * This servlet shows the CI plugin's configuration page,
@@ -32,8 +30,6 @@ import com.google.common.collect.Maps;
  */
 @SuppressWarnings("serial")
 public class CredentialServlet extends HttpServlet{
-
-    private static final String CONFIG_BROWSER_TEMPLATE = "/js/partials/PluginConfiguration/PluginConfiguration.vm";
 
     private TemplateRenderer templateRenderer;
     private PageBuilderService pageBuilderService;
@@ -107,18 +103,27 @@ public class CredentialServlet extends HttpServlet{
 
             //store if has data
             if( req.getParameterMap().size() > 0) {
-
+            	
                 String jiraUser = userManager.getRemoteUsername(req);
                 String ciUser = req.getParameter("ciUser");
                 String ciUrl = req.getParameter("ciUrl");
                 String ciAccessKeyId = req.getParameter("ciAccessKeyId");
                 String ciSecretKey = req.getParameter("ciSecretKey");
+                String idCredential = req.getParameter("idCredential");
+                
+                int id = -1;
+                if( !idCredential.equals("") ){
+                	id = Integer.parseInt(idCredential);
+                	Credential credentialToDelete = credentialService.getCredentialById( id );
+                	aIMSService.deleteAccessKeyId( credentialToDelete );
+                }
 
-                if( credentialService.hasConfiguration( ciUser ) ){
-                	aIMSService.deleteAccessKeyId(ciUser);
+                if( credentialService.hasCredentials( ciUser ) ){
+                	Credential credentialToDelete = credentialService.getCredentialByUser(ciUser );
+                	aIMSService.deleteAccessKeyId( credentialToDelete );
                 }
                 
-                Credential credential = credentialService.createOrUpdateCredential(jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
+                Credential credential = credentialService.createOrUpdateCredential( id, jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
 
                 if( credential != null ){
                     res.setContentType("application/json");
@@ -149,21 +154,26 @@ public class CredentialServlet extends HttpServlet{
 			String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
 			JSONObject jsonArray= new JSONObject(string);
 
-    		String ciUser = (String) jsonArray.getString("ciUser");
-
+    		int id = (int) jsonArray.getInt("id");
+    		Credential credential = credentialService.getCredentialById(id);
             //if exist configuration delete the access key
-            if(credentialService.hasConfiguration(ciUser)){
-            	aIMSService.deleteAccessKeyId( ciUser );
-            }
-
-            if( credentialService.deleteCredential(ciUser) ){
-                res.setContentType("application/json");
-                JSONObject obj=new JSONObject();
-                obj.put("success", "true");
-                res.getWriter().write( obj.toString() );
-            }
-            else{
-                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+    		if (credentialService.canBeDeleted(id) ){
+	    		if( credential != null ){
+	            	aIMSService.deleteAccessKeyId( credential );
+	            }
+	
+	            if( credentialService.deleteCredential(id) ){
+	                res.setContentType("application/json");
+	                JSONObject obj=new JSONObject();
+	                obj.put("success", "true");
+	                res.getWriter().write( obj.toString() );
+	            }
+	            else{
+	                res.sendError(HttpServletResponse.SC_BAD_REQUEST);
+	            }
+    		}
+    		else{
+                res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
             }
         }
     }

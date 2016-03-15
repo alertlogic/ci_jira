@@ -49,7 +49,7 @@ public class CIProxyAuthServlet extends HttpServlet{
 				return;
 		    }
     		
-    		String user = req.getParameter("ciUser");
+    		String user = req.getParameter("jiraUser");
     		if( user == null ){
     			user = userManager.getRemoteUsername(req);
     		}

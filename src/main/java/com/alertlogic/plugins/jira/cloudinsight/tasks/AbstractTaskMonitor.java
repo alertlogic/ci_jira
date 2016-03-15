@@ -7,6 +7,7 @@ import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.scheduling.PluginScheduler;
 
@@ -23,6 +24,7 @@ public abstract class AbstractTaskMonitor {
 	protected I18nResolver i18nResolver;
 	protected PluginScheduler pluginScheduler;
 	protected CredentialService credentialService;
+	protected RestUtil restUtilService;
 
     //Attributes that could change the implementation class
     protected long interval = 62000L;    // default job interval (1 minute)
@@ -35,7 +37,8 @@ public abstract class AbstractTaskMonitor {
 		RuleConfigService ruleConfigService,
 		JIRAService jiraService, 
 		I18nResolver i18nResolver,
-		CredentialService credentialService) 
+		CredentialService credentialService,
+		RestUtil restUtilService)
     {
         this.setPluginScheduler(pluginScheduler);
         this.pluginConfigService = pluginConfigService;
@@ -44,6 +47,7 @@ public abstract class AbstractTaskMonitor {
         this.jiraService = jiraService;
         this.i18nResolver = i18nResolver;
         this.credentialService = credentialService;
+        this.restUtilService = restUtilService;
     }
 
     public PluginConfigService getPluginConfigService() {
@@ -90,4 +94,7 @@ public abstract class AbstractTaskMonitor {
 		this.pluginScheduler = pluginScheduler;
 	}
 
+	public RestUtil getRestUtil() {
+		return restUtilService;
+	}
 }

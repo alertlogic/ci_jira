@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
 import com.atlassian.sal.api.message.I18nResolver;
@@ -46,7 +47,7 @@ public class AIMSService {
 
      		Client client = Client.create(new DefaultClientConfig());
      		client.addFilter( new HTTPBasicAuthFilter(conf.getCredential().getCiAccessKeyId(), CommonJiraPluginUtils.decode( conf.getCredential().getCiSecretKey() )) );
-
+     		
      		WebResource resource = client.resource(conf.getCredential().getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
 	    	resource.accept("application/json").type("application/json");
 
@@ -70,44 +71,90 @@ public class AIMSService {
 
      	return null;
     }
+    
+    /**
+	 * Authenticates to CI and return the data.
+	 * @return JSONObject	The response of the authentication with an extra endpoint data.
+	 * @throws Exception 
+	 */
+    public JSONObject ciAuthentication(Credential credential) throws Exception{
+
+     	if(credential!=null){
+     		Client client = Client.create(new DefaultClientConfig());
+     		client.addFilter( new HTTPBasicAuthFilter(credential.getCiAccessKeyId(), CommonJiraPluginUtils.decode( credential.getCiSecretKey() )) );
+     		
+     		WebResource resource = client.resource( credential.getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
+	    	resource.accept("application/json").type("application/json");
+
+     		ClientResponse response = resource.post(ClientResponse.class);
+
+     		if ( response.getStatus() == 200 ) {
+     			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
+     			jsonObj.put("endpoint", credential.getCiUrl());
+
+     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
+     			return jsonObj;
+     		}
+     		else{
+     			log.error( i18n.getText("ci.service.aimsservice.msg.log.error.authentication.invalid") + response.getStatus() );
+     			throw new Exception( "Error in authetication " + response.getStatus());
+     		}
+
+     	} else {
+     		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
+     	}
+
+     	return null;
+    }
+
 
 	/**
 	 * Delete access key
 	 * @return boolean Return if the operation was successfull
 	 * @throws Exception
 	 */
-    public boolean deleteAccessKeyId(String jiraUser)  {
-
-    	PluginConfig conf = pluginConfigService.getConfiguration( jiraUser );
-    	String accessKeyId = conf.getCredential().getCiAccessKeyId();
+    public boolean deleteAccessKeyId(Credential credential){
+    	
+    	String accessKeyId = credential.getCiAccessKeyId();
 
     	try {
-	    	JSONObject authJsonResponse = this.ciAuthentication( jiraUser );
+	    	JSONObject authJsonResponse = this.ciAuthentication( credential );
 	    	String token = getToken(authJsonResponse);
 	    	String account = getAccount(authJsonResponse);
 	    	String user = getUserId(authJsonResponse);
+	    	String urlBase = credential.getCiUrl();
 
 	    	ClientResponse responseDelete;
 	     	if ( token != null && account != null && user != null) {
-
+	     		urlBase += "/aims/" + API_VERSION + "/" + account + "/users/" + user + "/access_keys/" + accessKeyId;
+	     		
+	     		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.deleting") );
+	     		
 	     		ClientConfig clientConfig = new DefaultClientConfig();
 
 	     		responseDelete = Client.create (clientConfig).
-	     			resource( conf.getCredential().getCiUrl() + "/aims/v1/" + account + "/users/" + user + "/access_keys/" + accessKeyId).
+	     			resource( urlBase ).
 	     			accept( "application/json" ).
 		    		type( "application/json" ).
 		    		header( "x-aims-auth-token" , token ).
 	     			delete(ClientResponse.class);
 
 	     		if( responseDelete.getStatus() == 204 ){
+	     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.success") );
 	     			return true;
 				}
 	     		else {
+	     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
+	     			log.debug( "CI Plugin: "+responseDelete.getStatus() );
+	     			log.debug( "CI Plugin: "+urlBase );
+	     			log.debug( "CI Plugin: "+credential.getJiraUser() );
+	     			
 					return false;
 				}
 	     	}
     	}catch(Exception e){
-    		e.printStackTrace();
+    		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
+ 			e.printStackTrace();
     	}
 
      	return false;

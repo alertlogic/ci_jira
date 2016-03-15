@@ -4,8 +4,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
-import com.sun.jersey.api.client.Client;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -19,11 +18,14 @@ public class EnvironmentsService {
 
 	public PluginConfigService pluginConfigService;
 	public AIMSService aimsService;
+	public RestUtil restUtil;
 
-	public EnvironmentsService( PluginConfigService pluginConfigService, AIMSService aimsService )
+	public EnvironmentsService( PluginConfigService pluginConfigService, AIMSService aimsService, RestUtil restUtil)
 	{
 		this.pluginConfigService = pluginConfigService;
 		this.aimsService = aimsService;
+		this.restUtil = restUtil;
+		
 	}
 
 	/**
@@ -32,25 +34,18 @@ public class EnvironmentsService {
 	 * @throws Exception 
 	 */
 	public JSONObject getAllEnvironments(String jiraUser) throws Exception{
-		PluginConfig conf = this.pluginConfigService.getConfiguration(jiraUser);
-    	JSONObject jsonResponse = this.aimsService.ciAuthentication(jiraUser);
-    	String token = this.aimsService.getToken(jsonResponse);
-    	String account = this.aimsService.getAccount(jsonResponse);
+		restUtil.setupAuthetication( jiraUser );
+		String urlBase = restUtil.urlEndPointSource + "?source.type=environment";
 
     	ClientResponse responseGetEnvironments;
 
-     	if ( token != null && account != null)
+     	if ( urlBase != null)
      	{
      		ClientConfig clientConfig = new DefaultClientConfig();
      		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-
-     		responseGetEnvironments = Client.create (clientConfig).
-     			resource( conf.getCredential().getCiUrl() + "/sources/v1/" + account +  "/sources?source.type=environment").
-     			accept( "application/json" ).
-	    		type( "application/json" ).
-	    		header( "x-aims-auth-token" , token ).
-     			get(ClientResponse.class);
-
+     		
+     		responseGetEnvironments = restUtil.get(urlBase);
+     		
      		if ( responseGetEnvironments.getStatus() == 200 )
      		{
      			JSONObject jsonObj = new JSONObject( responseGetEnvironments.getEntity(String.class) );

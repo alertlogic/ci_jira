@@ -2,6 +2,7 @@ package com.alertlogic.plugins.jira.cloudinsight.service;
 
 import net.java.ao.Query;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,6 @@ public class PluginConfigService
     	}
         conf.setJiraUser(jiraUser);
         conf.setCredential(credential);
-
         conf.save();
 
         return conf;
@@ -88,4 +88,27 @@ public class PluginConfigService
 		}
     	return false;
     }
+    
+
+    /**
+     * Get the configuration of an user
+     * @return JSONObject with the credential condigured
+     */
+    public JSONObject getConfigurationByUserJSON( String jiraUser ){
+
+    	PluginConfig config = this.getConfiguration(jiraUser);
+    	JSONObject obj = new JSONObject();
+    	
+    	if (config == null) {
+    		return null;
+    	}
+    	else{
+            obj.put("id",config.getID());
+            obj.put("credential_ciUser",config.getCredential().getCiUser());
+            obj.put("credential_id",config.getCredential().getID());
+        }
+
+        return obj;
+    }
+
 }

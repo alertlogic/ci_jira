@@ -7,15 +7,11 @@
         <div class="content-container">
             <div class="content-body">
 
-                <div role="dialog" id="credential-crud-dialog" class="aui-layer aui-dialog2 aui-dialog2-xlarge data-aui-modal "  aria-hidden='true'>
+                <div role="dialog" id="credential-crud-dialog" class="aui-layer aui-dialog2 aui-dialog2-xlarge"  aria-hidden='true' data-aui-modal="true">
                     <!-- Dialog header -->
                     <header class="aui-dialog2-header">
                         <!-- The dialog's title -->
-                        <h2 class="aui-dialog2-header-main">Credential</h2>
-                        <!-- Close icon -->
-                        <a class="aui-dialog2-header-close">
-                            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog">Close</span>
-                        </a>
+                        <h2 class="aui-dialog2-header-main">$i18n.getText('ci.partials.pluginconfiguration.vm.credential.title')</h2>
                     </header>
                     <!-- Main dialog content -->
                     <div class="aui-dialog2-content">
@@ -39,8 +35,13 @@
                                 </div>
                             </div>
                             <div class="aui-item">
+                                <h2>
+                                    <div id="configformTitle"></div>
+                                </h2>
                                 <div id="aui-message-bar"></div>
                                 <form id="configForm" method="post" class="aui">
+                                    <input id="idCredential" hidden="true" class="text long-field" type="text" name="idCredential"
+                                    >
                                     <div class="field-group">
                                         <label for="url">
                                             $i18n.getText('ci.partials.pluginconfiguration.vm.url')
@@ -75,18 +76,19 @@
                                         <input id="ciAccessKeyId" class="text long-field" disabled>
                                     </div>
                                     <div class="buttons-container">
-                                        <button id="btnTest" class="aui-button test"  type="button">
-                                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.test')
+                                        <button id="btnCredentialTest" class="aui-button test"  type="button">
+                                            $i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.test')
                                         </button>
-                                        <button id="btnSave" class="aui-button aui-button-primary" disabled type="button">
-                                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.save')
+                                        <button id="btnCredentialSave" class="aui-button aui-button-primary" disabled type="button">
+                                            $i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.save')
                                         </button>
-                                        <button id="btnDelete" class="aui-button" type="button"
-                                            #if (!$ciUrl)
-                                                disabled
-                                            #end
-                                        >
-                                            $i18n.getText('ci.partials.pluginconfiguration.vm.button.delete')
+                                        <button id="btnCredentialDelete" class="aui-button" type="button"
+                                                disabled>
+                                            $i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.delete')
+                                        </button>
+                                        <button id="btnCredentialCancel" class="aui-button" type="button"
+                                                disabled>
+                                            $i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.cancel')
                                         </button>
                                     </div>
                                 </form>
@@ -95,9 +97,8 @@
                     </div>
                     <!-- Dialog footer -->
                     <footer class="aui-dialog2-footer">
-                        <!-- Actions to render on the right of the footer -->
                         <div class="aui-dialog2-footer-actions">
-                            <button id="btnCredentialDialogClose" class="aui-button aui-button-link">Close</button>
+                            <button id="btnCredentialClose" class="aui-button aui-button-link">$i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.close')</button>
                         </div>
                     </footer>
                 </div>
@@ -116,13 +117,28 @@
                     <div class="tabs-pane active-pane" id="tabs-config-credentials">
 
                         <div class="flatpack">
-                            <h2> $i18n.getText('ci.partials.pluginconfiguration.vm.panel.credentials') </h2>
+                            <h2>$i18n.getText('ci.partials.pluginconfiguration.vm.panel.credentials')</h2>
                             <span>
                                 $i18n.getText('ci.partials.pluginconfiguration.vm.conecction.label')
                                 <span id='conectionStatus' class='aui-lozenge'>$i18n.getText('ci.partials.pluginconfiguration.vm.conecction.status.checking')</span>
                             </span>
+                            <br/>
+                            <br/>
 
-                            <button id="btnCredential" class="aui-button">Show dialog</button>
+                            $i18n.getText('ci.partials.pluginconfiguration.vm.credential.select'):
+                            <select id="selectCredential" class="select-medium" size="1">
+                                <option value=""></option>
+                            </select>
+                            <button id="btnCredential" class="aui-button">$i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.dialog')</button>
+
+                            <br/>
+                            <button id="btnConfigSave" class="aui-button aui-button-primary" disabled type="button">
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.config.button.save')
+                            </button>
+                            <button id="btnConfigDelete" class="aui-button" type="button"
+                                    disabled>
+                                $i18n.getText('ci.partials.pluginconfiguration.vm.config.button.delete')
+                            </button>
                         </div>
                     </div>
 
