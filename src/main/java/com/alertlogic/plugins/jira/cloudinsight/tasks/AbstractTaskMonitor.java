@@ -35,7 +35,7 @@ public abstract class AbstractTaskMonitor {
 		PluginConfigService pluginConfigService,
 		AIMSService aimsService,
 		RuleConfigService ruleConfigService,
-		JIRAService jiraService, 
+		JIRAService jiraService,
 		I18nResolver i18nResolver,
 		CredentialService credentialService,
 		RestUtil restUtilService)
@@ -65,11 +65,11 @@ public abstract class AbstractTaskMonitor {
 	public JIRAService getJIRAService() {
 		return jiraService;
 	}
-	
+
 	public CredentialService getCredentialService() {
 		return credentialService;
 	}
-	
+
     public void setLastRun(Date lastRun) {
         this.lastRun = lastRun;
     }

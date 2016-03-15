@@ -14,7 +14,7 @@ public class RemediationsServiceTest {
 	RemediationsService remediationsService;
 	@Before
 	public void setUp() throws Exception {
-		remediationsService = new RemediationsService(null, null, null);		
+		remediationsService = new RemediationsService(null, null);		
 	}
 	
 	@Test

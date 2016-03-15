@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * Schedules the CI Add-on AutoAssign tasks.
  */
 public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements LifecycleAware {
-	
+
     private final Logger logger = LoggerFactory.getLogger(AutoAssignScheduledImpl.class);
 
     public static final String KEY = AutoAssignScheduledImpl.class.getName() + ":instance";
@@ -34,7 +34,7 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
 			JIRAService jiraService,
 			I18nResolver i18nResolver,
 			CredentialService credentialService,
-			RestUtil restUtilService) 
+			RestUtil restUtilService)
 	{
 		super(pluginScheduler, pluginConfigService, aimsService, ruleConfigService,jiraService, i18nResolver, credentialService, restUtilService);
 		this.interval = 186000L; //3 minutes 186
@@ -47,7 +47,7 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
 
     @SuppressWarnings("serial")
 	public void reschedule(long interval) {
-    	
+
         this.interval = interval;
 
         pluginScheduler.scheduleJob(
@@ -60,6 +60,6 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
                 interval);                  	// interval between repeats, in milliseconds
 
         logger.info(String.format(JOB_NAME+":: Scheduled to run every %dms, the first execution will be ignored.", interval));
-        
+
     }
 }

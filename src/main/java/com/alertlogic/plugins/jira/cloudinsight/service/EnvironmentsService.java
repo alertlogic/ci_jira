@@ -17,21 +17,18 @@ public class EnvironmentsService {
 	private static final Logger log = LoggerFactory.getLogger(AIMSService.class);
 
 	public PluginConfigService pluginConfigService;
-	public AIMSService aimsService;
 	public RestUtil restUtil;
 
-	public EnvironmentsService( PluginConfigService pluginConfigService, AIMSService aimsService, RestUtil restUtil)
+	public EnvironmentsService( PluginConfigService pluginConfigService, RestUtil restUtil)
 	{
 		this.pluginConfigService = pluginConfigService;
-		this.aimsService = aimsService;
 		this.restUtil = restUtil;
-		
 	}
 
 	/**
 	 * Return the environments
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public JSONObject getAllEnvironments(String jiraUser) throws Exception{
 		restUtil.setupAuthetication( jiraUser );
@@ -43,9 +40,9 @@ public class EnvironmentsService {
      	{
      		ClientConfig clientConfig = new DefaultClientConfig();
      		clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-     		
+
      		responseGetEnvironments = restUtil.get(urlBase);
-     		
+
      		if ( responseGetEnvironments.getStatus() == 200 )
      		{
      			JSONObject jsonObj = new JSONObject( responseGetEnvironments.getEntity(String.class) );

@@ -72,11 +72,11 @@ public class CredentialServlet extends HttpServlet{
 
             //load resources and show template
             loadWebResources();
-       
+
         	JSONArray credentialArray = credentialService.getCredentialsJSONArray();
         	res.setContentType("application/json");
 	        PrintWriter out = res.getWriter();
-        	
+
 	        if( credentialArray != null){
 	        	out.print(credentialArray.toString());
 	            out.flush();
@@ -103,14 +103,14 @@ public class CredentialServlet extends HttpServlet{
 
             //store if has data
             if( req.getParameterMap().size() > 0) {
-            	
+
                 String jiraUser = userManager.getRemoteUsername(req);
                 String ciUser = req.getParameter("ciUser");
                 String ciUrl = req.getParameter("ciUrl");
                 String ciAccessKeyId = req.getParameter("ciAccessKeyId");
                 String ciSecretKey = req.getParameter("ciSecretKey");
                 String idCredential = req.getParameter("idCredential");
-                
+
                 int id = -1;
                 if( !idCredential.equals("") ){
                 	id = Integer.parseInt(idCredential);
@@ -122,7 +122,7 @@ public class CredentialServlet extends HttpServlet{
                 	Credential credentialToDelete = credentialService.getCredentialByUser(ciUser );
                 	aIMSService.deleteAccessKeyId( credentialToDelete );
                 }
-                
+
                 Credential credential = credentialService.createOrUpdateCredential( id, jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
 
                 if( credential != null ){
@@ -161,7 +161,7 @@ public class CredentialServlet extends HttpServlet{
 	    		if( credential != null ){
 	            	aIMSService.deleteAccessKeyId( credential );
 	            }
-	
+
 	            if( credentialService.deleteCredential(id) ){
 	                res.setContentType("application/json");
 	                JSONObject obj=new JSONObject();

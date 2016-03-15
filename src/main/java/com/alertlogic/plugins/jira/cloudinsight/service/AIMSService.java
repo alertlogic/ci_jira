@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
 import com.alertlogic.plugins.jira.cloudinsight.util.CommonJiraPluginUtils;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -25,17 +26,19 @@ public class AIMSService {
 	public static final String API_VERSION = "v1";
 	public PluginConfigService pluginConfigService;
 	private I18nResolver i18n;
+	private RestUtil restUtil;
 
-	public AIMSService( PluginConfigService pluginConfigService, I18nResolver i18n )
+	public AIMSService( PluginConfigService pluginConfigService, I18nResolver i18n, RestUtil restUtil )
 	{
 		this.pluginConfigService = pluginConfigService;
 		this.i18n = i18n;
+		this.restUtil = restUtil;
 	}
 
 	/**
 	 * Authenticates to CI and return the data.
 	 * @return JSONObject	The response of the authentication with an extra endpoint data.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
     public JSONObject ciAuthentication(String jiraUser) throws Exception{
 
@@ -44,62 +47,23 @@ public class AIMSService {
      	if ( pluginConfigService.hasConfiguration( jiraUser ) ) {
 
      		conf = pluginConfigService.getConfiguration( jiraUser );
-
-     		Client client = Client.create(new DefaultClientConfig());
-     		client.addFilter( new HTTPBasicAuthFilter(conf.getCredential().getCiAccessKeyId(), CommonJiraPluginUtils.decode( conf.getCredential().getCiSecretKey() )) );
-     		
-     		WebResource resource = client.resource(conf.getCredential().getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
-	    	resource.accept("application/json").type("application/json");
-
-     		ClientResponse response = resource.post(ClientResponse.class);
-
-     		if ( response.getStatus() == 200 ) {
-     			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
-     			jsonObj.put("endpoint", conf.getCredential().getCiUrl());
-
-     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
-     			return jsonObj;
-     		}
-     		else{
-     			log.error( i18n.getText("ci.service.aimsservice.msg.log.error.authentication.invalid") + response.getStatus() );
-     			throw new Exception( "Error in authetication " + response.getStatus());
-     		}
-
+     		return ciAuthentication( conf.getCredential() );
      	} else {
      		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
      	}
 
      	return null;
     }
-    
+
     /**
 	 * Authenticates to CI and return the data.
 	 * @return JSONObject	The response of the authentication with an extra endpoint data.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
     public JSONObject ciAuthentication(Credential credential) throws Exception{
 
-     	if(credential!=null){
-     		Client client = Client.create(new DefaultClientConfig());
-     		client.addFilter( new HTTPBasicAuthFilter(credential.getCiAccessKeyId(), CommonJiraPluginUtils.decode( credential.getCiSecretKey() )) );
-     		
-     		WebResource resource = client.resource( credential.getCiUrl()+"/aims/"+API_VERSION+"/authenticate");
-	    	resource.accept("application/json").type("application/json");
-
-     		ClientResponse response = resource.post(ClientResponse.class);
-
-     		if ( response.getStatus() == 200 ) {
-     			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
-     			jsonObj.put("endpoint", credential.getCiUrl());
-
-     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.authentication.valid") );
-     			return jsonObj;
-     		}
-     		else{
-     			log.error( i18n.getText("ci.service.aimsservice.msg.log.error.authentication.invalid") + response.getStatus() );
-     			throw new Exception( "Error in authetication " + response.getStatus());
-     		}
-
+     	if( credential != null ){
+     		return restUtil.autheticate(credential);
      	} else {
      		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
      	}
@@ -113,31 +77,19 @@ public class AIMSService {
 	 * @return boolean Return if the operation was successfull
 	 * @throws Exception
 	 */
-    public boolean deleteAccessKeyId(Credential credential){
-    	
-    	String accessKeyId = credential.getCiAccessKeyId();
+    public boolean deleteAccessKeyId(Credential credential) {
 
+    	String accessKeyId = credential.getCiAccessKeyId();
     	try {
-	    	JSONObject authJsonResponse = this.ciAuthentication( credential );
-	    	String token = getToken(authJsonResponse);
-	    	String account = getAccount(authJsonResponse);
-	    	String user = getUserId(authJsonResponse);
-	    	String urlBase = credential.getCiUrl();
+        	restUtil.setupAuthetication(credential);
+	    	String urlBase = restUtil.urlEndPointAccessKey;
 
 	    	ClientResponse responseDelete;
-	     	if ( token != null && account != null && user != null) {
-	     		urlBase += "/aims/" + API_VERSION + "/" + account + "/users/" + user + "/access_keys/" + accessKeyId;
-	     		
-	     		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.deleting") );
-	     		
-	     		ClientConfig clientConfig = new DefaultClientConfig();
+	     	if ( urlBase != null) {
+	     		urlBase += accessKeyId;
 
-	     		responseDelete = Client.create (clientConfig).
-	     			resource( urlBase ).
-	     			accept( "application/json" ).
-		    		type( "application/json" ).
-		    		header( "x-aims-auth-token" , token ).
-	     			delete(ClientResponse.class);
+	     		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.deleting") );
+	     		responseDelete = restUtil.delete(urlBase);
 
 	     		if( responseDelete.getStatus() == 204 ){
 	     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.success") );
@@ -148,7 +100,7 @@ public class AIMSService {
 	     			log.debug( "CI Plugin: "+responseDelete.getStatus() );
 	     			log.debug( "CI Plugin: "+urlBase );
 	     			log.debug( "CI Plugin: "+credential.getJiraUser() );
-	     			
+
 					return false;
 				}
 	     	}
@@ -158,53 +110,5 @@ public class AIMSService {
     	}
 
      	return false;
-    }
-
-    /**
-     * Extract the token from authentication response.
-     * @param jsonResponse	This parameter can be obtained calling ciAuthentication
-     * @return token		The authentication token present in the response
-     */
-    public  String getToken(JSONObject jsonResponse){
-    	if ( jsonResponse != null ) {
-    		if(jsonResponse.has("authentication")){
-    			if(jsonResponse.getJSONObject("authentication").has("token")){
-    	    		return  jsonResponse.getJSONObject("authentication").getString("token");
-    			}
-    		}
-		}
-		return null;
-    }
-
-    /**
-     * Extract the account from authentication response.
-     * @param jsonResponse	This parameter can be obtained calling ciAuthentication
-     * @return accountId	Return the account id present in the response.
-     */
-    public String getAccount(JSONObject jsonResponse){
-    	if( jsonResponse != null ){
-    		if(jsonResponse.has("authentication")){
-    			if(jsonResponse.getJSONObject("authentication").has("account")){
-    				return  jsonResponse.getJSONObject("authentication").getJSONObject("account").getString("id");
-    			}
-    		}
-		}
-		return null;
-    }
-
-    /**
-     * Extract the user id from authentication response.
-     * @param jsonResponse	This parameter can be obtained calling ciAuthentication
-     * @return userId	Return the user id present in the response.
-     */
-    public String getUserId(JSONObject jsonResponse){
-    	if( jsonResponse != null ){
-    		if(jsonResponse.has("authentication")){
-    			if(jsonResponse.getJSONObject("authentication").has("user")){
-    				return  jsonResponse.getJSONObject("authentication").getJSONObject("user").getString("id");
-    			}
-    		}
-		}
-		return null;
     }
 }

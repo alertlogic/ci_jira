@@ -88,7 +88,6 @@ public class PluginConfigService
 		}
     	return false;
     }
-    
 
     /**
      * Get the configuration of an user
@@ -98,7 +97,7 @@ public class PluginConfigService
 
     	PluginConfig config = this.getConfiguration(jiraUser);
     	JSONObject obj = new JSONObject();
-    	
+
     	if (config == null) {
     		return null;
     	}
@@ -110,5 +109,4 @@ public class PluginConfigService
 
         return obj;
     }
-
 }

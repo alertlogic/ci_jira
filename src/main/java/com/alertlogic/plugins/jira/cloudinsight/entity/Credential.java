@@ -25,7 +25,7 @@ public interface Credential extends Entity{
 
     public void setCiSecretKey(String setCiSecretKey);
     public String getCiSecretKey();
-    
+
     @OneToMany
 	public PluginConfig[] getPluginConfigs();
 }

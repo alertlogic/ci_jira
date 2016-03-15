@@ -21,33 +21,31 @@ import com.sun.jersey.api.json.JSONConfiguration;
  *	Service for all the remediations operations
  */
 public class RemediationsService {
-	private static final Logger log = LoggerFactory.getLogger(AIMSService.class);
+	private static final Logger log = LoggerFactory.getLogger(RemediationsService.class);
 
 	public PluginConfigService pluginConfigService;
-	public AIMSService aimsService;
 	private RestUtil restUtil;
-	
-	public RemediationsService( PluginConfigService pluginConfigService, AIMSService aimsService, RestUtil restUtil )
+
+	public RemediationsService( PluginConfigService pluginConfigService, RestUtil restUtil )
 	{
 		this.pluginConfigService = pluginConfigService;
-		this.aimsService = aimsService;
 		this.restUtil = restUtil;
 	}
-	
+
 	/**
      * This method get a remediation item data from the CI API.
      * @param 	env				The Environment ID.
      * @param 	remediationItem	The Remediation Item Key.
      * @return	JSONObject 		Get the information of a remediation item.
-	 * @throws Exception 
+	 * @throws Exception
      */
     public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser) throws Exception{
 
     	restUtil.setupAuthetication( jiraUser );
     	String urlBase = restUtil.urlEndPointAsset;
     	ClientResponse responseGetRemediationItem;
-    	
-     	if ( urlBase != null && remediationItem != null) 
+
+     	if ( urlBase != null && remediationItem != null)
      	{
      		urlBase += env + "/assets?asset_types=remediation-item&remediation-item.key="+remediationItem+"&optional=remediation-item";
      		responseGetRemediationItem = restUtil.get(urlBase);
@@ -68,7 +66,7 @@ public class RemediationsService {
     /**
      * Get all the remediations items by environment
      * @param  {String} environment The environment to query
-     * @throws Exception 
+     * @throws Exception
      */
     public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser ) throws Exception {
     	restUtil.setupAuthetication( jiraUser );
@@ -77,7 +75,7 @@ public class RemediationsService {
 
      	if ( urlBase != null ) {
      		urlBase += env + "/assets?asset_types=remediation-item&reduce=true&remediation-item.deleted_on=0";
-     	
+
      		responseGetRemediationItem = restUtil.get(urlBase);
 
      		if( responseGetRemediationItem.getStatus() == 200 ){
@@ -94,7 +92,7 @@ public class RemediationsService {
     /**
      * Get all the remediations for a specific environment.
      * CI return  remediations and the filters
-     * @throws Exception 
+     * @throws Exception
      */
     public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser ) throws Exception {
     	restUtil.setupAuthetication( jiraUser );
@@ -106,7 +104,7 @@ public class RemediationsService {
      		urlBase += environment + "/remediations";
 	        String filterStringParams = getFilterStringParams(filters);
      		urlBase += filterStringParams;
-     		
+
      		response = restUtil.get( urlBase );
 
      		if ( response.getStatus() == 200 ) {
@@ -202,12 +200,12 @@ public class RemediationsService {
      * @param env				The environment
      * @param remediationItem	The remediation item id
      * @return Boolean			True if the remediation was completed.
-     * @throws Exception 
+     * @throws Exception
      */
     public Boolean markAsComplete(String env,String remediationItem, String jiraUser) throws Exception{
     	restUtil.setupAuthetication( jiraUser );
     	String urlBase = restUtil.urlEndPointAsset;
-    	
+
     	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
     	String status = getStatusRemediationItem( remediationsItemResponse , remediationItem);
  		log.debug("CI Plugin: Status CI : "+status);
@@ -219,9 +217,9 @@ public class RemediationsService {
      		Map<String, Object> data = new HashMap<String, Object>();
      		data.put("operation", "complete_remediations");
      		data.put("remediation_items", Arrays.asList( remediationItem));
-     		
+
      		urlBase += env + "/assets";
-     		
+
      		responseMarkasComplete = restUtil.put( urlBase, data);
 
      		log.debug("CI Plugin: Mark as complete status CI : "+responseMarkasComplete.getStatus());
@@ -284,7 +282,7 @@ public class RemediationsService {
     public Boolean unDipose(String env,String remediationItem, String jiraUser) throws Exception{
     	restUtil.setupAuthetication( jiraUser );
     	String urlBase = restUtil.urlEndPointAsset;
-    	
+
     	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
     	String status = getStatusRemediationItem( remediationsItemResponse, remediationItem );
 

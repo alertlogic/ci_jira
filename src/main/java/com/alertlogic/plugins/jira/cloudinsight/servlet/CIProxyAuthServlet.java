@@ -48,26 +48,26 @@ public class CIProxyAuthServlet extends HttpServlet{
 				CommonJiraPluginUtils.unauthorize(res, templateRenderer);
 				return;
 		    }
-    		
-    		String user = req.getParameter("jiraUser");
-    		if( user == null ){
-    			user = userManager.getRemoteUsername(req);
+
+    		String jiraUser = req.getParameter("user");
+    		if( jiraUser == null ){
+    			jiraUser = userManager.getRemoteUsername(req);
     		}
-    		
-    		if(!pluginConfigService.hasConfiguration(user)){
+
+    		if(!pluginConfigService.hasConfiguration(jiraUser)){
     			res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
     		}
     		else{
-    		
+
 	    		try{
-					JSONObject ciResponse = aimsService.ciAuthentication(user);
-		
+					JSONObject ciResponse = aimsService.ciAuthentication(jiraUser);
+
 					if (ciResponse != null) {
 						res.setContentType("application/json");
 						PrintWriter out = res.getWriter();
 						out.print(ciResponse);
 						out.flush();
-		
+
 					} else {
 						res.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
 					}

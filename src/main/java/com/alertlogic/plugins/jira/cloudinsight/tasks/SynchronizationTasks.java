@@ -54,40 +54,40 @@ public class SynchronizationTasks implements PluginJob {
     		}
         }
 	}
-	
+
 	/**
 	 * Search the credential for star the synchronization proccess
 	 */
     private void searchCredentialsToSynchronization(){
     	Credential[] credentials = monitor.getCredentialService().getCredentials();
-    	
+
     	for( int  i = 0; i < credentials.length; i++){
-    		synchronizeJob(monitor, credentials[i].getJiraUser());	
+    		synchronizeJob(monitor, credentials[i].getJiraUser());
     	}
     }
-    
+
 	/**
 	 * The main job, starts all the tasks required for the job.
 	 * @param monitor	Object	Reference to the tasks monitor object.
 	 */
 	private void synchronizeJob(SynchronizationScheduledImpl monitor, String jiraUser) {
 
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
-		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
-		
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+
 		try {
 			JSONObject environmentsAll = this.environmentsService.getAllEnvironments(jiraUser);
 			JSONArray environments = environmentsAll.getJSONArray("sources");
 			if (environments != null) {
-	
+
 				for ( int i = 0; i < environments.length(); i++ ) {
 					JSONObject environment = environments.getJSONObject(i).getJSONObject("source");
-	
+
 					if (environment != null) {
-	
+
 						String envId = environment.getString("id");
 						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
-	
+
 						try {
 							executeSynchronizeJob(monitor, envId, jiraUser);
 						} catch (Exception e) {
@@ -95,9 +95,9 @@ public class SynchronizationTasks implements PluginJob {
 							e.printStackTrace();
 						}
 					}
-	
+
 				}
-	
+
 			} else {
 				log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notenvironments"));		
 			}
@@ -112,15 +112,15 @@ public class SynchronizationTasks implements PluginJob {
 	 * @return
 	 */
 	private boolean skipSynchronization(Issue issue){
-		
+
 		long time = (new Date()).getTime() - issue.getUpdated().getTime();
-		
+
 		if( time < timeWait ){
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Synchronize the status between Cloud insight and jira,
 	 * can reopen issues that are close
@@ -132,13 +132,13 @@ public class SynchronizationTasks implements PluginJob {
 	 */
 	private void synchronizeStatus(Issue issue, String statusCI, SynchronizationScheduledImpl monitor ) {
 		String statusJira = issue.getStatusObject().getNameTranslation();
-		
+
 		try{
 			if( !skipSynchronization( issue ) ){
 				if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
 					if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
 						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
-	
+
 						int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
 						monitor.getJIRAService().doTransitionIssue(
 								issue,
@@ -153,7 +153,7 @@ public class SynchronizationTasks implements PluginJob {
 				    if ( statusCI.equals("disposed") || statusCI.equals("complete") || statusCI.equals("verified") ) {
 				    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
 				    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
-	
+
 				    		int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
 							monitor.getJIRAService().doTransitionIssue(
 									issue,
@@ -161,7 +161,7 @@ public class SynchronizationTasks implements PluginJob {
 									issue.getProjectObject().getLeadUserName(),
 									monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.close")
 								);
-	
+
 							log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenclosed")  + issue.getKey());		
 						}
 				    }
@@ -183,19 +183,19 @@ public class SynchronizationTasks implements PluginJob {
 	 * @param environmentId
 	 */
 	private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId, String jiraUser) {
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
 
     	if (!environmentId.isEmpty()) {
     		try{
-    			
+
 		    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environmentId, jiraUser);
-	
+
 		    	if ( allRemediationsItems.has("assets") ) {
-	
+
 		    		JSONArray assets = allRemediationsItems.getJSONArray("assets");
-	
+
 		    		if ( assets.length() != 0 ) {
-	
+
 		    			for(int i = 0; i < assets.length(); i++)
 		    	    	{
 		    	    		for(int j = 0; j < assets.getJSONArray(i).length(); j++)
@@ -205,19 +205,19 @@ public class SynchronizationTasks implements PluginJob {
 			    	    			String state = remediationItem.getString("state");
 			    	    			String key = remediationItem.getString("key");
 			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
-	
+
 			    	    			List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);
 			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue") + key);
 			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.amount") + issues.size());
 			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.cistate") + state);
-	
+
 			    	    			for(int k=0; k<issues.size();k++){
 			    	    				synchronizeStatus( issues.get(k), state, monitor);
 			    	    			}
 		    	    			}
 		    	        	}
 		    	    	}
-	
+
 					} else {
 						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notassets") );	
 					}
@@ -225,7 +225,7 @@ public class SynchronizationTasks implements PluginJob {
 				} else{
 					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notremediations") );	
 				}
-		    	
+
     		} catch(Exception exception) {
 	    		exception.printStackTrace();
 	    	}

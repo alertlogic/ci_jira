@@ -47,7 +47,7 @@ public class AutoAssignTask implements PluginJob {
 	    		Date currentDate = new Date();
 	        	log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
 	        	monitor.setLastRun(currentDate);
-    			
+
 	        	if( monitor.getPluginConfigService() != null ){
 	        		assingJob();
 	        	}
@@ -104,18 +104,18 @@ public class AutoAssignTask implements PluginJob {
 				if (rule != null) {
 
 					String ruleName = rule.getString("name");
-					
+
 					TaskLogger taskLogger = new TaskLogger();
 					taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.header") + ruleName);
-					
+
 					RuleConfig ruleConfig = this.ruleConfigService.getRuleById(rule.getInt("id"));
-					
+
 					//Verify that the task is not in blocked state
 					if(ruleConfig.getLastStatus() != TaskRuleExecutionState.BLOCKED)
 					{
 						int statusBeforeRun = ruleConfig.getLastStatus();
 						int ruleId = rule.getInt("id");
-						
+
 						try {
 							//Set the state of the rule to EXECUTING
 							this.ruleConfigService.updateLog(
@@ -123,10 +123,10 @@ public class AutoAssignTask implements PluginJob {
 									taskLogger.toString(), 
 									new Date(), TaskRuleExecutionState.EXECUTING);
 							log.debug(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.header") + ruleName);
-							
+
 							//If something bad happens, this method will throw an exception.
 							int plannedItems = executeJob(ruleName, rule, statusBeforeRun);
-							
+
 							//This line should be reach if no exceptions where triggered
 							updateRuleLog(ruleId,plannedItems,taskLogger);
 
@@ -134,7 +134,7 @@ public class AutoAssignTask implements PluginJob {
 							//Properly manage the exception and update logs with the errors.
 							manageRuleException(rule,ruleConfig,e,taskLogger,statusBeforeRun);
 						}
-						
+
 						log.debug(taskLogger.toString());
 					}
 				}
@@ -156,12 +156,12 @@ public class AutoAssignTask implements PluginJob {
 		StringWriter sw = new StringWriter();
 		e.printStackTrace(new PrintWriter(sw));
 		String exceptionAsString = sw.toString();
-		
+
 		//If error happens last important log becomes the previous one.
 		String lastImportantLog = rule.getString("lastLog");
 		String ruleName = rule.getString("name");
 		int ruleId = rule.getInt("id");
-		
+
 		//Is the second time it fails?
 		if (statusBeforeRun == TaskRuleExecutionState.ERROR) 
 		{
@@ -169,19 +169,19 @@ public class AutoAssignTask implements PluginJob {
 			taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.stacktrace") + exceptionAsString);	
 			taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.blocked") + ruleName +":"+e.getMessage());
 			taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.blocked") + ruleName +":"+monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.blocked.msg"));
-			
+
 			//Mark the rule as blocked
 			this.ruleConfigService.updateLog(ruleId, taskLogger.toString(), lastImportantLog, new Date(), TaskRuleExecutionState.BLOCKED);
-			
+
 		} else {
 			//Prepare the text for logging
 			taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.stacktrace") + exceptionAsString);
 			taskLogger.log(monitor.getI18nResolver().getText("ci.job.autoassign.msg.log.error")+ ruleName +":"+e.getMessage());
-			
+
 			//Mark the rule as error
 			this.ruleConfigService.updateLog(ruleId,  taskLogger.toString(), lastImportantLog, new Date(), TaskRuleExecutionState.ERROR);
 		}
-		
+
 		log.error(taskLogger.toString());
 	}
 
@@ -222,59 +222,58 @@ public class AutoAssignTask implements PluginJob {
 	private int executeJob(String ruleName, JSONObject rule, int statusBeforeRun) throws Exception 
 	{
 		//Create the instance of the service
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getAIMSService(), monitor.getRestUtil());
-		
+		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+
     	String environment = rule.getString("environment");
     	String jiraUser = rule.getString("user");
 
-    	if (!environment.isEmpty()) 
+    	if (!environment.isEmpty())
     	{
     		//Get the filters for this rule
 	    	JSONArray filters = rule.getJSONArray("filters");
 	    	JSONArray filtersString = rule.getJSONArray("filtersString");
-	    	
+
 	    	//Get all remediation items for the configures environment in the rule
 	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environment, jiraUser);
 	    	//Get all remediations based on the environment an the filter
 	    	JSONObject allRemediations = this.remediationsService.getAllRemediations( environment, filters, jiraUser);
 	    	//Get all remediations descritions
 	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions(jiraUser);
-	   	
+
 	    	JSONArray currentRemediations = getOpenRemediations(allRemediations,allRemediationsItems);
-	    	
+
 	    	if (currentRemediations.length() > 0) {
-	    		
+
 	    		JSONArray remediationKeys = this.remediationsService.getRemediationsKeys(currentRemediations);
 	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString, jiraUser);
-	    		
+
 	    		if (plannedItems.length() <= 0) {
 	    			throw new Exception(currentRemediations.length()+" "+monitor.getI18nResolver().getText("ci.job.autoassign.msg.plannederror"));
 	    		}
-	    		
+
 	    		//For each successfully planned item create a jira issue
-	    		for (int i = 0; i < plannedItems.length(); i++) 
+	    		for (int i = 0; i < plannedItems.length(); i++)
 	    		{
 	    			JSONObject remediationItem = plannedItems.getJSONObject(i);
 	    			JSONObject remediation = getRemediationData(currentRemediations,remediationItem);
 	    			assignRemediation(remediation,remediationItem,rule,descriptions);
 	    		}
-	    		
+
 	    		return plannedItems.length();
 	    	} else {
 	    		if (statusBeforeRun == TaskRuleExecutionState.ERROR) {
 	    			throw new Exception(monitor.getI18nResolver().getText("ci.job.autoassign.msg.blocked.error"));
 	    		}
 	    	}
-	    	
+
     	} else {
     		throw new Exception(monitor.getI18nResolver().getText("ci.job.autoassign.msg.noenv.error"));
     	}
-    	
+
     	//No planned items
     	return 0;
 	}
-	
-	
+
 	/**
 	 * Get the remediation data
 	 * @param currentRemediations	The current remediations
@@ -337,12 +336,12 @@ public class AutoAssignTask implements PluginJob {
 		JSONArray currentRemediations = new JSONArray();
 
 		if ( allRemediations != null ) {
-			
+
 			if ( allRemediations.has("remediations") ) {
 		    	if ( allRemediations.getJSONObject("remediations") != null ) {
-		
+
 		    		JSONArray assets = allRemediations.getJSONObject("remediations").getJSONArray("assets");
-		
+
 		    		if ( assets != null ) {
 						for (int i = 0; i < assets.length(); i++)
 						{
@@ -350,9 +349,9 @@ public class AutoAssignTask implements PluginJob {
 								currentRemediations.put(assets.getJSONObject(i));
 							}
 						}
-		
-					} 
-				} 
+
+					}
+				}
 			}
 		}
 

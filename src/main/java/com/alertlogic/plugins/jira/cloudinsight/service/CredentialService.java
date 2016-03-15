@@ -68,7 +68,7 @@ public class CredentialService
     	}
     	return null;
     }
-    
+
     /**
      * Get the configuration store as an active object
      */
@@ -80,7 +80,7 @@ public class CredentialService
     	}
     	return null;
     }
-    
+
     /**
      * Get all the credentials
      */
@@ -100,9 +100,9 @@ public class CredentialService
     {
     	return (activeObjects.count( Credential.class, Query.select().where("CI_USER = ?", user ) ) > 0);
     }
-    
+
     /**
-     * Review if exists some configuration that are using the credential  
+     * Review if exists some configuration that are using the credential
      * @param id credential
      * @return boolean
      */
@@ -110,7 +110,7 @@ public class CredentialService
     	try{
 	    	Credential credential = getCredentialById(id);
 	    	PluginConfig[] configs = credential.getPluginConfigs();
-	    	
+
 	    	if(configs.length > 0){
 	    		return false;
 	    	}
@@ -144,7 +144,7 @@ public class CredentialService
 		}
     	return false;
     }
-    
+
     /**
      * Get the credentials
      * @return JSONArray with the credentials stored on active objects

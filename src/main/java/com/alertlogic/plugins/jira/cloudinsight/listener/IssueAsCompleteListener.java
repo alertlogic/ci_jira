@@ -80,26 +80,26 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 			{
 				String reporter = issueEvent.getIssue().getReporterUser().getName();
 				try{
-					String environment = remediationItem.split("/")[2].split(":")[1];				
+					String environment = remediationItem.split("/")[2].split(":")[1];
 					log.debug("CI Plugin: Reporter : "+reporter);
 					if (remediationService.markAsComplete( environment, remediationItem, reporter))
-					{	
+					{
 						log.debug("CI Plugin: adding comment to issue");
 						String commentMsg = i18nResolver.getText("ci.listener.markascomplete.msg.success");
 						jiraService.commentIssue(issueEvent.getIssue(), issueEvent.getUser(), commentMsg);
-	
+
 					} else {
-	
+
 						JSONObject remediationsItemResponse = remediationService.getRemediationItem( environment, remediationItem, reporter);
 				    	String remediationStatus = remediationService.getStatusRemediationItem( remediationsItemResponse, remediationItem );
-	
+
 				    	if(!remediationStatus.equals("disposed"))
 						{
-	
+
 							log.debug("CI Plugin: adding comment to issue");
 							String commentMsg = i18nResolver.getText("ci.listener.markascomplete.msg.error");
 							jiraService.commentIssue(issueEvent.getIssue(), issueEvent.getUser(), commentMsg);
-	
+
 						}
 					}
 				}catch(Exception e){

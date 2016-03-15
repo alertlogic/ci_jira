@@ -27,7 +27,6 @@ var CIAIMSService = function() {
         storageService.removeKey("ci-user-id");
         storageService.removeKey("ci-endpoint");
         storageService.removeKey("jira-user");
-
         storageService.removeKey("field-remediation-item");
         storageService.removeKey("field-remediation-id");
         storageService.removeKey("field-group");

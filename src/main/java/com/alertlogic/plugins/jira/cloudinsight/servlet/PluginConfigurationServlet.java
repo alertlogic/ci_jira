@@ -78,7 +78,7 @@ public class PluginConfigurationServlet extends HttpServlet{
             //load resources and show template
             loadWebResources();
             Map<String, Object> context = Maps.newHashMap();
-            
+
             templateRenderer.render(CONFIG_BROWSER_TEMPLATE, context, res.getWriter());
         }
     }
@@ -98,10 +98,10 @@ public class PluginConfigurationServlet extends HttpServlet{
 
         	String jiraUser = userManager.getRemoteUsername(req);
     		JSONObject confObject = pluginConfigService.getConfigurationByUserJSON(jiraUser);
-    		
+
     		res.setContentType("application/json");
             PrintWriter out = res.getWriter();
-            
+
     		if(confObject!=null){
 	            out.print(confObject.toString());
 	            out.flush();
@@ -109,10 +109,10 @@ public class PluginConfigurationServlet extends HttpServlet{
         	else{
         		out.print("{}");
 	            out.flush();
-        	}            
+        	}
         }
     }
-    
+
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
     {
@@ -130,10 +130,10 @@ public class PluginConfigurationServlet extends HttpServlet{
     		String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
     		JSONObject jsonArray= new JSONObject(string);
     		int idCredential = jsonArray.getInt("idCredential");
-    		
+
     		Credential credential = credentialService.getCredentialById(idCredential);
             PluginConfig pluginConfig = pluginConfigService.createOrUpdateConfiguration(jiraUser, credential);
-            
+
             if( pluginConfig != null ){
                 res.setContentType("application/json");
                 JSONObject obj=new JSONObject();
@@ -159,7 +159,7 @@ public class PluginConfigurationServlet extends HttpServlet{
             //load resources and show template
             loadWebResources();
             String jiraUser = userManager.getRemoteUsername(req);
-        
+
             if( pluginConfigService.deleteConfiguration(jiraUser) ){
                 res.setContentType("application/json");
                 JSONObject obj=new JSONObject();
