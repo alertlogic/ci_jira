@@ -86,11 +86,11 @@ AJS.$( document ).ready( function() {
 
     /**
      * Save a credential
-     * @param user        user of cloud insight
-     * @param url         url end point of cloud insight
+     * @param idCredential  id credential
+     * @param user          user of cloud insight
+     * @param url           url end point of cloud insight
      */
     self.saveCredential = function( idCredential, user, url){
-
         var credentialsAll = credentialsService.getCredentials();
 
         credentialsAll.done( function( dataCredential ){
@@ -145,6 +145,7 @@ AJS.$( document ).ready( function() {
                     switch( jqXHR.status ) {
                         case 400:
                             msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.limit_exceded");
+                            self.loadAccessKeys( url, ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token );
                             break;
                         case 401:
                             msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.unauthorized");
@@ -182,6 +183,7 @@ AJS.$( document ).ready( function() {
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.success")
             );
             self.loadCredentials();
+            self.loadConfig();
 
         }).fail( function(jqXHR) {
             var msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.request");
@@ -216,11 +218,12 @@ AJS.$( document ).ready( function() {
         AJS.$('#idCredential').val( credentials[ id ].id );
         AJS.$('#ciUser').val( credentials[ id ].ciUser );
         AJS.$('#ciPassword').val( '' );
-        AJS.$('#ciUrl').val( credentials[ id ].ciUrl );
+        AJS.$('#ciUrl' ).select2().select2('val', credentials[ id ].ciUrl);
         AJS.$('#ciAccessKeyId').val( credentials[ id ].ciAccessKeyId );
         AJS.$('#btnCredentialDelete').prop( "disabled" , false );
         AJS.$('#btnCredentialCancel').prop( "disabled" , false );
         AJS.$('#configformTitle').html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.form.title.update.credential") );
+        AUIUtils.clearTable( "#accessKeyTable", true );
     };
 
     /**
@@ -256,9 +259,11 @@ AJS.$( document ).ready( function() {
         AJS.$('#idCredential').val('');
         AJS.$('#ciUser').val('');
         AJS.$('#ciPassword').val('');
-        AJS.$('#ciUrl').val('');
+        AJS.$('#ciUrl').select2().select2('val', '');
         AJS.$('#ciAccessKeyId').val('');
         AJS.$('#btnCredentialCancel').prop( "disabled" , true );
+        AJS.$('#btnCredentialSave').prop( "disabled" , true );
+        AJS.$('#btnCredentialDelete').prop( "disabled" , true );
         AJS.$('#configformTitle').html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.form.title.add.credential") );
     };
 
@@ -296,7 +301,75 @@ AJS.$( document ).ready( function() {
     self.loadCredentialDialog = function() {
         AJS.dialog2("#credential-crud-dialog").show();
         self.loadCredentials();
-    }
+    };
+
+    /**
+     * Delete access key
+     * @param {Object} access key
+     */
+    self.deleteAccessKey= function( accessKey ) {
+        ciAIMSService.deleteAccessKey( AJS.$('#ciUrl').val(), ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token, accessKey )
+        .done( function() {
+
+            AUIUtils.showMsgSuccess(
+                '#aui-message-bar',
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.delete.success")
+            );
+            self.loadAccessKeys( AJS.$('#ciUrl').val(), ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token );
+
+        }).fail( function(jqXHR) {
+            AUIUtils.showMsgError(
+                '#aui-message-bar',
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.delete.error")
+            );
+        });
+    };
+
+    /**
+     * Adds the key item to the view.
+     * @param {Object} access key
+     */
+    self.addAccessKeyToView = function( accessKey ) {
+        var tableBody = AJS.$("#accessKeyTable tbody");
+        var action = "pluginConfigurationController.deleteAccessKey('" + accessKey + "')" ;
+
+        var rowData = [
+            {
+                data: accessKey
+            },
+            {
+                data: "X",
+                style: 'row_pointer',
+                action: action
+            }
+        ];
+
+        AUIUtils.createTableRow( tableBody, rowData);
+    };
+
+    /**
+     * Load the access keys
+     * @param {string} url
+     * @param {string} user_id
+     * @param {string} account_id
+     * @param {string} token
+     */
+    self.loadAccessKeys = function( url, user_id, account_id, token ) {
+        var accessKeysAll = ciAIMSService.getAccessKeys( url, user_id, account_id, token );
+
+        AUIUtils.clearTable( "#accessKeyTable" , true);
+
+        accessKeysAll.done(function( data ){
+            var headerElement = AJS.$("#accessKeyTable thead tr");
+            AUIUtils.addTableHeader( headerElement, '', AJS.I18n.getText("ci.partials.pluginconfiguration.js.table.accesskey.header.accesskey"), '');
+            AUIUtils.addTableHeader( headerElement, '', AJS.I18n.getText("ci.partials.pluginconfiguration.js.table.accesskey.header.action"), '');
+
+            for(var i = 0 ; i < data.access_keys.length; i++)
+            {
+                self.addAccessKeyToView( data.access_keys[i] );
+            }
+        });
+    };
 
     /* Events on buttons and fields */
     /* Test conection with cloud insight*/
@@ -305,7 +378,9 @@ AJS.$( document ).ready( function() {
     });
     /* Save the credential */
     AJS.$('#btnCredentialSave').click( function() {
-        self.saveCredential( AJS.$('#idCredential').val(), AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
+        if(  AJS.$('#ciUser').val() !== '' && AJS.$('#ciUrl').val() !== '' ){
+            self.saveCredential( AJS.$('#idCredential').val(), AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
+        }
     });
     /* Delete credentials */
     AJS.$( "#btnCredentialDelete" ).click( function() {
@@ -324,7 +399,7 @@ AJS.$( document ).ready( function() {
         self.activeTestButton();
     });
 
-    AJS.$( "#ciUrlEndPoint" ).keyup(function() {
+    AJS.$( "#ciUrl" ).click(function() {
         self.activeTestButton();
     });
     /* Open the dialog */
@@ -391,6 +466,8 @@ AJS.$( document ).ready( function() {
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.save.success")
             );
             self.testConectionFromServer();
+            //force refresh
+            location.reload();
         });
 
         jiraConfig.fail( function( jqXHR ) {
@@ -407,10 +484,14 @@ AJS.$( document ).ready( function() {
         var jiraConfig = jiraService.Configuration().deleteConfig();
 
         jiraConfig.done( function( data ){
+            AJS.$('#selectCredential').auiSelect2().val("");
+
             JIRA.Messages.showSuccessMsg(
                 AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.delete.success")
             );
             self.testConectionFromServer();
+            //force refresh
+            location.reload();
         });
 
         jiraConfig.fail( function( jqXHR ) {
@@ -424,6 +505,7 @@ AJS.$( document ).ready( function() {
     self.loadConfig = function (){
 
         var credentialsAll = credentialsService.getCredentials();
+        AJS.$( "#selectCredential" ).auiSelect2().val("");
         AUIUtils.clearSelect("#selectCredential");
 
         credentialsAll.done(function( data ){
@@ -434,15 +516,22 @@ AJS.$( document ).ready( function() {
                 AUIUtils.addOptions( "#selectCredential", data, "id", "ciUser" );
             }
 
-            jiraService.Configuration().get().done(function( data ){
+            jiraService.Configuration().get().done(function( dataConfig ){
                 //that is for review before to save
-                config = data;
-                if ( data.hasOwnProperty('credential_id') ) {
-                    AJS.$('#selectCredential').select2().select2('val', data.credential_id);
+                config = dataConfig;
+
+                if ( dataConfig.hasOwnProperty('credential_id') ) {
+
+                    AJS.$('#selectCredential').select2().select2('val', dataConfig.credential_id);
                     AJS.$('#btnConfigSave').prop( "disabled" , false );
                     AJS.$('#btnConfigDelete').prop( "disabled" , false );
                 }
+
+                if( data.length > 0 ){
+                    AJS.$( "#selectCredential" ).triggerHandler("change");
+                }
             });
+
         });
     };
 
@@ -468,15 +557,12 @@ AJS.$( document ).ready( function() {
 
     self.loadConfig();
 
-    Bootstrap.onView("#selectCredential", function(){
-
-        if( typeof jQuery.fn.auiSelect2 == 'function') {
-            AJS.$( "#selectCredential" ).auiSelect2();
-        }
-        AJS.$( "#selectCredential" ).change(function() {
-            AJS.$('#btnConfigSave').prop( "disabled" , false );
-            AJS.$('#btnConfigDelete').prop( "disabled" , false );
-        });
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#selectCredential" ).auiSelect2();
+    }
+    AJS.$( "#selectCredential" ).change(function() {
+        AJS.$('#btnConfigSave').prop( "disabled" , false );
+        AJS.$('#btnConfigDelete').prop( "disabled" , false );
     });
 
     /* Save the configuration */
@@ -496,12 +582,21 @@ AJS.$( document ).ready( function() {
     });
 
     /** Permissions **/
-    Bootstrap.onView("#selectGroup", function(){
-        if( typeof jQuery.fn.auiSelect2 == 'function') {
-            AJS.$( "#selectGroup" ).auiSelect2();
-        }
-    });
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#selectGroup" ).auiSelect2();
+    }
 
+    var availableEndPoints = [
+        { "url": "https://api.cloudinsight.alertlogic.com" }
+        ,{ "url":"https://api.cloudinsight.alertlogic.co.uk"}
+        //,{ "url": "https://api.product.dev.alertlogic.com"}
+    ];
+
+    AUIUtils.addOptions( "#ciUrl", availableEndPoints, "url", "url" );
+
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#ciUrl" ).auiSelect2();
+    }
     /**
      * Adds the remediations item to the view.
      * @param {Object} rule The refence to the item

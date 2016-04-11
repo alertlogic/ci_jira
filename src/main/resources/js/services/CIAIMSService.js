@@ -89,12 +89,12 @@ var CIAIMSService = function() {
     /**
      * Delete an access key
      */
-    self.deleteAccessKey = function( accessKeyId ){
+    self.deleteAccessKey = function( urlEndPoint, userId, accountId, token, accessKeyId ){
 
-        var urlBase =  ciAIMSService.getSessionData().endpoint
+        var urlBase = urlEndPoint
         +"/aims/" + configService.serviceVersion
-        +"/" + ciAIMSService.getSessionData().accountId
-        +"/users/" + ciAIMSService.getSessionData().userId
+        +"/" + accountId
+        +"/users/" + userId
         +"/access_keys/" + accessKeyId;
 
         return AJS.$.ajax({
@@ -102,7 +102,28 @@ var CIAIMSService = function() {
             url: urlBase,
             dataType: 'json',
             headers: {
-                "x-aims-auth-token": ciAIMSService.getSessionData().token
+                "x-aims-auth-token": token
+            }
+        });
+    };
+
+    /**
+     * Get access keys
+     */
+    self.getAccessKeys = function( urlEndPoint, userId, accountId, token ){
+
+        var urlBase =  urlEndPoint
+        +"/aims/" + configService.serviceVersion
+        +"/" + accountId
+        +"/users/" + userId
+        +"/access_keys";
+
+        return AJS.$.ajax({
+            type: "GET",
+            url: urlBase,
+            dataType: 'json',
+            headers: {
+                "x-aims-auth-token": token
             }
         });
     };

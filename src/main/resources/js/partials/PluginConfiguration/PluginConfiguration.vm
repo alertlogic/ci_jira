@@ -48,8 +48,8 @@
                                             <span class="aui-icon icon-required"></span>
                                             <span class="content">required</span>
                                         </label>
-                                        <input id="ciUrl" class="text long-field" type="text" name="ciUrl"
-                                        >
+                                        <select id="ciUrl" class="select-medium" size="1" name="ciUrl">
+                                        </select>
                                         <div class="description"> $i18n.getText('ci.partials.pluginconfiguration.vm.url.description') </div>
                                     </div>
                                     <div class="field-group">
@@ -92,6 +92,14 @@
                                         </button>
                                     </div>
                                 </form>
+
+                                <table class="aui" id="accessKeyTable">
+                                    <thead>
+                                        <tr>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -127,8 +135,8 @@
 
                             $i18n.getText('ci.partials.pluginconfiguration.vm.credential.select'):
                             <select id="selectCredential" class="select-medium" size="1">
-                                <option value=""></option>
                             </select>
+                             &nbsp;
                             <button id="btnCredential" class="aui-button">$i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.dialog')</button>
 
                             <br/>
