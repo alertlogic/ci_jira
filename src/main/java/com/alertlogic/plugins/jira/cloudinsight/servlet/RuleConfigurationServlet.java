@@ -89,7 +89,6 @@ public class RuleConfigurationServlet extends HttpServlet{
     	}
     }
 
-    
     /**
      * Get the rules in json
      */
@@ -99,7 +98,7 @@ public class RuleConfigurationServlet extends HttpServlet{
         if (userManager != null) {
 
         	userManager.getRemoteUsername(req);
-        	
+
             if (!CommonJiraPluginUtils.isAnAuthorizedJiraUser(req, userManager)) {
                 CommonJiraPluginUtils.unauthorize(res, templateRenderer);
                 return;
@@ -138,7 +137,7 @@ public class RuleConfigurationServlet extends HttpServlet{
 			            out.flush();
 	            	}
             	}
-            	
+
             }
             catch(Exception e){
             	e.printStackTrace();
@@ -164,7 +163,7 @@ public class RuleConfigurationServlet extends HttpServlet{
 	    		String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
 	    		JSONObject jsonArray= new JSONObject(string);
 	    		String option = jsonArray.getString("option");
-	    		
+
 	    		if( option.equals("unblock") ){
 	    			int id = jsonArray.getInt("id");
 	    			boolean result = ruleConfigService.updateLog(id, "", null, TaskRuleExecutionState.SCHEDULED);

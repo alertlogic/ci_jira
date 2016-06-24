@@ -43,9 +43,9 @@ public class PermissionService {
         	permission.save();
         	log.debug(i18n.getText("ci.service.permission.msg.log.debug.group.stored"));
         	return permission;
-    	}        
+    	}
     }
-    
+
     /**
      * Get the group that has permissions in Json format
      * @return JSONArray permission
@@ -68,7 +68,7 @@ public class PermissionService {
 
         return permissionsArray;
     }
-    
+
     /**
      * Get the group that has permissions
      * @return ArrayList of Permission

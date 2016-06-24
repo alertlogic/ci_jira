@@ -45,7 +45,7 @@ public class PermissionConfigurationServlet extends HttpServlet{
     	if (userManager != null) {
 
         	userManager.getRemoteUsername(req);
-        	
+
             if (!CommonJiraPluginUtils.isAnAuthorizedJiraUser(req, userManager)) {
                 CommonJiraPluginUtils.unauthorize(res, templateRenderer);
                 return;
@@ -72,7 +72,7 @@ public class PermissionConfigurationServlet extends HttpServlet{
             }
         }
     }
-    
+
     /**
      * Get the rules in json
      */
@@ -96,12 +96,12 @@ public class PermissionConfigurationServlet extends HttpServlet{
 		    }
     		try{
 	    		ServletInputStream inputStream = req.getInputStream();
-	    		String string = CommonJiraPluginUtils.convertStreamToString(inputStream); 
+	    		String string = CommonJiraPluginUtils.convertStreamToString(inputStream);
 	    		JSONObject jsonArray= new JSONObject(string);
 	    		String group = jsonArray.getString("group");
-	    		
+
 	    		Permission permission = permissionService.assignPermission(group);
-	    		
+
 		    	String outJson  =  new JSONObject().put( "permissions", permission ).toString();
 
 				if (outJson != null) {
@@ -138,7 +138,7 @@ public class PermissionConfigurationServlet extends HttpServlet{
     			JSONObject jsonArray = new JSONObject( string );
 
 	    		int id = (int) jsonArray.getInt( "id" );
-	    			    		
+
 	    		if ( permissionService.removePermision( id ) ) {
 					res.setContentType( "application/json" );
 					JSONObject obj = new JSONObject();

@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.JIRAService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 import com.atlassian.sal.api.lifecycle.LifecycleAware;
 import com.atlassian.sal.api.message.I18nResolver;
 import com.atlassian.sal.api.scheduling.PluginScheduler;
@@ -18,21 +20,23 @@ import com.atlassian.sal.api.scheduling.PluginScheduler;
  * Schedules the CI Add-on sync task.
  */
 public class SynchronizationScheduledImpl extends AbstractTaskMonitor implements LifecycleAware {
-	
+
 	private final Logger logger = LoggerFactory.getLogger(SynchronizationScheduledImpl.class);
-	
+
 	public static final String KEY = SynchronizationScheduledImpl.class.getName() + ":instance";
     public static final String JOB_NAME = SynchronizationScheduledImpl.class.getName() + ":job";
 
 	public SynchronizationScheduledImpl(
 			PluginScheduler pluginScheduler,
-			PluginConfigService pluginConfigService, 
+			PluginConfigService pluginConfigService,
 			AIMSService aimsService,
-			RuleConfigService ruleConfigService, 
+			RuleConfigService ruleConfigService,
 			JIRAService jiraService,
-			I18nResolver i18nResolver) 
+			I18nResolver i18nResolver,
+			CredentialService credentialService,
+			RestUtil restUtilService)
 	{
-		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver);
+		super(pluginScheduler, pluginConfigService, aimsService,ruleConfigService, jiraService, i18nResolver, credentialService, restUtilService);
 	}
 
 	// declared by LifecycleAware
@@ -42,9 +46,9 @@ public class SynchronizationScheduledImpl extends AbstractTaskMonitor implements
 
     @SuppressWarnings("serial")
 	public void reschedule(long interval) {
-    	
+
         this.interval = interval;
-        
+
         pluginScheduler.scheduleJob(
                 JOB_NAME,                  		// unique name of the job
                 SynchronizationTasks.class, 	// class of the job

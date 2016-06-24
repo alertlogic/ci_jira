@@ -8,7 +8,9 @@ var remediationsSyncController;
  */
 AJS.$(document).ready(
 	function() {
-		Bootstrap.start(function(){
+		var currentUser = AJS.Meta.get('remote-user');
+
+		Bootstrap.start( currentUser, function(){
 			var self = remediationsSyncController = this;
 
 			var filtersTypeList;
