@@ -19,7 +19,13 @@ public class CloudInsightPluginHasConfigCondition extends AbstractWebCondition{
 	}
 
 	@Override
-	public boolean shouldDisplay(ApplicationUser arg0, JiraHelper arg1) {
-		return pluginConfigService.hasConfiguration();
+	public boolean shouldDisplay(ApplicationUser appUser, JiraHelper arg1) {
+
+		try{
+			return this.pluginConfigService.hasConfiguration(appUser.getUsername());
+		}
+		catch(Exception e){
+			return false;
+		}
 	}
 }

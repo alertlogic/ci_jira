@@ -82,7 +82,7 @@ public class RuleConfigService {
     		conf.save();
     	}
     }
-    
+
     /**
      * Update the status
      * @param id
@@ -96,7 +96,7 @@ public class RuleConfigService {
     		conf.save();
     	}
     }
-    
+
     /**
      * Update the log
      * @param id
@@ -110,7 +110,7 @@ public class RuleConfigService {
     		conf.save();
     	}
     }
-    
+
     /**
      * Update the log
      * @param id
@@ -124,7 +124,7 @@ public class RuleConfigService {
     		conf.save();
     	}
     }
-    
+
     /**
      * Update the log and last execution of a rule
      * @param id				The id of the rule
@@ -147,7 +147,7 @@ public class RuleConfigService {
     	}
         return false;
     }
-    
+
     /**
      * Update the log and last execution of a rule
      * @param id				The id of the rule
@@ -185,12 +185,12 @@ public class RuleConfigService {
 	        conf.setName(ruleName);
 	        conf.setEnvironment(environment);
 	        conf.setUser(userName);
-	
 	        conf.save();
+
 	        log.debug("CI Plugin: updateing a rule configuration on active objects");
 	        Filter[] filtersArray = conf.getFilters();
 			activeObjects.delete( filtersArray );
-	        
+
 	        for( int i = 0; i < filters.length; i++){
 	        	addFilter( conf , filters[ i ] );
 	        }
@@ -288,7 +288,7 @@ public class RuleConfigService {
             obj.put("group",rules[i].getGroup());
             obj.put("user",rules[i].getUser());
             obj.put("lastExecution",rules[i].getLastExecution());
-            obj.put("lastLog",rules[i].getLastLog());           
+            obj.put("lastLog",rules[i].getLastLog());
             obj.put("lastImportantLog",rules[i].getLastImportantLog());
             obj.put("lastStatus",rules[i].getLastStatus());
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(rules[i].getLastStatus()));
@@ -312,7 +312,6 @@ public class RuleConfigService {
 
         return rulesArray;
     }
-
 
     /**
      * Get the rules from active object

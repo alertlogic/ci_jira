@@ -26,10 +26,10 @@ public class CloudInsightUserHasPermissionCondition extends AbstractWebCondition
 
 	@Override
 	public boolean shouldDisplay(ApplicationUser appUser, JiraHelper jiraHelper) {
-		
+
 		Collection<Group> groupsForUser = jiraService.getGroupsForUser( appUser.getUsername() );
 		List<String> permissionsList = permissionService.getPermmisionsList() ;
-		
+
 		//by default if in the instance has not configured any permission everybody has permission.
 		if( permissionsList.size() == 0 ){
 			return true;
@@ -37,7 +37,7 @@ public class CloudInsightUserHasPermissionCondition extends AbstractWebCondition
 		//search if one of the groups for the user are configured with permissions
 		for( Group group: groupsForUser ){
 			if( permissionsList.indexOf( group.getName() ) >= 0 ){
-				return true;				
+				return true;
 			}
 		}
 		return false;

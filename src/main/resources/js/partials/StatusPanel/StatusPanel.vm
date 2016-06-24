@@ -5,7 +5,7 @@
 	 * On demand loading of the controller, this should be
 	 * a JIRA panel.
 	 */
-	statusController();
+	statusController("$issue.reporter.name");
 </script>
 <div id="remediationStatusPanel"></div>
 <div id="remediationStatusMessage"></div>

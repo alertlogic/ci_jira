@@ -7,7 +7,9 @@ var ruleConfigurationController;
  */
 AJS.$(document).ready(
 	function() {
-		Bootstrap.start(function(){
+		var currentUser = AJS.Meta.get('remote-user');
+
+		Bootstrap.start( currentUser, function(){
 			var self = ruleConfigurationController = this;
 			var environments = [];
 			var projects = [];
