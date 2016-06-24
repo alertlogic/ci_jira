@@ -31,13 +31,18 @@ var CIJIRAService = function() {
     /**
      * Authenticates using the proxy servlet
      */
-    self.AuthProxy = function() {
+    self.AuthProxy = function( user ) {
+
         var urlProxyServlet = urlBaseServlets + "proxyauthservlet";
+        var data = {
+            user: user
+        };
 
         return jQuery.ajax({
             type: "POST",
             url: urlProxyServlet,
-            dataType: 'json'
+            dataType: 'json',
+            data: data
         });
     };
 
@@ -48,32 +53,37 @@ var CIJIRAService = function() {
         var urlProxyServlet = urlBaseServlets + "pluginconfiguration";
 
         return {
-
             /**
-             * Save the configuration of credentials to login cloud insight
-             * @param user        user of cloud insight
-             * @param password    password of cloud insight
-             * @param url         url end point of cloud insight
-             **/
-            save: function( ciUser, ciUrl, ciAccessKeyId, ciSecretKey ) {
-                var data = {
-                    "ciUser": ciUser,
-                    "ciUrl": ciUrl,
-                    "ciAccessKeyId": ciAccessKeyId,
-                    "ciSecretKey": ciSecretKey
-                };
+             * Get the credential configured for the user logged
+             */
+            get: function() {
                 return jQuery.ajax({
                     type: "POST",
                     url: urlProxyServlet,
+                    dataType: 'json'
+                });
+            },
+
+            /**
+             * Save the configuration of credentials to login cloud insight
+             * @param idCredential        id credential
+             **/
+            save: function( idCredential ) {
+                var data = {
+                    "idCredential": idCredential
+                };
+                return jQuery.ajax({
+                    type: "PUT",
+                    url: urlProxyServlet,
                     dataType: 'json',
-                    data: data
+                    data: JSON.stringify(data)
                 });
             },
 
             /**
              * Delete the configuration stored
              **/
-            deleteConf: function() {
+            deleteConfig: function() {
                 return jQuery.ajax({
                     type: "DELETE",
                     url: urlProxyServlet,

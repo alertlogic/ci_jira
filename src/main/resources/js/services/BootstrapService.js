@@ -18,12 +18,12 @@ var BootstrapService = function() {
      * verifiying that the user has already logged in
      * into CI.
      */
-    self.start = function( controller ) {
+    self.start = function( currentUser, controller ) {
         self.initServices();
-        if (!ciAIMSService.isLoggedIn()) {
+        if( !ciAIMSService.isSameUser( currentUser ) || !ciAIMSService.isLoggedIn() ) {
 
-            jiraService.AuthProxy().done(function(data) {
-                ciAIMSService.saveSessionData(data);
+            jiraService.AuthProxy( currentUser ).done(function(data) {
+                ciAIMSService.saveSessionData( data, currentUser);
                 controller();
             }).fail(function(jqXHR, textStatus) {
 
@@ -51,6 +51,7 @@ var BootstrapService = function() {
         } else {
             controller();
         }
+
     };
 
     /**

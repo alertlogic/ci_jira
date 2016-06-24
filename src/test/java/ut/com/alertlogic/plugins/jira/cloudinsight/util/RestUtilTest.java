@@ -1,4 +1,4 @@
-package ut.com.alertlogic.plugins.jira.cloudinsight.service;
+package ut.com.alertlogic.plugins.jira.cloudinsight.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -7,18 +7,18 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.alertlogic.plugins.jira.cloudinsight.service.AIMSService;
+import com.alertlogic.plugins.jira.cloudinsight.util.RestUtil;
 
-public class AIMSServiceTest {
+public class RestUtilTest {
 
 	private JSONObject responseSuccess;
 	private JSONObject responseError;
-	private AIMSService aimsService;
+	private RestUtil restUtil;
 
 	@Before
     public void setUp() throws Exception
 	{
-		aimsService = new AIMSService(null,null);
+		restUtil = new RestUtil(null, null);
 		String json="{'authentication':{'user':{'id':'1'}, 'account':{'id':'2'},'token':'3'}}";
 		responseSuccess = new JSONObject(json);
 		responseError = null;
@@ -27,30 +27,30 @@ public class AIMSServiceTest {
     @Test
     public void testGetToken() throws Exception
     {
-    	String token = aimsService.getToken(responseSuccess);
+    	String token = restUtil.getToken(responseSuccess);
     	assertEquals(token,"3");
 
-    	String tokenError = aimsService.getToken(responseError);
+    	String tokenError = restUtil.getToken(responseError);
     	assertNull(tokenError);
     }
 
     @Test
     public void testGetAccount() throws Exception
     {
-    	String account = aimsService.getAccount(responseSuccess);
+    	String account = restUtil.getAccount(responseSuccess);
     	assertEquals(account,"2");
 
-    	String accountError = aimsService.getAccount(responseError);
+    	String accountError = restUtil.getAccount(responseError);
     	assertNull(accountError);
     }
 
     @Test
     public void testGetUserId() throws Exception
     {
-    	String token = aimsService.getUserId(responseSuccess);
+    	String token = restUtil.getUserId(responseSuccess);
     	assertEquals(token,"1");
 
-    	String tokenError = aimsService.getUserId(responseError);
+    	String tokenError = restUtil.getUserId(responseError);
     	assertNull(tokenError);
     }
 }
