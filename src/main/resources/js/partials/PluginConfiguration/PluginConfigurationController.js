@@ -207,7 +207,7 @@ AJS.$( document ).ready( function() {
     self.activeTestButton = function(){
         AJS.$('#btnCredentialSave').prop( "disabled" , true );
         AJS.$('#btnCredentialDelete').prop( "disabled" , true );
-        AJS.$("#btnCredentialTest").prop( "disabled", false );
+        self.testEnable( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
     };
 
     /**
@@ -370,6 +370,20 @@ AJS.$( document ).ready( function() {
             }
         });
     };
+
+    /**
+     * Validate if the btnCredentialTest button is enabled.
+     * @param user        user of cloud insight
+     * @param password    password of cloud insight
+     * @param url         url end point of cloud insight
+     */
+	self.testEnable = function( user, password, url){
+		if (user !== '' &&  password !== '' && url !== '') {
+			AJS.$('#btnCredentialTest').prop( "disabled" , false );
+		} else {
+			AJS.$('#btnCredentialTest').prop( "disabled" , true );
+		}
+	}
 
     /* Events on buttons and fields */
     /* Test conection with cloud insight*/
@@ -564,6 +578,16 @@ AJS.$( document ).ready( function() {
         AJS.$('#btnConfigSave').prop( "disabled" , false );
         AJS.$('#btnConfigDelete').prop( "disabled" , false );
     });
+    
+    /* Enable btnCredentialTest button. */
+	AJS.$( "#ciUser" ).change(function() {
+        self.testEnable( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
+    });
+	
+	/* Enable btnCredentialTest button. */
+	AJS.$( "#ciPassword" ).change(function() {
+        self.testEnable( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
+    });
 
     /* Save the configuration */
     AJS.$( "#btnConfigSave" ).click( function() {
@@ -589,7 +613,7 @@ AJS.$( document ).ready( function() {
     var availableEndPoints = [
         { "url": "https://api.cloudinsight.alertlogic.com" }
         ,{ "url":"https://api.cloudinsight.alertlogic.co.uk"}
-        //,{ "url": "https://api.product.dev.alertlogic.com"}
+        ,{ "url": "https://api.product.dev.alertlogic.com"}
     ];
 
     AUIUtils.addOptions( "#ciUrl", availableEndPoints, "url", "url" );
