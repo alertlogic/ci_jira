@@ -91,6 +91,9 @@
                                 <th id="header-vulnerability">
                                     $i18n.getText('ci.partials.remediationssync.js.header.count')
                                 </th>
+                                <th id="header-status">
+                                    $i18n.getText('ci.partials.remediationssync.js.header.status')
+                                </th>
                                 <th id="header-created">
                                     $i18n.getText('ci.partials.remediationssync.js.header.created')
                                 </th>

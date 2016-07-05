@@ -76,7 +76,7 @@
                                         <input id="ciAccessKeyId" class="text long-field" disabled>
                                     </div>
                                     <div class="buttons-container">
-                                        <button id="btnCredentialTest" class="aui-button test"  type="button">
+                                        <button id="btnCredentialTest" class="aui-button test" disabled type="button">
                                             $i18n.getText('ci.partials.pluginconfiguration.vm.credential.button.test')
                                         </button>
                                         <button id="btnCredentialSave" class="aui-button aui-button-primary" disabled type="button">
