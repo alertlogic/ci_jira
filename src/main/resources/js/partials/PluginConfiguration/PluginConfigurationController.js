@@ -9,6 +9,8 @@ AJS.$( document ).ready( function() {
 
     var ciResponseTest = '';
 
+    var credentials = {};
+    var config = {};
     /**
      * Test if the credentials are correct
      * @param user        user of cloud insight
@@ -34,24 +36,24 @@ AJS.$( document ).ready( function() {
      * @param password    password of cloud insight
      * @param url         url end point of cloud insight
      */
-    self.testConfig = function( user, password, url){
+    self.testCredential = function( user, password, url){
 
         var urlBase = url+"/aims/v1/authenticate";
 
         //validate empty values
         if(user == "" || password == "" || url == ""){
-            JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.field.empty") );
+            AUIUtils.showMsgError( '#aui-message-bar', AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.field.empty") );
             return ;
         }
         //validate url
         if( !AUIUtils.validateUrl( url ) ){
-            JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.format.url") );
+            AUIUtils.showMsgError( '#aui-message-bar', AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.format.url") );
             return ;
         }
 
         //validate email
         if( !AUIUtils.validateEmail( user ) ){
-            JIRA.Messages.showWarningMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.format.email") );
+            AUIUtils.showMsgError( '#aui-message-bar', AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.format.email") );
             return ;
         }
 
@@ -59,15 +61,10 @@ AJS.$( document ).ready( function() {
 
         test.done( function( data ) {
             ciResponseTest = data;
+            AUIUtils.showMsgSuccess( '#aui-message-bar', AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.success.connection.body") );
 
-            AJS.messages.success("#aui-message-bar", {
-                title: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.success.connection.title") ,
-                fadeout: true,
-                body: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.success.connection.body")
-            });
-
-            AJS.$('#btnSave').prop( "disabled" , false );
-            AJS.$("#btnTest").prop( "disabled", true );
+            AJS.$('#btnCredentialSave').prop( "disabled" , false );
+            AJS.$("#btnCredentialTest").prop( "disabled", true );
         });
 
         test.fail( function( jqXHR ) {
@@ -84,114 +81,123 @@ AJS.$( document ).ready( function() {
                     break;
             };
 
-            AJS.messages.error("#aui-message-bar", {
-                title: AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.validation.error.connection.title"),
-                fadeout: true,
-                body: msg
-            });
+            AUIUtils.showMsgError( '#aui-message-bar', msg );
         });
     };
 
     /**
-     * Save a configuration
-     * @param user        user of cloud insight
-     * @param url         url end point of cloud insight
+     * Save a credential
+     * @param idCredential  id credential
+     * @param user          user of cloud insight
+     * @param url           url end point of cloud insight
      */
+    self.saveCredential = function( idCredential, user, url){
+        var credentialsAll = credentialsService.getCredentials();
 
-    self.saveConfig = function( user, url){
+        credentialsAll.done( function( dataCredential ){
+            var isNewCredential = true;
 
-        ciAIMSService.destroySessionData();
+            //review if exists a credential with the same user
+            for(var i = 0 ; i < dataCredential.length; i++)
+            {
+                if( dataCredential[ i ].ciUser == user ) {
+                    isNewCredential = false;
+                    AUIUtils.showMsgError(
+                        '#aui-message-bar',
+                        AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.save.exists.error")
+                    );
+                }
+            }
 
-        //generate keys
-        var generateAccessKey = ciAIMSService.createAccessKey( url, ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token);
+            if( isNewCredential ){
 
-        generateAccessKey.done(function( data ){
-            JIRA.Messages.showSuccessMsg(
-                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.success")
-            );
+                //generate keys
+                var generateAccessKey = ciAIMSService.createAccessKey( url, ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token);
 
-            jiraService.Configuration().save( user, url, data.access_key_id, btoa( data.secret_key) ).
-                done( function() {
+                generateAccessKey.done(function( data ){
+                    AUIUtils.showMsgSuccess(
+                        '#aui-message-bar',
+                        AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.success")
+                    );
 
-                        jiraService.AuthProxy()
-                        .done(
-                            function() {
-                                JIRA.Messages.showSuccessMsg(
-                                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.success")
+                    credentialsService.createCredential( idCredential, user, url, data.access_key_id, btoa( data.secret_key) ).
+                        done( function() {
+                                AJS.$('#btnCredentialDelete').prop('disabled', false);
+                                self.loadCredentials();
+                                self.testConectionFromServer();
+
+                                AUIUtils.showMsgSuccess(
+                                    '#aui-message-bar',
+                                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.save.success")
                                 );
-                                window.location = window.location.href;
-                        })
-                        .fail(
-                            function( jqXHR ) {
-                                JIRA.Messages.showErrorMsg(
-                                    AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.errorserver")
-                                );
-                        });
+                            }).
+                        fail( function() {
+                            AUIUtils.showMsgError(
+                                '#aui-message-bar',
+                                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.save.error")
+                            );
+                    });
 
-                        AJS.$('#btnDelete').prop('disabled', false);
+                });
 
-                        self.testConectionFromServer();
-                    }).
-                fail( function() {
-                    //Si no hay suficientes decirles q borren uno
-                        JIRA.Messages.showSuccessMsg(
-                            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.save.error")
-                        );
-            });
+                generateAccessKey.fail(function( jqXHR ) {
+                    var msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.default");
 
-        });
+                    switch( jqXHR.status ) {
+                        case 400:
+                            msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.limit_exceded");
+                            self.loadAccessKeys( url, ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token );
+                            break;
+                        case 401:
+                            msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.unauthorized");
+                            break;
+                        case 403:
+                            msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.forbidden");
+                            break;
+                        case 404:
+                            msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.not_found");
+                            break;
+                        case 410:
+                            msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.gone");
+                            break;
+                    };
 
-        generateAccessKey.fail(
-            function( jqXHR ) {
-                var msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.default");
-
-                switch( jqXHR.status ) {
-                    case 400:
-                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.limit_exceded");
-                        break;
-                    case 401:
-                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.unauthorized");
-                        break;
-                    case 403:
-                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.forbidden");
-                        break;
-                    case 404:
-                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.not_found");
-                        break;
-                    case 410:
-                        msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.error.gone");
-                        break;
-                };
-
-                JIRA.Messages.showErrorMsg( msg );
+                    AUIUtils.showMsgError( '#aui-message-bar', msg );
+                });
+            }
         });
     };
 
     /**
-     * Delete the configuration stored
+     * Delete the credential stored
      */
-    self.detele = function() {
+    self.deteleCredential = function() {
+        var id = AJS.$('#idCredential').val();
 
-        jiraService.Configuration().deleteConf().
+        credentialsService.deleteCredential( id ).
         done( function() {
-            ciAIMSService.destroySessionData();
-            AJS.$('#ciUser').val('');
-            AJS.$('#ciPassword').val('');
-            AJS.$('#ciUrl').val('');
-
-            AJS.$('#ciAccessKeyId').val('');
-
             self.activeTestButton();
 
-            JIRA.Messages.showSuccessMsg(
-                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.success")
+            AUIUtils.showMsgSuccess(
+                '#aui-message-bar',
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.success")
             );
-            self.testConectionFromServer();
+            self.loadCredentials();
+            self.loadConfig();
 
-        }).fail( function() {
-            JIRA.Messages.showErrorMsg(
-                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.delete.error")
-            );
+        }).fail( function(jqXHR) {
+            var msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.request");
+
+            switch( jqXHR.status ) {
+                case 400:
+                    msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.error.request");
+                    break;
+                case 412:
+                    msg = AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.credential.delete.error.precondition");
+                    break;
+            };
+
+            AUIUtils.showMsgError( '#aui-message-bar', msg );
         });
     };
 
@@ -199,68 +205,398 @@ AJS.$( document ).ready( function() {
      * Enable the test button and disable the others
      */
     self.activeTestButton = function(){
-        AJS.$('#btnSave').prop( "disabled" , true );
-        AJS.$('#btnDelete').prop( "disabled" , true );
-        AJS.$("#btnTest").prop( "disabled", false );
+        AJS.$('#btnCredentialSave').prop( "disabled" , true );
+        AJS.$('#btnCredentialDelete').prop( "disabled" , true );
+        AJS.$("#btnCredentialTest").prop( "disabled", false );
     };
 
     /**
-     * Shows a confirmation dialog before the deletion of credentials
+     * Load the credential cliked on the form
+     * @param  credential id
      */
-    self.confirmDeleteCredentials = function() {
-        AUIUtils.confirmDialog(
-            "confirmDeleteDialogCredentials",
-            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.confirm.remove.credentials"),
-            self.detele );
+    self.loadCredentialInForm = function( id ){
+        AJS.$('#idCredential').val( credentials[ id ].id );
+        AJS.$('#ciUser').val( credentials[ id ].ciUser );
+        AJS.$('#ciPassword').val( '' );
+        AJS.$('#ciUrl' ).select2().select2('val', credentials[ id ].ciUrl);
+        AJS.$('#ciAccessKeyId').val( credentials[ id ].ciAccessKeyId );
+        AJS.$('#btnCredentialDelete').prop( "disabled" , false );
+        AJS.$('#btnCredentialCancel').prop( "disabled" , false );
+        AJS.$('#configformTitle').html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.form.title.update.credential") );
+        AUIUtils.clearTable( "#accessKeyTable", true );
+    };
+
+    /**
+     * Adds the credential item to the view.
+     * @param {Object} credential The refence to the item
+     */
+    self.addCredentialToView = function( credential ) {
+        var tableBody = AJS.$("#credentialsTable tbody");
+        var action = "pluginConfigurationController.loadCredentialInForm(" + credential.id + ")" ;
+
+        var rowData = [
+            {
+                header: "header-ci-user",
+                data: credential.ciUser,
+                style: 'row_pointer',
+                action: action
+            },
+            {
+                header: "header-ci-url",
+                data: credential.ciUrl,
+                style: 'row_pointer',
+                action: action
+            }
+        ];
+
+        AUIUtils.createTableRow( tableBody, rowData);
+    };
+
+    /**
+     * Clean the credentials form and set the title in adding
+     */
+    self.resetCredentialForm = function(){
+        AJS.$('#idCredential').val('');
+        AJS.$('#ciUser').val('');
+        AJS.$('#ciPassword').val('');
+        AJS.$('#ciUrl').select2().select2('val', '');
+        AJS.$('#ciAccessKeyId').val('');
+        AJS.$('#btnCredentialCancel').prop( "disabled" , true );
+        AJS.$('#btnCredentialSave').prop( "disabled" , true );
+        AJS.$('#btnCredentialDelete').prop( "disabled" , true );
+        AJS.$('#configformTitle').html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.form.title.add.credential") );
+    };
+
+    /**
+     * Load all credentials stored
+     */
+    self.loadCredentials = function() {
+        var credentialsAll = credentialsService.getCredentials();
+
+        AUIUtils.clearTable( "#credentialsTable" );
+        AUIUtils.invisible( "#credentialZeroState" );
+        AJS.$( "#credentialLoading" ).show();
+
+        self.resetCredentialForm();
+
+        credentialsAll.done(function( data ){
+
+            if (data.length <= 0) {
+                AUIUtils.visible( "#credentialZeroState" );
+            } else {
+                AUIUtils.invisible( "#credentialZeroState" );
+            }
+
+            for(var i = 0 ; i < data.length; i++)
+            {
+                credentials[ data[i].id ] =  data[i];
+                self.addCredentialToView( data[i] );
+            }
+        });
+    };
+
+    /**
+     * Refresh the credentials list and show a dialog
+     */
+    self.loadCredentialDialog = function() {
+        AJS.dialog2("#credential-crud-dialog").show();
+        self.loadCredentials();
+    };
+
+    /**
+     * Delete access key
+     * @param {Object} access key
+     */
+    self.deleteAccessKey= function( accessKey ) {
+        ciAIMSService.deleteAccessKey( AJS.$('#ciUrl').val(), ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token, accessKey )
+        .done( function() {
+
+            AUIUtils.showMsgSuccess(
+                '#aui-message-bar',
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.delete.success")
+            );
+            self.loadAccessKeys( AJS.$('#ciUrl').val(), ciResponseTest.authentication.user.id , ciResponseTest.authentication.account.id, ciResponseTest.authentication.token );
+
+        }).fail( function(jqXHR) {
+            AUIUtils.showMsgError(
+                '#aui-message-bar',
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.accesskey.delete.error")
+            );
+        });
+    };
+
+    /**
+     * Adds the key item to the view.
+     * @param {Object} access key
+     */
+    self.addAccessKeyToView = function( accessKey ) {
+        var tableBody = AJS.$("#accessKeyTable tbody");
+        var action = "pluginConfigurationController.deleteAccessKey('" + accessKey + "')" ;
+
+        var rowData = [
+            {
+                data: accessKey
+            },
+            {
+                data: "X",
+                style: 'row_pointer',
+                action: action
+            }
+        ];
+
+        AUIUtils.createTableRow( tableBody, rowData);
+    };
+
+    /**
+     * Load the access keys
+     * @param {string} url
+     * @param {string} user_id
+     * @param {string} account_id
+     * @param {string} token
+     */
+    self.loadAccessKeys = function( url, user_id, account_id, token ) {
+        var accessKeysAll = ciAIMSService.getAccessKeys( url, user_id, account_id, token );
+
+        AUIUtils.clearTable( "#accessKeyTable" , true);
+
+        accessKeysAll.done(function( data ){
+            var headerElement = AJS.$("#accessKeyTable thead tr");
+            AUIUtils.addTableHeader( headerElement, '', AJS.I18n.getText("ci.partials.pluginconfiguration.js.table.accesskey.header.accesskey"), '');
+            AUIUtils.addTableHeader( headerElement, '', AJS.I18n.getText("ci.partials.pluginconfiguration.js.table.accesskey.header.action"), '');
+
+            for(var i = 0 ; i < data.access_keys.length; i++)
+            {
+                self.addAccessKeyToView( data.access_keys[i] );
+            }
+        });
     };
 
     /* Events on buttons and fields */
     /* Test conection with cloud insight*/
-    Bootstrap.onView('#btnTest', function(){
-        AJS.$('#btnTest').click( function() {
-            self.testConfig( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
-        });
+    AJS.$('#btnCredentialTest').click( function() {
+        self.testCredential( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
     });
-
-    /* Save the credential*/
-    Bootstrap.onView('#btnSave', function(){
-        AJS.$('#btnSave').click( function() {
-            self.saveConfig( AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
-        });
+    /* Save the credential */
+    AJS.$('#btnCredentialSave').click( function() {
+        if(  AJS.$('#ciUser').val() !== '' && AJS.$('#ciUrl').val() !== '' ){
+            self.saveCredential( AJS.$('#idCredential').val(), AJS.$('#ciUser').val(), AJS.$('#ciUrl').val());
+        }
     });
-
     /* Delete credentials */
-    Bootstrap.onView('#btnDelete', function(){
-        AJS.$('#btnDelete').click( function() {
-            self.confirmDeleteCredentials();
-        });
+    AJS.$( "#btnCredentialDelete" ).click( function() {
+        self.deteleCredential();
+    });
+    /* Save the credential */
+    AJS.$('#btnCredentialCancel').click( function() {
+        self.resetCredentialForm();
+    });
+    /* Active test button if the user is typing */
+    AJS.$( "#ciUser" ).keyup(function() {
+        self.activeTestButton();
     });
 
-    Bootstrap.onView("#ciUser", function(){
-        AJS.$( "#ciUser" ).keyup(function() {
-            self.activeTestButton();
-        });
+    AJS.$( "#ciPassword" ).keyup(function() {
+        self.activeTestButton();
     });
 
-    Bootstrap.onView("#ciPassword", function(){
-        AJS.$( "#ciPassword" ).keyup(function() {
-            self.activeTestButton();
-        });
+    AJS.$( "#ciUrl" ).click(function() {
+        self.activeTestButton();
+    });
+    /* Open the dialog */
+    AJS.$( "#btnCredential" ).click( function() {
+        self.loadCredentialDialog();
+    });
+    /* Reload the credentials list in the configuration*/
+    AJS.$( "#btnCredentialClose" ).click( function() {
+        AJS.dialog2("#credential-crud-dialog").hide();
+        self.loadConfig();
     });
 
-    Bootstrap.onView("#ciUrlEndPoint", function(){
-        AJS.$( "#ciUrlEndPoint" ).keyup(function() {
-            self.activeTestButton();
+    /** Credential configured for the current user **/
+
+    /**
+     * Test to connect using the servlet,
+     * in order to test that the server has a way to connect with the CI api.
+     */
+    self.testConectionFromServer = function() {
+        var currentUser = AJS.Meta.get('remote-user');
+        var promise = jiraService.AuthProxy( currentUser );
+        var element = AJS.$( '#conectionStatus' );
+
+        element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.checking") );
+        element.removeClass('aui-lozenge-success aui-lozenge-error');
+
+        promise.done( function() {
+            element.html('Success');
+            element.addClass('aui-lozenge-success');
         });
+
+        promise.fail( function( jqXHR, textStatus, errorThrown ) {
+
+            switch( jqXHR.status ) {
+                case 412:
+                    element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.not.verified") );
+                    element.addClass('aui-lozenge');
+                    break;
+                case 502:
+                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.connection') );
+                    element.addClass('aui-lozenge-error');
+                    break;
+                case 401:
+                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.authentication') );
+                    element.addClass('aui-lozenge-error');
+                    break;
+            }
+        });
+    };
+
+    self.testConectionFromServer();
+    /**
+     * Save a configuration of the user
+     */
+    self.saveConfig = function( ){
+
+        var idCredential = AJS.$( "#selectCredential" ).val();
+        ciAIMSService.destroySessionData();
+
+        var jiraConfig = jiraService.Configuration().save( idCredential );
+
+        jiraConfig.done( function( data ){
+            JIRA.Messages.showSuccessMsg(
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.save.success")
+            );
+            self.testConectionFromServer();
+            //force refresh
+            location.reload();
+        });
+
+        jiraConfig.fail( function( jqXHR ) {
+            JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.save.error") );
+        });
+    };
+
+    /**
+     * Delete the configuration for an user
+     */
+    self.deleteConfig = function( ){
+        ciAIMSService.destroySessionData();
+
+        var jiraConfig = jiraService.Configuration().deleteConfig();
+
+        jiraConfig.done( function( data ){
+            AJS.$('#selectCredential').auiSelect2().val("");
+
+            JIRA.Messages.showSuccessMsg(
+                AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.delete.success")
+            );
+            self.testConectionFromServer();
+            //force refresh
+            location.reload();
+        });
+
+        jiraConfig.fail( function( jqXHR ) {
+            JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.delete.error") );
+        });
+    };
+
+    /**
+     * Load the current configuration of an user logged
+     */
+    self.loadConfig = function (){
+
+        var credentialsAll = credentialsService.getCredentials();
+        AJS.$( "#selectCredential" ).auiSelect2().val("");
+        AUIUtils.clearSelect("#selectCredential");
+
+        credentialsAll.done(function( data ){
+
+            if (data.length <= 0) {
+                JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.withoutconfig") );
+            }else{
+                AUIUtils.addOptions( "#selectCredential", data, "id", "ciUser" );
+            }
+
+            jiraService.Configuration().get().done(function( dataConfig ){
+                //that is for review before to save
+                config = dataConfig;
+
+                if ( dataConfig.hasOwnProperty('credential_id') ) {
+
+                    AJS.$('#selectCredential').select2().select2('val', dataConfig.credential_id);
+                    AJS.$('#btnConfigSave').prop( "disabled" , false );
+                    AJS.$('#btnConfigDelete').prop( "disabled" , false );
+                }
+
+                if( data.length > 0 ){
+                    AJS.$( "#selectCredential" ).triggerHandler("change");
+                }
+            });
+
+        });
+    };
+
+    /**
+     * Shows a confirmation dialog before a deletion of a config
+     */
+    self.confirmDeleteConfig = function() {
+        AUIUtils.confirmDialog(
+            "confirmDeleteDialog",
+            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.confirm.remove"),
+            self.deleteConfig);
+    };
+
+    /**
+     * Shows a confirmation dialog before a update of a config
+     */
+    self.confirmUpdateConfig = function() {
+        AUIUtils.confirmDialog(
+            "confirmUpdateDialog",
+            AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.confirm.update"),
+            self.saveConfig);
+    };
+
+    self.loadConfig();
+
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#selectCredential" ).auiSelect2();
+    }
+    AJS.$( "#selectCredential" ).change(function() {
+        AJS.$('#btnConfigSave').prop( "disabled" , false );
+        AJS.$('#btnConfigDelete').prop( "disabled" , false );
     });
 
-    /* Permissions */
-    Bootstrap.onView("#selectGroup", function(){
-        if( typeof jQuery.fn.auiSelect2 == 'function') {
-            AJS.$( "#selectGroup" ).auiSelect2();
+    /* Save the configuration */
+    AJS.$( "#btnConfigSave" ).click( function() {
+        if ( config.hasOwnProperty('credential_id') ) {
+            if( AJS.$( "#selectCredential" ).val() != config.credential_id ){
+                self.confirmUpdateConfig();
+            }
+        }else{
+            self.saveConfig();
         }
     });
 
+    /* Confirm before delete */
+    AJS.$( "#btnConfigDelete" ).click( function() {
+        self.confirmDeleteConfig();
+    });
+
+    /** Permissions **/
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#selectGroup" ).auiSelect2();
+    }
+
+    var availableEndPoints = [
+        { "url": "https://api.cloudinsight.alertlogic.com" }
+        ,{ "url":"https://api.cloudinsight.alertlogic.co.uk"}
+        //,{ "url": "https://api.product.dev.alertlogic.com"}
+    ];
+
+    AUIUtils.addOptions( "#ciUrl", availableEndPoints, "url", "url" );
+
+    if( typeof jQuery.fn.auiSelect2 == 'function') {
+        AJS.$( "#ciUrl" ).auiSelect2();
+    }
     /**
      * Adds the remediations item to the view.
      * @param {Object} rule The refence to the item
@@ -286,7 +622,6 @@ AJS.$( document ).ready( function() {
 
     /**
      * Load the permissions that are already configured
-     * @return {[type]} [description]
      */
     self.loadPermissions = function() {
         AJS.$( "#btnAddGroup" ).prop('disabled', true);
@@ -433,44 +768,7 @@ AJS.$( document ).ready( function() {
         }
     };
 
-    /**
-     * Test to connect using the servlet,
-     * in order to test that the server has a way to connect with the CI api.
-     */
-    self.testConectionFromServer = function() {
-        var promise = jiraService.AuthProxy();
-        var element = AJS.$( '#conectionStatus' );
-
-        element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.checking") );
-        element.removeClass('aui-lozenge-success aui-lozenge-error');
-
-        promise.done( function() {
-            element.html('Success');
-            element.addClass('aui-lozenge-success');
-        });
-
-        promise.fail( function( jqXHR, textStatus, errorThrown ) {
-
-            switch( jqXHR.status ) {
-                case 412:
-                    element.html( AJS.I18n.getText("ci.partials.pluginconfiguration.js.conecction.status.not.verified") );
-                    element.addClass('aui-lozenge');
-                    break;
-                case 502:
-                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.connection') );
-                    element.addClass('aui-lozenge-error');
-                    break;
-                case 401:
-                    element.html( AJS.I18n.getText('ci.partials.pluginconfiguration.js.conecction.status.error.authentication') );
-                    element.addClass('aui-lozenge-error');
-                    break;
-            }
-        });
-    };
-
-    self.testConectionFromServer();
-
-    //active the actions in permmisions buttons
+    //Active the actions in permmisions buttons
     AJS.$( '#btnAddGroup' ).prop('disabled', true);
     AJS.$( '#btnAddGroup' ).click( function() {
         self.addGroup();
@@ -481,6 +779,7 @@ AJS.$( document ).ready( function() {
         self.confirmDeleteGroup();
     });
 
+    /* Check all the permissions */
     AJS.$( '#allCheck' ).click(function(){
         var checkedStatus = this.checked;
         AJS.$( '#btnRemoveGroup' ).prop('disabled', true);

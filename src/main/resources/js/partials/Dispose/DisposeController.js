@@ -15,77 +15,71 @@ AJS.$(function () {
  * into a JIRA Dialog.
  */
 function disposeController() {
-    AJS.$(document).ready(function() {
-        Bootstrap.start(function(){
-            var self = this;
+    AJS.$(document).ready( function() {
+        var jiraIssueId = AJS.$('#jiraIssueId').val();
+        var issue = jiraService.Issue().getById( jiraIssueId );
 
-            var fields = jiraService.Field().getFields();
-            var jiraIssueId = AJS.$('#jiraIssueId').val();
-            var remediationItemCustomName = fields.remediationItem ;
+        issue.done( function( data ){
+            var user = data.fields.reporter.name;
 
-            Bootstrap.onView("#disposeCancelButton", function(){
-                AJS.$("#disposeCancelButton").click(function(){
-                    JIRA.Dialogs.disposeIssue.hide();
+            Bootstrap.start( user, function(){
+                var self = this;
+
+                var fields = jiraService.Field().getFields();
+
+                var remediationItemCustomName = fields.remediationItem ;
+
+                Bootstrap.onView("#disposeCancelButton", function(){
+                    AJS.$("#disposeCancelButton").click(function(){
+                        JIRA.Dialogs.disposeIssue.hide();
+                    });
                 });
-            });
 
-            Bootstrap.onView("#disposeRemediationButton", function(){
+                Bootstrap.onView("#disposeRemediationButton", function(){
 
-                AJS.$("#disposeRemediationButton").click(function(){
-                    //User data
-                    //var jiraIssueId = AJS.$('#jiraIssueId').val();
-                    var disposeReason = AJS.$('#disposeReason').val();
-                    var disposeExpiration = AJS.$('#disposeUntil').val();
-                    var disposeComment = AJS.$('#disposeComment').val() == "" ? AJS.I18n.getText("ci.partials.dispose.js.comment.no") : AJS.$('#disposeComment').val();
+                    AJS.$("#disposeRemediationButton").click(function(){
+                        //User data
+                        var disposeReason = AJS.$('#disposeReason').val();
+                        var disposeExpiration = AJS.$('#disposeUntil').val();
+                        var disposeComment = AJS.$('#disposeComment').val() == "" ? AJS.I18n.getText("ci.partials.dispose.js.comment.no") : AJS.$('#disposeComment').val();
 
-                    var expirationOptions = {
-                        "none": 0,
-                        "tomorrow": 86400,
-                        "week": 604800,
-                        "month": 2592000
-                    };
-                    var expirationTS = AUIUtils.todayToTimestamp() + ( expirationOptions[disposeExpiration] * 1000 );
+                        var expirationOptions = {
+                            "none": 0,
+                            "tomorrow": 86400,
+                            "week": 604800,
+                            "month": 2592000
+                        };
+                        var expirationTS = AUIUtils.todayToTimestamp() + ( expirationOptions[disposeExpiration] * 1000 );
 
-
-                    if( remediationItemCustomName != null )
-                    {
-                        var issue = jiraService.Issue().getById(jiraIssueId);
-
-                        issue.success(function(data){
+                        if( remediationItemCustomName != null )
+                        {
                             var remediationItem =  data.fields[ remediationItemCustomName ];
                             var environment = remediationsService.getEnvironmentFromRemediationItem( remediationItem );
                             var dispose = remediationsService.disposeRemediation( environment, remediationItem, disposeReason, expirationTS, disposeComment);
 
-                            dispose.success(function(data){
+                            dispose.success( function( data ){
                                 JIRA.Dialogs.disposeIssue.hide();
                                 JIRA.Messages.showSuccessMsg(  AJS.I18n.getText("ci.partials.dispose.js.msg.success.disposed") );
                                 jiraService.Issue().comment( jiraIssueId, AJS.I18n.getText("ci.partials.dispose.js.msg.success.comment.disposed")+" "+disposeComment).done(function(){
                                     var transaction = jiraService.Issue().doTransition( jiraIssueId, 'close', AJS.I18n.getText("ci.partials.dispose.js.msg.close.issue"));
 
-                                    transaction.done(function(){
+                                    transaction.done( function(){
                                         JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
                                     });
                                 });
                             });
 
-                            dispose.error(function(data){
+                            dispose.error( function( data ){
                                 JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.dispose.js.msg.error.issue.not.disposed") );
                             });
-                        });
-
-                        issue.error(function(data){
-                            JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.dispose.js.msg.error.issue.not.found") );
-                        });
-                    }
+                        }
+                    });
                 });
-            });
-            //loading
-            Bootstrap.onView("#disposeMsg", function(){
+                //loading
+                Bootstrap.onView("#disposeMsg", function(){
 
-                if( remediationItemCustomName != null )
-                {
-                    var issue = jiraService.Issue().getById(jiraIssueId);
-                    issue.success(function(data){
+                    if( remediationItemCustomName != null )
+                    {
                         var remediationItem =  data.fields[ remediationItemCustomName ];
                         if( remediationItem == null ){
 
@@ -95,13 +89,14 @@ function disposeController() {
                             AJS.$("#disposeForm").hide();
                             AJS.$("#disposeRemediationButton").hide();
                         }
-                    });
-
-                    issue.error(function(data){
-                        JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.dispose.js.msg.error.issue.not.found") );
-                    });
-                }
+                    }
+                });
             });
         });
+
+        issue.error( function( data ){
+            JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.dispose.js.msg.error.issue.not.found") );
+        });
+
     });
 }

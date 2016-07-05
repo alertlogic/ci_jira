@@ -13,6 +13,7 @@ import com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService;
 import com.atlassian.sal.api.user.UserManager;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import com.google.common.collect.Maps;
+import com.sun.jersey.core.util.Base64;
 
 /**
  * A set of common Jira CI Add-on operations.
@@ -96,7 +97,27 @@ public class CommonJiraPluginUtils {
      * @return String
      */
     public static String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
+        @SuppressWarnings("resource")
+		Scanner s = new Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
+    }
+
+    /**
+     * This function decode a string encoded as base 64.
+     * @param encodedText	The string to encode
+     * @return	String		The decoded string
+     */
+    public static String decode(String encodedText) {
+    	byte[] decodedBytes = Base64.decode(encodedText);
+    	return new String(decodedBytes);
+    }
+
+    /**
+     * This function encode a string on base 64
+     * @param text		The text to encode
+     * @return	String	The encoded string
+     */
+    public static String encode(String text) {
+    	return new String(Base64.encode(text.getBytes()));
     }
 }

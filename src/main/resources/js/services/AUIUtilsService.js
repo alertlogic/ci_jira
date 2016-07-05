@@ -409,7 +409,7 @@ var AUIUtilsService = function() {
     self.confirmDialog = function( name, message, callback ) {
 
         var dialog = new AJS.Dialog({
-            width:300,
+            width:400,
             height:200,
             id:name,
             closeOnOutsideClick: true
@@ -466,7 +466,7 @@ var AUIUtilsService = function() {
      * Get the url to reset password based on the API url.
      * @return string url endpoint reset passwor
      */
-    this.getResetPasswordUrl = function( url ) {
+    self.getResetPasswordUrl = function( url ) {
 
         var domain = url.split(".");
 
@@ -477,6 +477,34 @@ var AUIUtilsService = function() {
         } else {
             return configService.url.us;
         }
+    };
+
+    /**
+     * Search an element in the DOM and add a success message.
+     * @param  {string} selector
+     * @param  {string} msg
+     * @return show a message
+     */
+    self.showMsgSuccess = function( selector, msg ){
+        AJS.messages.success( selector, {
+            title: AJS.I18n.getText("ci.atlassianplugin.utils.success.title") ,
+            fadeout: true,
+            body: msg
+        });
+    };
+
+    /**
+     * Search an element in the DOM and add a error message.
+     * @param  {string} selector
+     * @param  {string} msg
+     * @return show a message
+     */
+    self.showMsgError = function( selector, msg ){
+        AJS.messages.error( selector, {
+            title: AJS.I18n.getText("ci.atlassianplugin.utils.error.title") ,
+            fadeout: true,
+            body: msg
+        });
     };
 };
 /**

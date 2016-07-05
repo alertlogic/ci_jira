@@ -15,18 +15,22 @@ Make sure you have the **JIRA System Administrator permission** ( jira-system-ad
 
 ##Configure the Add-on
 
-After installation, you must configure the add-on. To configure the Cloud Insight add-on for JIRA:
+After installation, each administrator must configure the add-on. To configure the Cloud Insight add-on for JIRA:
 
 1.	Under User-installed add-ons on the JIRA Administration page, click to expand "JIRA-cloud-insight," and then click "Configure."
 2.	On the JIRA menu bar, click "Cloud Insight," and then select "Add-on configuration."
-3.	On the Add-on Configuration page, fill out the form using the following information:
+3.	On the Add-on Configuration page, click credentials that is going to  open a window fill out the form using the following information:
   *	Your Cloud Insight deployment URL
     - UK API: `https://api.cloudinsight.alertlogic.co.uk`
     - US API: `https://api.cloudinsight.alertlogic.com`
   *	Your Cloud Insight username
   * Your Cloud Insight password
-4.	Click "Test" to verify your credentials.
+4.	Click "Test" to verify credentials.
 5.	Click "Save."
+6.  Close the window and choose the credential which to want to be connect.
+
+* It is important that you be conscious about choose the correct and be carefull about do not delete it if you have issues using it.
+
 
 ##Create JIRA Cloud Insight Projects
 
