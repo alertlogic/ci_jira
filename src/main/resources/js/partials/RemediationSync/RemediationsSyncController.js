@@ -65,14 +65,15 @@ AJS.$(document).ready(
 			 * open: not exist in the remeditionsItems
 			 * other state is not open
 			 */
-			self.isAnOpenRemediation = function( remediationId ) {
+			self.isAnOpenRemediation = function( remediation ) {
 				for (var i = 0; i < allRemediationsItems.assets.length; i++) {
 					//review if the remediations has items
-					if (allRemediationsItems.assets[i][0].remediation_id === remediationId)
+					if (allRemediationsItems.assets[i][0].remediation_id === remediation.remediation_id)
 					{
 						if( allRemediationsItems.assets[i][0].state === "incomplete" )
 						{
 							//if the remediation is uncomplete this means that it is re-open
+							remediation.status = AJS.I18n.getText("ci.partials.remediationssync.js.status.reopen");
 							return true;
 						}
 						else{
@@ -83,6 +84,7 @@ AJS.$(document).ready(
 
 				}
 				//if the remediation not exist in remediation items is because it is open
+				remediation.status = AJS.I18n.getText("ci.partials.remediationssync.js.status.open");
 				return true;
 			};
 
@@ -144,7 +146,7 @@ AJS.$(document).ready(
 									var remediationCount = 0;
 
 									for (var i = 0; i < data.remediations.assets.length; i++) {
-										if (self.isAnOpenRemediation(data.remediations.assets[i].remediation_id)) {
+										if (self.isAnOpenRemediation(data.remediations.assets[i])) {
 
 											currentRemediations.push(data.remediations.assets[i]);
 
@@ -459,6 +461,10 @@ AJS.$(document).ready(
 					{
 						header:"header-vulnerability",
 						data: remediation.vulnerabilities.length
+					},
+					{
+						header:"header-status",
+						data: remediation.status
 					},
 					{
 						header:"header-created",
