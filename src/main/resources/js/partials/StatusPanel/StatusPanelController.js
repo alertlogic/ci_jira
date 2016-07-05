@@ -2,10 +2,10 @@
  * Explicit load of the controller, to be used
  * into a JIRA Panel.
  */
-function statusController() {
+function statusController( user ) {
 	AJS.$(document).ready(
 		function() {
-			Bootstrap.start(function(){
+			Bootstrap.start( user, function(){
 				var self = this;
 
 				var status = {

@@ -12,7 +12,7 @@ public class TaskRuleExecutionState {
 	public final static int SUCCESS   = 2;//Execution OK
 	public final static int BLOCKED   = 3;//Blocked after two continuous error states
 	public final static int EXECUTING = 4;//Executing
-	
+
 	/**
 	 * Get the canonical name of the state
 	 * @param state	The state

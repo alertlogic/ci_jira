@@ -106,7 +106,7 @@ public class JIRAService {
 
 		return null;
 	}
-	
+
 	/**
 	 * Get the string for a level
 	 * @param level	The level for a threat
@@ -167,7 +167,7 @@ public class JIRAService {
 			 formated = description.substring(0,255) ;
 	    }
 		formated = formated.replaceAll("(\\r|\\n)", " ");
-		
+
 		return formated;
 	}
 
@@ -183,19 +183,19 @@ public class JIRAService {
 	 * @param level
 	 * @param userName
 	 * @return JSONObject with a log and if it was success or not
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public void createIssue(String summary, String description, long projectID, String remediationItem, String remediationId, String jiraGroup, String level, String userName) throws Exception {
 
 		IssueService issueService = ComponentAccessor.getIssueService();
 		//Validation that the project exists and are valid
 		Project project = ComponentAccessor.getProjectManager().getProjectObj( projectID );
-		if( project == null ) {		
+		if( project == null ) {
             throw new Exception("CI Plugin: this project does not exists "+projectID);
 		}
 
 		screenConfigService.assigValuesToVariables();
-		if( !screenConfigService.hasIssueTypeConfigurated(project) ) {	
+		if( !screenConfigService.hasIssueTypeConfigurated(project) ){
             throw new Exception("CI Plugin: this project is not configured properly :"+projectID);
 		}
 
@@ -231,17 +231,17 @@ public class JIRAService {
 
             Map<String, String> errors = result.getErrorCollection().getErrors();
             String errorDetails="";
-            
+
             for (String key: errors.keySet()) {
             	errorDetails += "CI Plugin: Error Field, "+key + " - " + errors.get(key)+"\n";
         	}
-            
+
             throw new Exception(errorDetails);
 
         } else {
         	issueService.create( user, result);
         }
-        
+
 	}
 
 	/**
@@ -287,8 +287,8 @@ public class JIRAService {
 	    	IssueResult transResult = issueService.transition(user, validationResult);
 	    	if(transResult.isValid()){
 
-	    		commentIssue(transResult.getIssue(), 
-	    				transResult.getIssue().getProjectObject().getLead(), 
+	    		commentIssue(transResult.getIssue(),
+	    				transResult.getIssue().getProjectObject().getLead(),
 						msg);
 
 	    		return true;

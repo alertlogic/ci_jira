@@ -8,14 +8,6 @@ var RulesService = function() {
     var urlBaseServlets;
 
     /**
-     * Start the service calling required
-     * init functions.
-     */
-    self.startService = function() {
-        self.initUrlBaseHost();
-    };
-
-    /**
      * Inits the url base host variables for the service.
      */
     self.getUrlBaseHost = function() {

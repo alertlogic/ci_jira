@@ -12,7 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Credential;
 import com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig;
+import com.alertlogic.plugins.jira.cloudinsight.service.CredentialService;
 import com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService;
 import com.atlassian.activeobjects.external.ActiveObjects;
 import com.atlassian.activeobjects.test.TestActiveObjects;
@@ -23,19 +25,20 @@ public class PluginConfigServiceTest {
 	private EntityManager entityManager;
     private ActiveObjects activeObject;
     private PluginConfigService pluginConfigService;
+    private CredentialService credentialService;
 
     private String ciUser = "ci test";
     private String ciAccessKeyId = "123";
     private String ciSecretKey = "123";
     private String ciUrl = "http://test.com";
     private String jiraUser = "jira test";
-
     @Before
     public void setUp() throws Exception
     {
         assertNotNull(entityManager);
         activeObject = new TestActiveObjects(entityManager);
         pluginConfigService = new PluginConfigService(activeObject);
+        credentialService = new CredentialService(activeObject);
     }
 
     @SuppressWarnings("unchecked")
@@ -46,18 +49,15 @@ public class PluginConfigServiceTest {
 
         assertEquals(0, activeObject.find(PluginConfig.class).length);
 
-        PluginConfig add = pluginConfigService.createOrUpdateConfiguration(jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
+        Credential credential = credentialService.createOrUpdateCredential(-1, jiraUser, ciUser, ciUrl, ciAccessKeyId, ciSecretKey);
+        PluginConfig add = pluginConfigService.createOrUpdateConfiguration(jiraUser, credential);
         assertFalse(add.getID() == 0);
 
         activeObject.flushAll();
 
         PluginConfig[] pluginConfig = activeObject.find(PluginConfig.class);
         assertEquals(1, pluginConfig.length);
-        assertEquals(ciUser, pluginConfig[0].getCiUser());
         assertEquals(jiraUser, pluginConfig[0].getJiraUser());
-        assertEquals(ciUrl, pluginConfig[0].getCiUrl());
-        assertEquals(ciAccessKeyId, pluginConfig[0].getCiAccessKeyId());
-        assertEquals(ciSecretKey, pluginConfig[0].getCiSecretKey());
      }
 
     @SuppressWarnings("unchecked")
@@ -65,19 +65,15 @@ public class PluginConfigServiceTest {
     public void testGetConfiguration() throws Exception
     {
         activeObject.migrate(PluginConfig.class);
-        assertNull(pluginConfigService.getConfiguration());
+        assertNull(pluginConfigService.getConfiguration(jiraUser));
 
         final PluginConfig pluginConfig = activeObject.create(PluginConfig.class);
-        pluginConfig.setCiUser(ciUser);
-        pluginConfig.setCiUrl(ciUrl);
         pluginConfig.setJiraUser(jiraUser);
-        pluginConfig.setCiAccessKeyId(ciAccessKeyId);
-        pluginConfig.setCiSecretKey(ciSecretKey);
         pluginConfig.save();
 
         activeObject.flushAll();
 
-        PluginConfig plugin = pluginConfigService.getConfiguration();
+        PluginConfig plugin = pluginConfigService.getConfiguration(jiraUser);
         assertNotNull(plugin);
         assertEquals(pluginConfig.getID(), plugin.getID());
     }
@@ -87,19 +83,15 @@ public class PluginConfigServiceTest {
     public void testHasConfiguration() throws Exception
     {
         activeObject.migrate(PluginConfig.class);
-        assertFalse(pluginConfigService.hasConfiguration());
+        assertFalse(pluginConfigService.hasConfiguration(jiraUser));
 
         final PluginConfig pluginConfig = activeObject.create(PluginConfig.class);
-        pluginConfig.setCiUser(ciUser);
-        pluginConfig.setCiUrl(ciUrl);
         pluginConfig.setJiraUser(jiraUser);
-        pluginConfig.setCiAccessKeyId(ciAccessKeyId);
-        pluginConfig.setCiSecretKey(ciSecretKey);
         pluginConfig.save();
 
         activeObject.flushAll();
 
-        Boolean has = pluginConfigService.hasConfiguration();
+        Boolean has = pluginConfigService.hasConfiguration(jiraUser);
         assertTrue(has);
     }
 }
