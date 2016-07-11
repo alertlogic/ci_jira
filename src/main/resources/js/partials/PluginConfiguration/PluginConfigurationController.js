@@ -527,25 +527,27 @@ AJS.$( document ).ready( function() {
             if (data.length <= 0) {
                 JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.pluginconfiguration.js.msg.config.withoutconfig") );
             }else{
-                AUIUtils.addOptions( "#selectCredential", data, "id", "ciUser" );
+                jiraService.Configuration().get().done(function( dataConfig ){
+                    //that is for review before to save
+                    config = dataConfig;
+
+                    if ( dataConfig.hasOwnProperty('credential_id') ) {
+                        AUIUtils.addOptions( "#selectCredential", data, "id", "ciUser" );
+
+                        AJS.$('#selectCredential').select2().select2('val', dataConfig.credential_id);
+                        AJS.$('#btnConfigSave').prop( "disabled" , true );
+                        AJS.$('#btnConfigSave').html(AJS.I18n.getText("ci.partials.pluginconfiguration.vm.config.button.update") );
+                        AJS.$('#btnConfigDelete').prop( "disabled" , false );
+                    } else {
+                        data.unshift({"ciUser":AJS.I18n.getText("ci.partials.pluginconfiguration.vm.credential.select.credential"), "id":0})
+                        AUIUtils.addOptions( "#selectCredential", data, "id", "ciUser" );
+
+                        if( data.length > 0 ){
+                            AJS.$( "#selectCredential" ).triggerHandler("change");
+                        }
+                    }
+                });
             }
-
-            jiraService.Configuration().get().done(function( dataConfig ){
-                //that is for review before to save
-                config = dataConfig;
-
-                if ( dataConfig.hasOwnProperty('credential_id') ) {
-
-                    AJS.$('#selectCredential').select2().select2('val', dataConfig.credential_id);
-                    AJS.$('#btnConfigSave').prop( "disabled" , false );
-                    AJS.$('#btnConfigDelete').prop( "disabled" , false );
-                }
-
-                if( data.length > 0 ){
-                    AJS.$( "#selectCredential" ).triggerHandler("change");
-                }
-            });
-
         });
     };
 
@@ -575,15 +577,36 @@ AJS.$( document ).ready( function() {
         AJS.$( "#selectCredential" ).auiSelect2();
     }
     AJS.$( "#selectCredential" ).change(function() {
-        AJS.$('#btnConfigSave').prop( "disabled" , false );
-        AJS.$('#btnConfigDelete').prop( "disabled" , false );
+        if (AJS.$( "#selectCredential" ).val() != 0) {
+            jiraService.Configuration().get().done(function( dataConfig ){
+                //that is for review before to save
+                config = dataConfig;
+
+                if ( dataConfig.hasOwnProperty('credential_id') ) {
+                    if (AJS.$( "#selectCredential" ).val() == dataConfig.credential_id) {
+                        AJS.$('#btnConfigSave').prop( "disabled" , true );
+                        AJS.$('#btnConfigDelete').prop( "disabled" , false );
+                    } else {
+                        AJS.$('#btnConfigSave').prop( "disabled" , false );
+                        AJS.$('#btnConfigSave').html(AJS.I18n.getText("ci.partials.pluginconfiguration.vm.config.button.update") );
+                        AJS.$('#btnConfigDelete').prop( "disabled" , true );
+                    }
+                } else {
+                    AJS.$('#btnConfigSave').prop( "disabled" , false );
+                    AJS.$('#btnConfigDelete').prop( "disabled" , true );
+                }
+            });
+        } else {
+            AJS.$('#btnConfigSave').prop( "disabled" , true );
+            AJS.$('#btnConfigDelete').prop( "disabled" , true );
+        }
     });
-    
+
     /* Enable btnCredentialTest button. */
 	AJS.$( "#ciUser" ).change(function() {
         self.testEnable( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
     });
-	
+
 	/* Enable btnCredentialTest button. */
 	AJS.$( "#ciPassword" ).change(function() {
         self.testEnable( AJS.$('#ciUser').val(), AJS.$('#ciPassword').val(), AJS.$('#ciUrl').val());
