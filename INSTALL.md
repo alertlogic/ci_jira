@@ -5,7 +5,9 @@ The Cloud Insight add-on for JIRA integrates Cloud Insight remediations as JIRA 
 
 ##Install the Add-on
 
-Make sure you have the **JIRA System Administrator permission** ( jira-system-administrators ) before installing the add-on, this permission enables the "Upload add-on" link. After you log into your JIRA account, perform the following steps to install the Cloud Insight add-on for JIRA:
+You must have **JIRA System Administrator permissions** (jira-system-administrators) to activate the "Upload add-on" link and install the add-on. 
+
+To install the Cloud Insight add-on for JIRA, log into your JIRA account, and then perform the following steps:
 
 1.	Click the Settings icon, and then select "Add-ons."
 2.	In the left navigation pane, select "Manage add-ons."
@@ -15,28 +17,37 @@ Make sure you have the **JIRA System Administrator permission** ( jira-system-ad
 
 ##Configure the Add-on
 
-After installation, each administrator must configure the add-on. To configure the Cloud Insight add-on for JIRA:
+After installation, you must add and configure accounts for one or more Cloud Insight administrators to assign issues or schedule rules in JIRA. After you add credentials, you can select any account to assign issues or schedule rules.
 
-1.	Under User-installed add-ons on the JIRA Administration page, click to expand "JIRA-cloud-insight," and then click "Configure."
-2.	On the JIRA menu bar, click "Cloud Insight," and then select "Add-on configuration."
-3.	On the Add-on Configuration page, click credentials that is going to  open a window fill out the form using the following information:
-  *	Your Cloud Insight deployment URL
+To add a new credential from which to choose:
+
+1.	On the JIRA menu bar, select "Cloud Insight," and then "Add-on Configuration."  
+2.	Click "Handle Credentials."
+3.	In the Credentials window, enter the following information:
+  *	Your Cloud Insight URL
     - UK API: `https://api.cloudinsight.alertlogic.co.uk`
     - US API: `https://api.cloudinsight.alertlogic.com`
-  *	Your Cloud Insight username
+  *	Your Cloud Insight user name
   * Your Cloud Insight password
-4.	Click "Test" to verify credentials.
+4.	Click "Test" to verify the credentials.
 5.	Click "Save."
-6.  Close the window and choose the credential which to want to be connect.
+6.  Click "Close."
+  
+To configure the Cloud Insight add-on for JIRA:
 
-* It is important that you be conscious about choose the correct and be carefull about do not delete it if you have issues using it.
+1.	On the JIRA menu bar, select "Cloud Insight," and then "Add-on Configuration."
+2.	On the Add-on Configuration page, click the Credentials tab, and then select the account to use to assign issues or schedule rules.
+3.	Click "Save."
+
+**Note:** Ensure you select the correct administrator credential. If you assigned issues from a credential, do not delete the credential or select another, or all the issues and the rules configured by the credential are going to be broken.
+
 
 
 ##Create JIRA Cloud Insight Projects
 
 JIRA Cloud Insight projects allow you to assign a Cloud Insight project type to projects you create specifically JIRA issues for Cloud Insight remediations. To create a Cloud Insight Project:
 
-1.	On the JIRA menu bar, select "Project," and then select "Create Project."
+1.	On the JIRA menu bar, select "Projects," and then select "Create Project."
 2.	On the Select Project Type screen, click "Cloud Insight Project," and then click "Next."
 3.	Enter the name of the project, and then click "Submit."
 
