@@ -78,43 +78,113 @@
                         </select>
                         <button id="assign-button" class="aui-button aui-button-primary">$i18n.getText('ci.partials.remediationssync.vm.button.assign')</button>
                     </div>
-
-                    <table class="aui" id="dataTable">
-                        <thead>
-                            <tr>
-                                <th id="header-select">
-                                    <input id="allCheck" class="check-input" type="checkbox">
-                                </th>
-                                <th id="header-description">
-                                    $i18n.getText('ci.partials.remediationssync.js.header.steps') (0)
-                                </th>
-                                <th id="header-vulnerability">
-                                    $i18n.getText('ci.partials.remediationssync.js.header.count')
-                                </th>
-                                <th id="header-status">
-                                    $i18n.getText('ci.partials.remediationssync.js.header.status')
-                                </th>
-                                <th id="header-created">
-                                    $i18n.getText('ci.partials.remediationssync.js.header.created')
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-
-                    <div id="remediationSyncLoading" class="text-align-center">
-                        $i18n.getText('ci.partials.remediationssync.vm.remediations.loading')
-                    </div>
+					<div class="remediations">
+						<div id="remediationsList" class="remediationList">
+							<div>
+								<h2>
+									<span>
+										<span>$i18n.getText('ci.partials.remediationssync.js.header.steps')</span>
+									</span> 
+									<span id="remediationCount" class="pull-right">0</span>
+								</h2>
+								<div id="remediationItem">
+									
+								</div>
+							</div>
+						</div>
+	                    <div id="remediationSyncLoading" class="text-align-center">
+	                        $i18n.getText('ci.partials.remediationssync.vm.remediations.loading')
+	                    </div>
                     
-                    <div id="div-zero-state" class="zero-state">
-	                    $i18n.getText('ci.partials.remediationssync.vm.mes.zero.state')
-	                </div>
-                </div>
-
-            </div>
-
-          </div>
+	                    <div id="div-zero-state" class="zero-state">
+		                    $i18n.getText('ci.partials.remediationssync.vm.mes.zero.state')
+		                </div>
+                	</div>
+            	</div>
+          	</div>
         </section>
+        
+        
+        
+        
+        <section role="dialog" id="detail-dialog" class="aui-layer aui-dialog2 aui-dialog2-xlarge" style="width:90%" aria-hidden="true">
+		     <header class="aui-dialog2-header">
+		        <!-- The dialog's title -->
+		        <h2 class="aui-dialog2-header-main">$i18n.getText('ci.partials.remediationdetails.vm.title')</h2>
+		        <!-- Actions to render on the right of the header -->
+		        <div class="aui-dialog2-header-secondary">
+		          	<button id="assign-button-dialog" class="aui-button aui-button-primary"></button>
+		        </div>
+		       
+		        <!-- Close icon -->
+		        <a class="aui-dialog2-header-close">
+		            <span class="aui-icon aui-icon-small aui-iconfont-close-dialog"></span>
+		        </a>
+		    </header>
+        	<div class="aui-dialog2-content">
+	        	<div class="form-body" class="aui">
+			    	<div id="details-content" class="assistive">
+				    	<div class="module toggle-wrap" id="detailsPanel">
+				    	</div>
+						<div class="aui-tabs horizontal-tabs">
+							<ul class="tabs-menu">
+								<li class="menu-item active-tab">
+						            <a href="#detailsTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.details.title')</a>
+						        </li>
+						        <li class="menu-item">
+						            <a href="#filtersTab">$i18n.getText('ci.partials.remediationdetails.vm.tab.filters.title')</a>
+						        </li>
+						    </ul>
+	
+						    <div class="tabs-pane active-pane" id="detailsTab">
+						    	<div class="aui-group">
+		    						<div class="aui-item">
+		    							<div id="vulnerabilitiesTab">
+									        <table id="vulnerabilitiesTable" class="table-simple">
+					                        	<thead><tr></tr></thead>
+					                        	<tbody></tbody>
+					                    	</table>
+									    </div>
+									</div>
+									<div class="aui-item">
+										<div id="assetsTab">
+									        <table id="assetsTable" class="table-simple">
+					                        	<thead><tr></tr></thead>
+					                        	<tbody></tbody>
+					                    	</table>
+									    </div>
+									</div>
+									<div class="aui-item">
+										<div id="evidencesTab">
+								    	    <table id="evidencesTable" class="table-simple">
+					                        	<thead><tr></tr></thead>
+					                        	<tbody></tbody>
+					                    	</table>
+					                    </div>
+									</div>
+								</div>
+							</div>
+	
+						    <div class="tabs-pane" id="filtersTab">
+						        <table class="aui" id="filtersTable">
+		                        	<thead><tr></tr></thead>
+		                        	<tbody></tbody>
+		                    	</table>
+						    </div>
+						</div>
+					</div>
+					<div id="details-loading" class="details-loading">
+		    			<p>$i18n.getText('ci.partials.remediationdetails.vm.loading.text')</p>
+					</div>
+				    <div id="details-error" class="assistive">
+				    </div>
+				</div>
+			</div>
+		</section>
+		
+        
+        
+        
 
         <!-- End of Content -->
     </div>

@@ -1,14 +1,18 @@
 /* Generic css */
 .high-risk{
+	padding-left: 15px;
     border-left: 5px solid #F92B0E;
 }
 .medium-risk{
+	padding-left: 15px;
     border-left: 5px solid #FF7F00;
 }
 .low-risk{
+	padding-left: 15px;
     border-left: 5px solid #f6ba3e;
 }
 .none-risk{
+	padding-left: 15px;
     border-left: 5px solid #535353;
 }
 .row_pointer{
@@ -94,6 +98,7 @@
 }
 .content-data-div{
     padding: 10px;
+    word-break: break-all;
 }
 .filters-panel {
     width:300px;
