@@ -91,7 +91,7 @@
   font-size: 2em;
   display: inline-block;
   width: 25px;
-  padding-top: 15px;
+  padding-top: 20px;
 }
 .remediations .remediationList .remediation {
   margin: 60px 0;
@@ -136,7 +136,7 @@
   padding: 0;
   margin: 0 10px 10px 0;
   border-bottom: 0;
-  word-wrap: break-word;
+   word-break: keep-all;
   font-size: 1.2em;
 }
 .remediations .remediationList .remediation div.remediation-data-col .remediation-info {
@@ -327,7 +327,7 @@
   background-color: #FFF;
   border-color: #535353;
   color: #535353;
-  border-style: double;
+  border-style: solid;
 }
 .remediations .remediationList .remediation .details .view-details .btn-circle:hover {
   background-color: #535353;
