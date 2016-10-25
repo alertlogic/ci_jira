@@ -31,6 +31,7 @@
 		<dependency>com.atlassian.auiplugin:dialog2</dependency>
 		<dependency>jira.webresources:jquery-livestamp</dependency>
 		<resource type="download" name="cloud-insight-for-jira.css" location="/css/cloud-insight-for-jira.css" />
+		<resource type="download" name="cloud-insight-remediations-list.css" location="/css/cloud-insight-remediations-list.css" />
 		<resource type="download" name="images/" location="/images" />
 		<context>cloud-insight-for-jira</context>
 	</web-resource>
@@ -344,7 +345,7 @@
         </transformation>
 
         <resource type="download" name="CustomProjectTemplate.soy.js" location="/js/partials/Project/CustomProjectTemplate.soy"/>
-
+        
         <resource type="download" name="images/" location="/images">
             <param name="content-type" value="image/png; charset=binary"/>
         </resource>
@@ -352,6 +353,19 @@
         <context>atl.general</context>
         <context>atl.admin</context>
     </web-resource>
+
+	<web-resource key="font-awesome-resource" name="Font Awesome Resources">
+		<context>atl.general</context>
+		<context>atl.admin</context>
+		<resource type="download" name="font-awesome.css" location="assets/font-awesome/css/font-awesome.css" />
+	    <resource type="download" name="font-awesome.min.css" location="assets/font-awesome/css/font-awesome.min.css" />
+	    <resource type="download" name="FontAwesome.otf" location="/fonts/font-awesome/fonts/FontAwesome.otf"/>
+	    <resource type="download" name="fontawesome-webfont.eot" location="assets/font-awesome/fonts/fontawesome-webfont.eot"/>
+	    <resource type="download" name="fontawesome-webfont.svg" location="assets/font-awesome/fonts/fontawesome-webfont.svg"/>
+	    <resource type="download" name="fontawesome-webfont.ttf" location="assets/font-awesome/fonts/fontawesome-webfont.ttf"/>
+	    <resource type="download" name="fontawesome-webfont.woff" location="assets/font-awesome/fonts/fontawesome-webfont.woff"/>
+	    <resource type="download" name="fontawesome-webfont.woff2" location="assets/font-awesome/fonts/fontawesome-webfont.woff2"/>
+	</web-resource>
 
     <project-blueprint key="ci-project-template" weight="90">
         <label key="ci.atlassianplugin.project.template.name"/>
@@ -382,6 +396,14 @@
             <transformer key="jsI18n"/>
         </transformation>
     	<resource type="download" name="RemediationDetailsController.js" location="/js/partials/RemediationDetails/RemediationDetailsController.js"/>
+  	</web-resource>
+  	
+  	<web-resource name="RemediationSyncDetailsController" key="remediationSyncDetailsController">
+    	<context>atl.general</context>
+    	<transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+    	<resource type="download" name="RemediationSyncDetailsController.js" location="/js/partials/RemediationSync/RemediationSyncDetailsController.js"/>
   	</web-resource>
 
 </atlassian-plugin>

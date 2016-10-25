@@ -152,7 +152,7 @@ AJS.$(document).ready(
 					},
 					{
 						header: "header-edit",
-						data: "<a onclick='ruleConfigurationController.editRule("+rule.id+")'>Edit</a>"
+						data: "<a class='row_pointer' onclick='ruleConfigurationController.editRule("+rule.id+")'>Edit</a>"
 					}
 				];
 
