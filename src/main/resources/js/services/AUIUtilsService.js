@@ -494,6 +494,7 @@ var AUIUtilsService = function() {
         id = id.replace(/\./g,'\\.');
         id = id.replace(/\'/g,"\\'");
         id = id.replace(/\"/g,'\\"');
+        id = id.replace(/\:/g,'\\:');
 
         return id;
     };
