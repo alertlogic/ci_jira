@@ -23,6 +23,8 @@ AJS.$(document).ready(
 			var issueTypeId;
 			var isARuleLoaded;
 			var ruleId;
+			var remediationKeyDetail;
+			var vulnerabilityInstanceMap = {};
 
 			/**
 			 * Review if the information is of a rule
@@ -92,11 +94,10 @@ AJS.$(document).ready(
 			 * Update the total of remediations in the header
 			 */
 			self.updateTableHeader = function(total) {
-
-				var headerDesc = AJS.$("#header-description");
-
-				headerDesc.html( AJS.I18n.getText("ci.partials.remediationssync.js.header.steps")+" ("+total+")");
-
+				var headerDesc = AJS.$("#remediationCount");
+				
+				headerDesc.html(total);
+				
 				AJS.$( "#allCheck" ).click(function(){
 					var checkedStatus = this.checked;
 					AJS.$( "#assign-button" ).prop('disabled', true);
@@ -115,11 +116,13 @@ AJS.$(document).ready(
 			 */
 			self.validateSelected = function() {
 				AJS.$( "#assign-button" ).prop('disabled', true);
-				AJS.$('#dataTable tbody tr').find('td:first :checkbox').each(function() {
-					if (AJS.$(this).prop('checked')) {
-						AJS.$( "#assign-button" ).prop('disabled', false);
-					}
-				});
+				
+				var remediationSelected = AJS.$('.remediation-check.actionable.on');
+				
+				if (remediationSelected !== null && remediationSelected.length > 0) {
+					AJS.$( "#assign-button" ).prop('disabled', false);
+				}
+				
 				var project = AJS.$( "#select-project" ).val();
 				if (!project) {
 					AJS.$( "#assign-button" ).prop('disabled', true);
@@ -128,36 +131,47 @@ AJS.$(document).ready(
 
 			/**
 			 * Load the items for an environment and filters
-			 * @param  {String} environment
-			 * @param  {Array} selected filters array
+			 * @param  {String} currentEnvironment. Id environment selected
+			 * @param  {Array} selectedFiltersArray. Filters array
+			 * @param  {Array} selectedRemediations. Remediations selected array
+			 * @param  {String} remediationKey. Remediation Key if it is add to project from detail.
 			 * @return {void}
 			 */
-			self.loadItems = function( currentEnvironment, selectedFiltersArray) {
+			self.loadItems = function( currentEnvironment, selectedFiltersArray, selectedRemediations, remediationKey) {
 				remediationsService.getAllRemediationsItemsByEnvironment(currentEnvironment).done(function(remediationsItems){
-						allRemediationsItems = remediationsItems;
+					allRemediationsItems = remediationsItems;
 
-						remediationsService.getAllRemediations(currentEnvironment,selectedFiltersArray).done(function(data){
+					remediationsService.getAllRemediations(currentEnvironment,selectedFiltersArray).done(function(data){
+						currentRemediations = [];
 
-							currentRemediations = [];
+						if ( data["remediations"] ) {
+							if ( data.remediations.assets ) {
 
-							if ( data["remediations"] ) {
-								if ( data.remediations.assets ) {
+								var remediationCount = 0;
+								
+								assetsService.byType(currentEnvironment, 'vulnerability', []).done( function( response ){
 
-									var remediationCount = 0;
-
-									for (var i = 0; i < data.remediations.assets.length; i++) {
+									vulnerabilityInstanceMap = {};
+			                	
+				                	response.assets.forEach( function( row ) {
+				                        var vulnAsset = row[0];
+				                        vulnerabilityInstanceMap[vulnAsset.key] = vulnAsset;
+				                    });
+				                	
+				                	for (var i = 0; i < data.remediations.assets.length; i++) {
 										if (self.isAnOpenRemediation(data.remediations.assets[i])) {
-
+											data.remediations.assets[i] = remediationSupportService.preprocessRemediation(data.remediations.assets[i],
+																														  currentEnvironment,
+																														  currentUser,
+																														  vulnerabilityInstanceMap,
+																														  selectedFiltersArray);
 											currentRemediations.push(data.remediations.assets[i]);
-
 											self.addRemediationItemToView(data.remediations.assets[i]);
-
 											remediationCount++;
-
 										}
 									}
-
-									if( data.remediations.assets.length === 0 && isARuleLoaded===true ){
+				                	
+				                	if( data.remediations.assets.length === 0 && isARuleLoaded===true ){
 				                    	JIRA.Messages.showWarningMsg(
 											AJS.I18n.getText("ci.partials.remediationssync.js.msg.rule.filters.warning")
 										);
@@ -171,31 +185,38 @@ AJS.$(document).ready(
 									}
 
 									AJS.$("#remediationSyncLoading").hide();
-								}
+									
+									if (remediationKey !== undefined) {
+										self.closeRemediationDetailPopup(selectedRemediations);
+									}
+				                });
 							}
-
-							if (data["filters"]) {
-								self.setRemediationsFilters(data["filters"]);
-							}
-
-						});
+						}
+						if (data["filters"]) {
+							self.setRemediationsFilters(data["filters"]);
+						}
 					});
+				});
 			};
 
 			/**
 			 * Load all remediations items for this environment.
+			 * @param  {Array} selectedRemediations. Remediations selected array
+			 * @param  {String} remediationKey. Remediation Key if it is add to project from detail.
+			 * @return {void}
 			 */
-			self.loadAllRemediationsItems = function() {
-				AUIUtils.clearTable( "#dataTable" );
+			self.loadAllRemediationsItems = function(selectedRemediations, remediationKey) {
+				AJS.$("#remediationItem").empty();
 				self.updateTableHeader( 0 );
 				AUIUtils.invisible("#div-zero-state");
 				AJS.$("#remediationSyncLoading").show();
 
 				if (currentEnvironment) {
-
 					var selectedFiltersArray = self.getSelectedFiltersArray();
-					self.loadItems(currentEnvironment,selectedFiltersArray);
-
+					self.loadItems(currentEnvironment,selectedFiltersArray, selectedRemediations, remediationKey);
+				} else {
+					AUIUtils.visible("#div-zero-state");
+					AJS.$("#remediationSyncLoading").hide();
 				}
 			};
 
@@ -215,6 +236,7 @@ AJS.$(document).ready(
 					self.refreshAfterFilterChange();
 				}
 				self.isReadySaveRuleButton();
+				self.validateSelected();
 			};
 
 			/**
@@ -358,6 +380,7 @@ AJS.$(document).ready(
 					refreshAfterFilterChange();
 				}
 				self.isReadySaveRuleButton();
+				self.validateSelected();
 			};
 
 			/**
@@ -365,8 +388,9 @@ AJS.$(document).ready(
 			 */
 			self.getSelectedRemediations = function(){
 				var selectedRemediationsID = [];
-				AJS.$('input[name="remediations"]:checked').each(function() {
-					selectedRemediationsID.push(this.value);
+
+				AJS.$('.remediation-check.actionable.on').each(function() {
+					selectedRemediationsID.push(this.getAttribute('value'));
 				});
 
 				return selectedRemediationsID;
@@ -393,6 +417,16 @@ AJS.$(document).ready(
 				return selectedRemediationsKeys;
 			};
 
+			self.closeRemediationDetailPopup = function(selectedRemediationsID){
+				if (selectedRemediationsID != null && selectedRemediationsID.length > 0) {
+					AJS.$('input[name="remediations"]').each(function(i) {
+						if(selectedRemediationsID.indexOf(AJS.$('input[name="remediations"]')[i].value) > -1){
+							AJS.$('input[name="remediations"]')[i].checked = true;
+						}
+					});
+				}
+			};
+			
 			/**
 			 * Populates the project select.
 			 * @param  {Array} projects The array of projects names
@@ -445,37 +479,180 @@ AJS.$(document).ready(
 			 * @param {Object} remediation The refence to the item
 			 */
 			self.addRemediationItemToView = function( remediation ) {
-				var tableBody = AJS.$("#dataTable tbody");
-
-				var rowData = [
-					{
-						header:"header-select",
-						data: "<input type='checkbox' name='remediations' class='check-input' value='"
-						+remediation.remediation_id+"' onclick='remediationsSyncController.validateSelected()'/>"
-					},
-					{
-						header:"header-description",
-						data: "<div class='remediation-row "+AUIUtils.getThreatLevelClass(remediation.threat_level)+"'>"
-						+AUIUtils.htmlLize(remediation.name)+"</div>"
-					},
-					{
-						header:"header-vulnerability",
-						data: remediation.vulnerabilities.length
-					},
-					{
-						header:"header-status",
-						data: remediation.status
-					},
-					{
-						header:"header-created",
-						data: moment( remediation.created_on ).format("MM/DD/YYYY")
-					}
-				];
-
-				AUIUtils.createTableRow(tableBody,rowData);
-
+				var remediationsDiv = AJS.$("#remediationItem");
+				var remediationItem = self.remediationItem(remediation);
+				remediationsDiv.append(remediationItem);
 			};
 
+			/**
+			 * Build a remediation item to the view.
+			 * @param {Object} remediation The refence to the item
+			 */
+			self.remediationItem = function(remediation){
+				var html  = "<div id='"+remediation.remediation_id+"' class='remediation " + AUIUtils.getLevelClass(remediation.threat_level) +"'>";
+					html += "  <div id='remediation' onclick='remediationsSyncController.remediationSelectedEvent(this)'>";
+					html += "    <div class='row table-row checkbox-container'>";
+					html += "      <div class='col-xs-2 middle'>";
+					html += "        <div value='"+remediation.remediation_id+"'  class='remediation-check actionable'>";
+					html += "          <span class='check fa fa-check'></span>";
+					html += "        </div>";
+					html += "      </div>";
+					html += "      <div class='col-xs-11 details'>";
+					html += "        <div class='outline'>";
+					html += self.vulnerabilitiesList(remediation);
+					html += "        </div>";
+					
+					if (remediation.vulnerabilities.length > 4){
+						html += self.extraVulnerabilitiesList(remediation.vulnerabilities.length - 4);
+					}
+					
+					html += "      </div>";
+					html += "    </div>";
+					html += "  </div>";
+					html += "</div>";
+					
+				return html;
+			}
+			
+			/**
+			 * Build vulnerability list remediation to the view.
+			 * @param {Object} remediation The refence to the item
+			 */
+			self.vulnerabilitiesList = function (remediation) {
+				var html = "  <div class='row table-row'>";
+					html += "    <div class='col-xs-8 remediation-data-col'>";
+					html += "      <div class='row'>";
+					html += "        <div class='col-xs-12'>";
+					html += "          <div class='remediation-name'>";  
+					html += "            <h3>"+AUIUtils.trimExcerpt(remediation.name)+"</h3>";  
+					html += "          </div>";    
+					html += "          <div class='pull-right remediation-info'>";   
+					html += "            <ul>";    
+					html += "              <li><i class='risk fa fa-circle high'></i> " + remediation._vulnExtraInfo.high + "</li>";  
+					html += "              <li><i class='risk fa fa-adjust medium'></i> " + remediation._vulnExtraInfo.medium + "</li>";
+					html += "              <li><i class='risk fa fa-circle-o low'></i> " + remediation._vulnExtraInfo.low + "</li>";
+					html += "              <li><i class='risk fa fa-info-circle none'></i> " + remediation._vulnExtraInfo.none + "</li>";
+					html += "            </ul>";
+					html += "          </div>";
+					html += "        </div>";
+					html += "      </div>";
+					html += "      <div class='vulns-list'>";
+					html += "        <div class='row table-row'>";
+					html += "      </div>";
+					html += "      <ul class='vulns'>";
+					
+					for (var idx = 0; idx<remediation.vulnerabilities.length; idx++) {
+	                    var vul = remediation.vulnerabilities[idx];
+	                    var classCss = AUIUtils.getLevelClassVulnerability( vul._threatCode );
+					
+	                    if (idx > 3) {
+							break;
+						}
+	                    
+						html += "    <li title=''>";
+						html += "      <span class='risk fa fa-details "+classCss+"'></span>";
+						html += "      <div>";
+						html += "        <span class='pull-right badge'>" + vul._cvss_score + "</span>"+ vul.name;
+						html += "      </div>";
+						html += "    </li>";
+					}
+					
+					html += "      </ul>";
+					html += "    </div>";
+					html += "  </div>";
+					html += self.detailButton(remediation.key);
+					
+				return html;
+			}
+			
+			/**
+			 * Build detail button remediation to the view.
+			 * @param {Object} remediationKey Remediation key
+			 */
+			self.detailButton = function(remediationKey){
+				var html  = "<div class='col-xs-4 middle vertical-middle remediation-state-col'>";
+					html += "  <div>";
+					html += "    <h3>";
+					html += "      <span ><span>Open</span></span>";
+					html += "    </h3>";
+					html += "  </div>";
+					html += "  <div class='view-details view-details-button-container'>";
+					html += "    <button class='btn btn-default btn-circle' onclick='remediationsSyncController.showDetailsEvent(event, \""+ remediationKey + "\")'>";
+					html += "      <span>"+AJS.I18n.getText("ci.partials.remediationssync.vm.button.detail.remediation")+"</span>";
+					html += "    </button>";
+					html += "  </div>";
+					html += "</div>";
+					
+				return html;	
+			}
+			
+			/**
+			 * Build message when the vulnerability list exceed limit.
+			 * @param {Object} extraVulnerabilities Number the vulnerabilities extras.
+			 */
+			self.extraVulnerabilitiesList = function (extraVulnerabilities) {
+				var html  = "<div class='row table-row'>";
+					html += "  <div class='col-xs-12 align-bottom'>";
+					html += "    <div class='vulns-list'>";
+					html += "      <div class='extra-vulns'>";
+					html += "        <i class='fa fa-plus'></i> ";
+					html += extraVulnerabilities;
+					html += "        <span>other exposures</span>";
+					html += "      </div>";
+					html += "    </div>";
+					html += "  </div>";
+					html += "</div>";
+				
+				return html;
+			}
+			
+			/**
+			 * Event to show remediation detail in popup
+			 * @param {Object} event Event.
+			 * @param {String} remediationKey Remediation key
+			 */
+			self.showDetailsEvent = function( event, remediation_key ) {
+				event.stopPropagation();
+				
+				var projectSelected = AJS.$("#select-project option:selected");
+                var groupSelected = AJS.$( "#select-group option:selected" );
+                var assignButtonDialog = AJS.$( "#assign-button-dialog" );
+                
+				AJS.$("#details-loading").removeClass("hidden");
+                AJS.$("#details-content").addClass("assistive");
+                assignButtonDialog.hide();
+                
+				if (projectSelected !== null && projectSelected.val().length > 0) {
+					assignButtonDialog.show();
+					assignButtonDialog.prop('disabled', true);
+					var textButton = AJS.I18n.getText("ci.partials.remediationssync.vm.button.add.remediation.project").format(projectSelected.text());
+					if (groupSelected !== null && groupSelected.val().length > 0) {
+						textButton += " " +  AJS.I18n.getText("ci.partials.remediationssync.vm.button.add.remediation.group").format(groupSelected.text());
+					}
+					assignButtonDialog[0].innerText = textButton;
+				} 
+				
+                remediationKeyDetail = remediation_key;
+                remediationSyncDetailsController(remediation_key);
+				
+				AJS.dialog2("#detail-dialog").show();
+			};
+
+			/**
+			 * Event to select remediation item.
+			 * @param {Object} event Event.
+			 */
+			self.remediationSelectedEvent = function(event) {
+				if (!event.parentElement.classList.contains('on')) {
+					event.parentElement.classList.add('on');
+					event.getElementsByClassName('remediation-check actionable')[0].classList.add('on');
+				} else {
+					event.parentElement.classList.remove('on');
+					event.getElementsByClassName('remediation-check actionable')[0].classList.remove('on');
+				}
+				self.validateSelected();
+			};
+			
 			/**
 			 * Add Select Events
 			 */
@@ -485,7 +662,7 @@ AJS.$(document).ready(
 				}
 				AJS.$( "#select-environment" ).change(function() {
 					currentEnvironment = AJS.$( "#select-environment" ).val();
-
+					
 					selectedFilters = [];
 					AUIUtils.clearTable("#selectedFilters");
 
@@ -497,9 +674,10 @@ AJS.$(document).ready(
 					}
 
 					self.isReadySaveRuleButton();
+					self.validateSelected();
 				});
 			});
-
+			
 			Bootstrap.onView("#select-group", function(){
 				if( typeof jQuery.fn.auiSelect2 == 'function') {
 					AJS.$( "#select-group" ).auiSelect2();
@@ -512,6 +690,7 @@ AJS.$(document).ready(
 				}
 				AJS.$( "#select-project" ).change(function() {
 					self.isReadySaveRuleButton();
+					self.validateSelected();
 				});
 			});
 
@@ -533,18 +712,25 @@ AJS.$(document).ready(
 			Bootstrap.onView("#rule-name", function(){
 				AJS.$( "#rule-name" ).keyup(function() {
 					self.isReadySaveRuleButton();
+					self.validateSelected();
 				});
 			});
 
 			/**
 			 * Plan remediations and create issues.
 			 */
-			self.planRemediationsAndCreateIssues = function( project, group ) {
+			self.planRemediationsAndCreateIssues = function( project, group, remediationKey ) {
 				var selectedRemediations = self.getSelectedRemediations();
 
-				if (selectedRemediations.length > 0 ) {
+				if (selectedRemediations.length > 0 || remediationKey !== undefined) {
 
 					var remediationsKeys = self.getSelectedRemediationsKeys();
+					
+					if(remediationKey !== undefined) {
+						remediationsKeys = [remediationKey];
+						selectedRemediations = []; 
+						selectedRemediations.push(AUIUtils.getLastDetailFromKey( remediationKey ));
+					}
 
 					var selectedFiltersArray = self.getSelectedFiltersArray();
 
@@ -555,9 +741,8 @@ AJS.$(document).ready(
 							selectedRemediations.length+" "
 							+AJS.I18n.getText("ci.partials.remediationssync.js.msg.planned"));
 
-						self.createJiraIssues(plannedItems,project,group);
+						self.createJiraIssues(plannedItems,project,group, selectedRemediations);
 						JIRA.Loading.hideLoadingIndicator();
-
 					}).fail(function(jqXHR, textStatus) {
 
 						JIRA.Messages.showWarningMsg(
@@ -566,59 +751,73 @@ AJS.$(document).ready(
 						JIRA.Loading.hideLoadingIndicator();
 
 					});
-
 				}
 			};
 
+			self.assignRemediation = function (remediationKey) {
+				var group = AJS.$( "#select-group" ).val();
+				var project = AJS.$( "#select-project" ).val();
+				JIRA.Loading.showLoadingIndicator();
+
+				if (project) {
+					var projectIsConfigured = jiraService.ConfigureProject(project);
+					projectIsConfigured.done(function(){
+						jiraService.Field().configurate();
+
+						jiraService.IssueType().getAll().success(function(data){
+
+							for (var i = 0; i < data.length; i++) {
+								if (data[i].name === AJS.I18n.getText("ci.constant.issuetype.name")){
+									issueTypeId = data[i].id;
+									break;
+								}
+							}
+							if (issueTypeId) {
+								self.planRemediationsAndCreateIssues(project,group, remediationKey);
+							} else {
+								JIRA.Messages.showWarningMsg(
+									AJS.I18n.getText("ci.partials.remediationssync.js.msg.issuetype.error")
+								);
+								JIRA.Loading.hideLoadingIndicator();
+							}
+						});
+
+					});
+
+					projectIsConfigured.fail(function(jqXHR, textStatus) {
+						JIRA.Messages.showWarningMsg(
+							AJS.I18n.getText("ci.partials.remediationssync.js.msg.planned.error")
+						);
+						JIRA.Loading.hideLoadingIndicator();
+					});
+				}
+			};
+			
 			/**
 			 * Assign button
 			 */
-			Bootstrap.onView("#assign-button", function(){
-
+			Bootstrap.onView("#assign-button", function() {
 				AJS.$( "#assign-button" ).prop('disabled', true);
+				
 				AJS.$( "#assign-button" ).click(function() {
-
-					var group = AJS.$( "#select-group" ).val();
-					var project = AJS.$( "#select-project" ).val();
-					JIRA.Loading.showLoadingIndicator();
-
-					if (project) {
-
-						var projectIsConfigured = jiraService.ConfigureProject(project);
-						projectIsConfigured.done(function(){
-							jiraService.Field().configurate();
-
-							jiraService.IssueType().getAll().success(function(data){
-
-								for (var i = 0; i < data.length; i++) {
-									if (data[i].name === AJS.I18n.getText("ci.constant.issuetype.name")){
-										issueTypeId = data[i].id;
-										break;
-									}
-								}
-								if (issueTypeId) {
-									self.planRemediationsAndCreateIssues(project,group);
-								} else {
-									JIRA.Messages.showWarningMsg(
-										AJS.I18n.getText("ci.partials.remediationssync.js.msg.issuetype.error")
-									);
-									JIRA.Loading.hideLoadingIndicator();
-								}
-							});
-
-						});
-
-						projectIsConfigured.fail(function(jqXHR, textStatus) {
-							JIRA.Messages.showWarningMsg(
-								AJS.I18n.getText("ci.partials.remediationssync.js.msg.planned.error")
-							);
-							JIRA.Loading.hideLoadingIndicator();
-						});
-					}
-
+					self.assignRemediation();
 				});
 			});
 
+			/**
+			 * Assign one remediation button from details remediatinos popup.
+			 */
+			AJS.$( "#assign-button-dialog" ).click(function() {
+				AJS.$( "#assign-button-dialog" ).prop('disabled', true);
+				
+				self.assignRemediation(remediationKeyDetail);
+				
+				AJS.$( "#assign-button-dialog" ).prop('disabled', false);
+				AJS.dialog2("#detail-dialog").hide();
+			});
+			
+			
+			
 			/**
 			 * Return the remediation
 			 */
@@ -637,7 +836,7 @@ AJS.$(document).ready(
 			/**
 			 * Creates the jira issues, based on the planned items
 			 */
-			self.createJiraIssues = function( plannedItems, project, group ) {
+			self.createJiraIssues = function( plannedItems, project, group, selectedRemediations){
 
 				var ofMsg = AJS.I18n.getText("ci.partials.remediationssync.js.msg.issues.of");
 				var assignMessage = AJS.I18n.getText("ci.partials.remediationssync.js.msg.issues.assign");
@@ -673,10 +872,8 @@ AJS.$(document).ready(
 								"(" + issueCreated + " " + ofMsg + " " + plannedItems.length+") "+assignMessage);
 
 							if ( (issueCreated+issueNotCreated)  === plannedItems.length ) {
-								self.loadAllRemediationsItems();
+								self.slideUpRemediationItems(selectedRemediations, function(){});
 							}
-
-
 						}).fail( function( jqXHR, textStatus, errorThrown){
 							issueNotCreated++;
 							JIRA.Messages.showErrorMsg(
@@ -690,7 +887,7 @@ AJS.$(document).ready(
 								remediationItemKey);
 
 							if ( (issueCreated+issueNotCreated)  === plannedItems.length ) {
-								self.loadAllRemediationsItems();
+								self.slideUpRemediationItems(selectedRemediations, function(){});
 							}
 
 						}).always(function(){
@@ -713,7 +910,7 @@ AJS.$(document).ready(
 							remediationItemRemoved++;
 
 							if ( remediationItemRemoved  === plannedItems.length ) {
-								self.loadAllRemediationsItems();
+								self.slideUpRemediationItems(selectedRemediations, function(){});
 							}
 						});
 					}
@@ -874,7 +1071,26 @@ AJS.$(document).ready(
 					self.storeRules();
 				});
 			});
-
+			
+			/**
+             * Slide up all the remediations in the list, uses a selector
+             * to apply this animation to the div that contains the remediation.
+             * @param  {Array} remediations Reference to the remediations list.
+             * @param  {Function} callback  The callback function when animation finished.
+             */
+            self.slideUpRemediationItems = function( remediations, callback ) {
+                for ( var i = 0; i < remediations.length; i++ ) {
+                	AJS.$( "#" + remediations[i] ).slideUp(1000, function(){
+                		var headerDesc = AJS.$("#remediationCount");
+        				var remediationCount = headerDesc.text();
+        				headerDesc.html(remediationCount - 1);
+        				
+        				this.remove();
+        				
+        				self.validateSelected();
+                	});
+                }
+            };
 		});
 	}
 );

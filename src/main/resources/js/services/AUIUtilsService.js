@@ -374,6 +374,42 @@ var AUIUtilsService = function() {
         }
        return className;
     };
+    
+    /**
+     * Return the threat level css class to create a
+     * visual bezel.
+     */
+    self.getLevelClass = function(level){
+        var className = "";
+        switch (level) {
+            case 3:        className = "high"; break;
+            case 2:        className = "medium"; break;
+            case 1:        className = "low"; break;
+            case 'High':   className = "high"; break;
+            case 'Medium': className = "medium"; break;
+            case 'Low':    className = "low"; break;
+            default:       className = "none"; break;
+        }
+       return className;
+    };
+    
+    /**
+     * Return the threat level css class to create a
+     * visual bezel.
+     */
+    self.getLevelClassVulnerability = function(level){
+        var className = "";
+        switch (level) {
+            case 3:        className = "high fa-circle"; break;
+            case 2:        className = "medium fa-adjust"; break;
+            case 1:        className = "low fa-circle-o"; break;
+            case 'high':   className = "high fa-circle"; break;
+            case 'medium': className = "medium fa-adjust"; break;
+            case 'low':    className = "low fa-circle-o"; break;
+            default:       className = "none fa-info-circle"; break;
+        }
+       return className;
+    };
 
     /**
      * Return the summary with the correct format
@@ -458,6 +494,7 @@ var AUIUtilsService = function() {
         id = id.replace(/\./g,'\\.');
         id = id.replace(/\'/g,"\\'");
         id = id.replace(/\"/g,'\\"');
+        id = id.replace(/\:/g,'\\:');
 
         return id;
     };
@@ -504,6 +541,168 @@ var AUIUtilsService = function() {
             title: AJS.I18n.getText("ci.atlassianplugin.utils.error.title") ,
             fadeout: true,
             body: msg
+        });
+    };
+    
+    /**
+     * Downright poopy excerpt generator; placeholder only. 
+     * Anyone with time and competency, please feel free to revise.
+     */
+    self.trimExcerpt = function( fullText, maxLength ) {
+        maxLength = maxLength || 112;
+        if ( fullText.indexOf( "\n\n" ) !== -1 ) {
+            fullText = fullText.substring( 0, fullText.indexOf( "\n\n" ) );
+        } else if ( fullText.indexOf( "\r\n\r\n" ) !== -1 ) {
+            fullText = fullText.substring( 0, fullText.indexOf( "\r\n\r\n" ) );
+        }
+        if ( fullText.length > maxLength ) {
+            var terminators = [ ".", "\n", "\r\n", ",", ";", " " ];
+            var earliest = fullText.length;
+            for ( var i = 0; i < terminators.length; i++ ) {
+                var thisMatch = fullText.indexOf( terminators[i], maxLength );
+                if ( thisMatch !== -1 && thisMatch < earliest ) {
+                    earliest = thisMatch;
+                    break;
+                }
+            }
+            if ( earliest !== fullText.length ) {
+                fullText = fullText.substring( 0, earliest) + "...";
+            }
+        }
+        return fullText;
+    };
+    
+    /**
+     *  @property _threatMap This is a map of raw CVSS thresholds -> logical risk levels.  See getThreatLevelFromAsset to see how it should be used.
+     */
+
+    this._threatMap = [{
+        threshold: 7,
+        level: 3,
+        code: 'high',
+        label: 'Critical'
+    }, {
+        threshold: 3,
+        level: 2,
+        code: 'medium',
+        label: "Medium Risk"
+    }, {
+        threshold: 0.0000001,
+        level: 1,
+        code: 'low',
+        label: "Low Risk"
+    }, {
+        threshold: 0,
+        level: 0,
+        code: 'none',
+        label: "No Risk"
+    }];
+
+    /**
+     * Gets a reference to the service's _threatMap property.
+     * @returns {object} a reference to the threat map defined above; see getThreatLevelFromAsset.
+     */
+
+    this.threatMap = function() {
+        return this._threatMap; /*  Occam says: do not duplicate objects unnecessarily */
+    };
+    
+    /**
+     * Uses an asset definition's threatiness property to determine its logic threat level.
+     *
+     * @param {object} asset The asset to determine the threat level for; note that this asset must have a 'threatiness' property.
+     * 
+     * @returns {object} An object describing the asset's threat level.  This object will have 'code' and 'label' properties.
+     */
+
+    this.getThreatLevelFromAsset = function(asset) {
+        /** Lets handle both threat level or threatiness 
+          * in each case of presence 
+        **/
+
+        // this var will hold the value that is gonna be
+        // used as indicator of threat level or threatiness 
+        var indicator = asset.threatiness || 0.0;
+        var attribute = "threshold";
+        if (asset.threat_level) {
+            indicator = asset.threat_level || 0;
+            attribute = "level";
+        }
+        var threatMap = this.threatMap();
+        for (var i = 0; i < threatMap.length; i++) {
+
+            if (indicator >= threatMap[i][attribute]) {
+                return threatMap[i];
+            }
+
+        }
+        return threatMap[threatMap.length - 1];
+    };
+    
+    /**
+     * Uses a CVSS score to determine a logical threat level.
+     *
+     * @param {number} score The CVSS score to retrieve a threat level for.
+     *
+     * @returns {object} An object describing the asset's threat level.  This object will have 'code' and 'label' properties.
+     */
+
+    this.getThreatLevelFromCVSS = function(score) {
+        var threatMap = this.threatMap();
+        for (var i = 0; i < threatMap.length; i++) {
+            if (score >= threatMap[i].threshold) {
+                return threatMap[i];
+            }
+        }
+        return threatMap[threatMap.length - 1];
+    };
+    
+    /**
+     * Counts objects by category, which the category is determined via callback.
+     *
+     * @param {Array} array The array to count by category.
+     * @param {function} categorizer The category callback.
+     * @param {Object} thisObject An instance to use as 'this' for the callback (optional).
+     *
+     * @returns {Object} A map of categories and counts.
+     */
+    this.countBuckets = function(array, categorizer, thisObject) {
+        var buckets = {};
+        thisObject = thisObject || this;
+        for (var index = 0; index < array.length; index++) {
+            var bucket = categorizer.call(thisObject, array[index], index);
+            if (!bucket) {
+                continue;
+            }
+            if (buckets[bucket] === undefined) {
+                buckets[bucket] = 0;
+            }
+            buckets[bucket] ++;
+        }
+        return buckets;
+    };
+    
+    /**
+     * Utility method for formatting strings.
+     * Note that this is actually applied to String's prototype.  It's only located here as a matter
+     * of convenience =\
+     */
+
+    String.prototype.format = function() {
+        var args = arguments;
+        return this.replace(/\{\{|\}\}|\{(\d+)\}/g, function(m, n) {
+            if (m === "{{") {
+                return "{";
+            }
+            if (m === "}}") {
+                return "}";
+            }
+            if ( typeof( args[n] ) === 'undefined' ) {
+                return "(undefined:" + m +")";
+            } else if ( args[n] === null ) {
+                return "(null:" + m + ")";
+            }
+            return args[n].toString();
         });
     };
 };

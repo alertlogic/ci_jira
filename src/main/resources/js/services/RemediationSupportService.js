@@ -4,7 +4,35 @@
  */
 var RemediationSupportService = function() {
     var self = this;
-
+    
+    //Remediation descriptions reference object
+    //(Migrated from RemediationsController)
+    self.remediationDescriptions = {};
+    self.plannedItemMap = {}; /*  all known planned items, indexed by key */
+    /*  Note that all of those quotes use double quotes.  How boring.  *Sigh*   */
+    self.states = {
+        open      : "open",
+        planned   : "planned",
+        complete  : "complete",
+        disposed  : "disposed",
+        incomplete: "incomplete",
+        verified  : "verified"
+    };
+    
+    /**
+     * Used for sorting, using a descending order of priority.
+     */
+    var stateWeights = {
+        open      : 100,
+        incomplete: 110,
+        planned   : 50,
+        disposed  : 10,
+        complete  : 10,
+        verified  : 0,
+        _mine     : 0,      /*  This adjusts the relative importance of items I have added to my plan */
+        _theirs   : -5      /*  This adjusts the relative importance of items others have added to their plans */
+    };
+    
     /**
      * Return an object with titles and values of asset afected of one remediation
      */
@@ -397,8 +425,118 @@ var RemediationSupportService = function() {
             "values" : evidenceValues
         };
     };
+    
+    /**
+     * Sorts remediation vulnerability types by CVSS descending, then name ascending.
+     */
+    this.sortByCVSSAndName = function( a, b ) {
+        if ( a._cvss_score !== b._cvss_score ) {
+            return b._cvss_score - a._cvss_score;
+        }
+        var aName = a.name;
+        var bName = b.name;
+        return aName === bName ? 0 : aName < bName ? -1 : 1;
+    };
+    
+    /**
+     * Preprocess the remediation (Migrated from RemediationsController)
+     * @param  {Object} remediation The remediation to process.
+     * @param  {String} environmentID The environment Id.
+     * @param  {String} userID The environment Id.
+     * @param  {Object} vulnerabilityInstanceMap A hash of all known vulnerability instances, keyed by their asset key
+     * @param  {Array} filtersMap The filters map.
+     */
+    self.preprocessRemediation = function( remediation,
+    										environmentID, 
+    										userID, 
+    										vulnerabilityInstanceMap, 
+    										filtersMap ) {
 
+        var emptyVulnBreakdown = { high: 0, medium: 0, low: 0, none: 0 };
+        remediation._vulnerability_count = 0;
+        remediation._threatCode = AUIUtils.getThreatLevelFromAsset( remediation ).code;
+        remediation._vulnDisplayCount = 4;
+
+        if ( remediation.vulnerabilities ) {
+            remediation.vulnerabilities.forEach(function( vulnerabilityGroup, vulnerabilityGroupIndex ) {
+                remediation._vulnerability_count += 1;
+                vulnerabilityGroup._cvss_score = 0.0;
+                if ( vulnerabilityInstanceMap ) {
+                    vulnerabilityGroup.instances.forEach( function( vulnerabilityInstanceKey ) {
+                        if ( vulnerabilityInstanceMap && vulnerabilityInstanceMap.hasOwnProperty( vulnerabilityInstanceKey ) ) {
+                            var vulnerabilityInstance = vulnerabilityInstanceMap[vulnerabilityInstanceKey];
+                            vulnerabilityGroup._cvss_score = Math.max( vulnerabilityGroup._cvss_score, vulnerabilityInstance.cvss_score );
+                        }
+                    } );
+                }
+                vulnerabilityGroup._threatCode = AUIUtils.getThreatLevelFromCVSS( vulnerabilityGroup._cvss_score ).code;
+            } );
+            remediation.vulnerabilities.sort( self.sortByCVSSAndName );
+
+            /*  summarize threat level for all of the vulnerabilities we ARE displaying (now we dont need slice at all)*/
+            remediation._vulnExtraInfo = AJS.$.extend({}, emptyVulnBreakdown, AUIUtils.countBuckets(remediation.vulnerabilities, function(vulnGroup) { return vulnGroup._threatCode; }));
+        }
+
+        /*  Is there a corresponding remediation-item (a "planned" remediation) */
+        var plannedItem = null;
+        if ( typeof( remediation._plannedItem ) === 'object' ) {
+            /*  We already have a planned item associated with this remediation; simply use that to extract data. */
+            plannedItem = remediation._plannedItem;
+        } else if ( self.plannedItemMap.hasOwnProperty( remediation.remediation_id ) ) {
+            plannedItem = self.plannedItemMap[remediation.remediation_id];
+        }
+
+        if ( plannedItem !== null ) {
+            /*  if there are more than one planned items for a given remediation instance, we'll need to distinguish between those belonging to different users */
+            remediation._plannedItem = plannedItem;
+            remediation._state = remediation._plannedItem.state;    /*  Inherit state from planned item */
+            remediation._actor_id = remediation._plannedItem.user_id;
+            remediation._effective_timestamp = remediation._plannedItem.modified_on || remediation._plannedItem.created_on;
+            remediation._created_on = remediation._plannedItem.created_on;
+            remediation._expiration_date = remediation._plannedItem.expires;
+            
+            // Here we loop over planned item filters to set up the display information
+            if (remediation._plannedItem.filters) {
+                for (var filterIndex = 0; filterIndex < remediation._plannedItem.filters.length; filterIndex++) {
+                    var filter = remediation._plannedItem.filters[filterIndex];
+                    // If the filter is not found in the filters map we remove it from the filters array
+                    // meaning is not a selectable one from the left column of remediation list.
+                    if (filtersMap[filter]) {
+                        remediation._plannedItem.filters[filterIndex] = filtersMap[filter];
+                    } else {
+                        remediation._plannedItem.filters.splice(filterIndex, 1);
+                    }
+                }
+            }
+        } else {
+            remediation._plannedItem = null;
+            remediation._state = self.states.open;            /*  Default state */
+        }
+        
+        remediation.threat_level = remediation.threat_level || remediation.threatiness_level || 0.0;
+        remediation._weight = stateWeights[remediation._state] + remediation.threat_level;  /*  Used for sorting */
+        
+        if ( remediation._actor ) {
+            if ( remediation._actor_id === userID ) {
+                remediation._weight += stateWeights._mine;
+            } else {
+                remediation._weight += stateWeights._theirs;
+            }
+        }
+        /*  Further adjust _weight by threat_level and raw threatiness */
+        remediation._weight += ( remediation.threat_level / 4.0 );          //  Add up to 0.75 points for threat level
+        remediation._weight += ( remediation.threatiness / 1000000.0 );      //  Add a tiny adjustment based on raw threatiness.  A note: threatiness doesn't have a scale, so if it exceeds ~250,000 is could break the sorting algorithm subtly by causing high-threatiness remediations to be sorted above low-threatiness remediations of a higher threat_level.  This might arguably be the correct behavior anyway :)
+        
+        //remediation._actionable = self.canSelectItem( remediation, controllerMode, userID );
+        if ( self.remediationDescriptions.hasOwnProperty( remediation.remediation_id ) ) {
+            remediation.name = self.remediationDescriptions[remediation.remediation_id].name;
+            remediation.description = self.remediationDescriptions[remediation.remediation_id].description;
+        }
+        
+        return remediation;
+    };
 };
+
 /**
  * Creates the service instance.
  */

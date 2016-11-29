@@ -1,0 +1,433 @@
+.row {
+  margin-left: -15px;
+  margin-right: -15px;
+}
+.col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+  position: relative;
+  min-height: 1px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
+  float: left;
+}
+.col-xs-12 {
+  width: 94%;
+}
+.col-xs-11 {
+  width: 91.66666667%;
+}
+.col-xs-10 {
+  width: 83.33333333%;
+}
+.col-xs-9 {
+  width: 75%;
+}
+.col-xs-8 {
+  width: 66.66666667%;
+}
+.col-xs-7 {
+  width: 58.33333333%;
+}
+.col-xs-6 {
+  width: 50%;
+}
+.col-xs-5 {
+  width: 41.66666667%;
+}
+.col-xs-4 {
+  width: 33.33333333%;
+}
+.col-xs-3 {
+  width: 25%;
+}
+.col-xs-2 {
+  width: 16.66666667%;
+}
+.col-xs-1 {
+  width: 8.33333333%;
+}
+.row.table-row {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  display: table;
+}
+.row.table-row > [class*="col-"] {
+  float: none;
+  display: table-cell;
+  vertical-align: middle;
+  padding: 0;
+}
+.remediations {
+  min-height: 730px;
+}
+.remediations .remediationList {
+  padding-left: 20px;
+}
+.remediations .remediationList h2 {
+  border-bottom: 1px solid #D5D6D2;
+  margin-bottom: 0;
+  padding-bottom: 4px;
+}
+.remediations .remediationList .remediation-check {
+  border: 4px solid #535353;
+  opacity: .1;
+  height: 68px;
+  width: 68px;
+  margin: auto;
+}
+.remediations .remediationList .remediation-check.actionable {
+  cursor: pointer;
+}
+.remediations .remediationList .remediation-check.on {
+  opacity: 1;
+}
+.remediations .remediationList .remediation-check.on .check {
+  opacity: 1;
+}
+.remediations .remediationList .remediation-check .check {
+  color: #535353;
+  font-size: 2em;
+  display: inline-block;
+  width: 25px;
+  padding-top: 20px;
+}
+.remediations .remediationList .remediation {
+  margin: 60px 0;
+}
+.remediations .remediationList .remediation .checkbox-container {
+  cursor: pointer;
+}
+.remediations .remediationList .remediation .view-details {
+  cursor: pointer;
+}
+.remediations .remediationList .remediation.on .details .outline {
+  padding: 15px;
+  border: 4px solid #6C6C6C;
+}
+.remediations .remediationList .remediation.in-process {
+  cursor: wait;
+  opacity: 0.35;
+}
+.remediations .remediationList .remediation.high .details {
+  border-left-color: #F92B0E;
+}
+.remediations .remediationList .remediation.medium .details {
+  border-left-color: #FF7F00;
+}
+.remediations .remediationList .remediation.low .details {
+  border-left-color: #f6ba3e;
+}
+.remediations .remediationList .remediation.none .details {
+  border-left-color: #535353;
+}
+.remediations .remediationList .remediation .vuln-count {
+  border-bottom: 1px solid #D5D6D2;
+}
+.remediations .remediationList .remediation div.remediation-data-col {
+  overflow-x: hidden;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-name {
+  width: 60%;
+  display: inline-block;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-name h3 {
+  padding: 0;
+  margin: 0 10px 10px 0;
+  border-bottom: 0;
+   word-break: keep-all;
+  font-size: 1.2em;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info {
+  width: 40%;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info > i {
+  padding: 0 10px;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info ul {
+  display: inline-block;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 12px;
+  float: right;
+  white-space: nowrap;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info ul li {
+  border-left: 1px solid #D5D6D2;
+  display: inline;
+  padding: 0 10px;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info ul li:first-child {
+  border-left: none;
+  padding-left: 0;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info .risk.high {
+  color: #F92B0E;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info .risk.medium {
+  color: #FF7F00;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info .risk.low {
+  color: #f6ba3e;
+}
+.remediations .remediationList .remediation div.remediation-data-col .remediation-info .risk.none {
+  color: #535353;
+}
+@media only screen and (max-width: 1200px) {
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-info {
+    display: none;
+  }
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-name {
+    width: 100%;
+  }
+}
+@media only screen and (max-width: 1600px) {
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-info.message-panel ul li {
+    padding: 0 5px;
+  }
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-info ul li {
+    padding: 0 8px;
+  }
+}
+@media only screen and (max-width: 1300px) {
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-info.message-panel {
+    display: none;
+  }
+  .remediations .remediationList .remediation div.remediation-data-col .remediation-name.message-panel {
+    width: 100%;
+  }
+}
+.remediations .remediationList .remediation div.remediation-state-col h3 {
+  padding: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border-bottom: 0;
+  max-width: 90%;
+}
+.remediations .remediationList .remediation .middle {
+  text-align: center;
+}
+.remediations .remediationList .remediation .bottom {
+  vertical-align: bottom;
+}
+.remediations .remediationList .remediation .vertical-middle {
+  vertical-align: middle;
+}
+.remediations .remediationList .remediation .details {
+  padding-left: 15px;
+  border-left: 8px solid #535353;
+}
+.remediations .remediationList .remediation .details ul.vulns {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.remediations .remediationList .remediation .details ul.vulns li.on {
+  border: 4px solid #535353;
+}
+.remediations .remediationList .remediation .details ul.vulns li.on .fa-details {
+  font-size: 1.6em;
+  padding-top: 4px;
+}
+.remediations .remediationList .remediation .details ul.vulns li.actionable {
+  cursor: pointer;
+}
+.remediations .remediationList .remediation .details ul.vulns li {
+  position: relative;
+  border: 4px solid #f3f3f3;
+  margin-bottom: 10px;
+  padding: 4px 4px 4px 30px;
+}
+.remediations .remediationList .remediation .details ul.vulns li .risk {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 1.4em;
+  padding: 0 4px;
+}
+.remediations .remediationList .remediation .details ul.vulns li .risk.high {
+  color: #F92B0E;
+}
+.remediations .remediationList .remediation .details ul.vulns li .risk.medium {
+  color: #FF7F00;
+}
+.remediations .remediationList .remediation .details ul.vulns li .risk.low {
+  color: #f6ba3e;
+}
+.remediations .remediationList .remediation .details ul.vulns li .risk.none {
+  color: #535353;
+}
+.remediations .remediationList .remediation .details ul.vulns li .vuln-details .vuln-details {
+  padding-right: 25px;
+}
+.remediations .remediationList .remediation .details ul.vulns li .vuln-details .title {
+  padding: 0;
+  font-size: 1.5em;
+}
+.remediations .remediationList .remediation .details ul.vulns li .vuln-details .info .header {
+  font-size: 1.3em;
+  border-bottom: 1px solid #535353;
+  margin-top: 20px;
+}
+.remediations .remediationList .remediation .details ul.vulns li .vuln-details .info .content {
+  padding: 10px 0;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li {
+  position: relative;
+  border: 4px solid #f3f3f3;
+  margin-bottom: 10px;
+  padding: 4px 4px 4px 10px;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .risk {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 1.4em;
+  padding: 0 10px;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption {
+  border-left: 3px solid;
+  margin-left: 35px;
+  padding-left: 10px;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption.high {
+  border-color: #F92B0E;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption.medium {
+  border-color: #FF7F00;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption.low {
+  border-color: #f6ba3e;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption.none {
+  border-color: #535353;
+}
+.remediations .remediationList .remediation .details ul.remediation-targets li .asset-caption a {
+  text-decoration: none;
+  color: inherit;
+}
+.remediations .remediationList .remediation .details .extra-vulns {
+  color: #D5D6D2;
+}
+.remediations .remediationList .remediation .details .view-details .btn-circle {
+  width: 80px;
+  height: 80px;
+  text-align: center;
+  padding: 6px 0;
+  line-height: 1.42;
+  border-radius: 40px;
+  background-color: #FFF;
+  border-color: #535353;
+  color: #535353;
+  border-style: solid;
+}
+.remediations .remediationList .remediation .details .view-details .btn-circle:hover {
+  background-color: #535353;
+  border-color: #535353;
+  color: #FFF;
+}
+.remediations .remediationList .zero-state {
+  border: 2px dashed #D5D6D2;
+  color: #D5D6D2;
+  padding: 15px 30px;
+  text-align: center;
+  margin-top: 20px;
+}
+.remediations .customFilter {
+  margin-top: 10px;
+}
+.remediations.loading .action-header .action-list {
+  display: none;
+}
+.remediations .nameColoredSquare .colored-square {
+  float: none !important;
+}
+.remediations .ui-select-container .btn-default {
+  background-color: #FFF;
+  color: #535353;
+}
+.remediations .ui-select-container .btn-default-focus {
+  background-color: inherit;
+  outline: none;
+  box-shadow: none;
+}
+.remediations .ui-select-container .form-control {
+  border: 2px solid #535353;
+  text-align: left;
+  height: 43px;
+  margin-bottom: 10px;
+}
+.remediations .ui-select-container .caret {
+  display: none;
+}
+.remediations .ui-select-placeholder {
+  display: inline-block;
+  overflow: hidden;
+  width: 100%;
+  padding-top: 4px;
+}
+.remediations .col-xs-8.align-bottom {
+  height: 45px;
+  display: table-cell;
+  vertical-align: bottom !important;
+}
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.fa-check:before {
+  content: "\f00c";
+}
+.fa-circle:before {
+  content: "\f111";
+}
+.fa-circle-o:before {
+  content: "\f10c";
+}
+.fa-adjust:before {
+  content: "\f042";
+}
+.fa-info-circle:before {
+  content: "\f05a";
+}
+.fa-plus-circle:before {
+  content: "\f055";
+}
+.pull-right {
+  float: right;
+}
+.badge {
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-align: center;
+  background-color: #777777;
+  border-radius: 10px;
+}
+.badge:empty {
+  display: none;
+}
+.badge {
+  border-radius: 50px;
+  font-weight: normal;
+  padding: 5px 7px;
+  font-size: .65em;
+}

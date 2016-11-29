@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alertlogic.plugins.jira.cloudinsight</groupId>
     <artifactId>jira-cloud-insight</artifactId>
-    <version>6.2.2.5-SNAPSHOT</version>
+    <version>6.2.2.6-SNAPSHOT</version>
     <organization>
         <name>Alert logic</name>
         <url>https://www.alertlogic.com/</url>
@@ -222,7 +222,7 @@
                     <instructions>
 				    	<!-- OSGi instructions go here -->
 				    	<Export-Package>
-						    com.alertlogic.plugins.jira.cloudinsight*;version="6.2.2.5"
+						    com.alertlogic.plugins.jira.cloudinsight*;version="6.2.2.6"
 						</Export-Package>
 				    </instructions>
                     <!-- Uncomment to install TestKit backdoor in JIRA. -->
