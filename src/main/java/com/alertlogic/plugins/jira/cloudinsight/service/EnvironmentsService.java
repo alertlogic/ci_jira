@@ -32,7 +32,7 @@ public class EnvironmentsService {
 	 */
 	public JSONObject getAllEnvironments(String jiraUser) throws Exception{
 		restUtil.setupAuthetication( jiraUser );
-		String urlBase = restUtil.urlEndPointSource + "?source.config.aws.defender_support=!true&source.type=environment";
+		String urlBase = restUtil.urlEndPointSource + "?source.config.aws.defender_support=!true&source.type=environment&source.config.collection_type=aws&source.config.collection_method=api";
 
     	ClientResponse responseGetEnvironments;
 
