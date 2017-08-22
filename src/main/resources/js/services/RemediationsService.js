@@ -264,7 +264,7 @@ var RemediationsService = function() {
         +"/assets/"+configService.serviceVersion
         +"/"+ciAIMSService.getSessionData().accountId
         +"/environments/"+environment
-        +"/assets?asset_types=remediation-item&remediation-item.key="+remediation_item+"&optional=remediation-item";
+        +"/assets?asset_types=remediation-item&remediation-item.key="+remediation_item+"";
 
         return jQuery.ajax({
             type: "GET",

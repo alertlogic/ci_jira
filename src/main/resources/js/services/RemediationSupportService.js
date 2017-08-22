@@ -101,7 +101,7 @@ var RemediationSupportService = function() {
                     vulnsAsset[ vulnerability.vulnerability_id ] = {
                         'key': vulnerability.vulnerability_id,
                         'assets': targets,
-                        'evidences': vulnerability.instances
+                        'evidences': self.getInstancesForVulnerability( vulnerability )
                     };
                 }
             }
@@ -437,7 +437,22 @@ var RemediationSupportService = function() {
         var bName = b.name;
         return aName === bName ? 0 : aName < bName ? -1 : 1;
     };
-    
+
+    /**
+     * Return the list of instances tie to a vulnerability
+     * @param  {obj} vulnerability from assets
+     * @return {array}    array with instances keys
+     */
+    self.getInstancesForVulnerability = function( vulnerability ) {
+        var instances = [];
+        if( vulnerability.hasOwnProperty('vinstances') ){
+            vulnerability.vinstances.forEach( function( instanceItem ) {
+                instances.push(instanceItem.key);
+            } );
+        }
+        return instances;
+    };
+
     /**
      * Preprocess the remediation (Migrated from RemediationsController)
      * @param  {Object} remediation The remediation to process.
@@ -463,12 +478,8 @@ var RemediationSupportService = function() {
                 vulnerabilityGroup._cvss_score = 0.0;
                 if ( vulnerabilityInstanceMap ) {
 
-                    var instances = [];
-                    if( vulnerabilityGroup.hasOwnProperty('vinstances') ){
-                        vulnerabilityGroup.vinstances.forEach( function( instanceItem ) {
-                            instances.push(instanceItem.key);
-                        } );
-                    }
+                    var instances = self.getInstancesForVulnerability( vulnerabilityGroup );
+
                     instances.forEach( function( vulnerabilityInstanceKey ) {
                         if ( vulnerabilityInstanceMap && vulnerabilityInstanceMap.hasOwnProperty( vulnerabilityInstanceKey ) ) {
                             var vulnerabilityInstance = vulnerabilityInstanceMap[vulnerabilityInstanceKey];
