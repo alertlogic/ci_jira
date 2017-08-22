@@ -462,7 +462,14 @@ var RemediationSupportService = function() {
                 remediation._vulnerability_count += 1;
                 vulnerabilityGroup._cvss_score = 0.0;
                 if ( vulnerabilityInstanceMap ) {
-                    vulnerabilityGroup.instances.forEach( function( vulnerabilityInstanceKey ) {
+
+                    var instances = [];
+                    if( vulnerabilityGroup.hasOwnProperty('vinstances') ){
+                        vulnerabilityGroup.vinstances.forEach( function( instanceItem ) {
+                            instances.push(instanceItem.key);
+                        } );
+                    }
+                    instances.forEach( function( vulnerabilityInstanceKey ) {
                         if ( vulnerabilityInstanceMap && vulnerabilityInstanceMap.hasOwnProperty( vulnerabilityInstanceKey ) ) {
                             var vulnerabilityInstance = vulnerabilityInstanceMap[vulnerabilityInstanceKey];
                             vulnerabilityGroup._cvss_score = Math.max( vulnerabilityGroup._cvss_score, vulnerabilityInstance.cvss_score );
