@@ -150,7 +150,7 @@ public class SynchronizationTasks implements PluginJob {
 						}
 			    }
 				else{
-				    if ( statusCI.equals("disposed") || statusCI.equals("complete") || statusCI.equals("verified") ) {
+				    if ( statusCI.equals("disposed") || statusCI.equals("complete") ) {
 				    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
 				    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
 

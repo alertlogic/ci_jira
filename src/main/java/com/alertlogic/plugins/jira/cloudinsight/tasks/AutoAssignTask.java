@@ -69,7 +69,7 @@ public class AutoAssignTask implements PluginJob {
 			//review if the remediations has items
 			if (remediation.getString("remediation_id").equals(remediationId))
 			{
-				if( remediation.getString("state").equals("incomplete"))
+				if( remediation.getString("state").equals("incomplete") || remediation.getString("state").equals("verified"))
 				{
 					//if the remediation is incomplete this means that it is re-open
 					return true;

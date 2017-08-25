@@ -28,7 +28,7 @@
                         <thead>
                             <tr>
                                 <th id="header-select">
-                                    <input id="allCheck" class="check-input" type="checkbox">
+                                    <input id="allCheck" type="checkbox">
                                 </th>
                                 <th id="header-name">
                                     $i18n.getText('ci.partials.ruleconfiguration.vm.header.name')
