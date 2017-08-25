@@ -72,7 +72,7 @@ AJS.$(document).ready(
 					//review if the remediations has items
 					if (allRemediationsItems.assets[i][0].remediation_id === remediation.remediation_id)
 					{
-						if( allRemediationsItems.assets[i][0].state === "incomplete" )
+						if( allRemediationsItems.assets[i][0].state === "incomplete" || allRemediationsItems.assets[i][0].state === "verified" )
 						{
 							//if the remediation is uncomplete this means that it is re-open
 							remediation.status = AJS.I18n.getText("ci.partials.remediationssync.js.status.reopen");

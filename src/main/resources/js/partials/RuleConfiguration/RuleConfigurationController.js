@@ -111,7 +111,7 @@ AJS.$(document).ready(
 				var rowData = [
 					{
 						header: "header-select",
-						data: "<input type='checkbox' name='rules' class='check-input' value='"
+						data: "<input type='checkbox' name='rules' value='"
 						+rule.id+"' onclick='ruleConfigurationController.validateSelected()'/>"
 					},
 					{
