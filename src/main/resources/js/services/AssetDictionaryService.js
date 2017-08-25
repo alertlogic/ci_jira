@@ -340,6 +340,30 @@ var AssetDictionaryService = function() {
             getTypeName: function() {
                 return gettext( "Zone" );
             }
+        },
+
+        "role" : {
+            getTypeName: function() {
+                return gettext( "Role" );
+            }
+        },
+
+        "instance-profile" : {
+            getTypeName: function() {
+                return gettext( "Instance Profile" );
+            }
+        },
+
+        "volume" : {
+            getTypeName: function() {
+                return gettext( "Volume" );
+            }
+        },
+
+        "redshift-cluster" : {
+            getTypeName: function() {
+                return gettext( "Redshift Cluster" );
+            }
         }
     };
 
