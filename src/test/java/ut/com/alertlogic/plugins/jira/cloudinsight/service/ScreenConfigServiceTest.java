@@ -45,12 +45,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 
-import org.slf4j.*;
-
 @RunWith(MockitoJUnitRunner.class)
 public class ScreenConfigServiceTest {
 
-  private Logger LOGGER = LoggerFactory.getLogger(ScreenConfigServiceTest.class);
 	private ScreenConfigService screenConfigServiceMock;
 
 	private ConstantsManager constantsManager;
@@ -101,27 +98,25 @@ public class ScreenConfigServiceTest {
 		customFieldMock = new MockCustomField("1","name test", null);
     }
 
-	// @Test
-	// public void testCreateCustomField() throws Exception {
+	@Ignore
+	public void testCreateCustomField() throws Exception {
 
-	// 	when( customFieldManager.getCustomFieldObjectByName(
-	// 			Mockito.anyString() )).thenReturn(null);
+		when( customFieldManager.getCustomFieldObjectByName(
+				Mockito.anyString() )).thenReturn(null);
 
-	// 	when( customFieldManager.createCustomField(
-	// 			Mockito.anyString(),
-	// 			Mockito.anyString(),
-	// 			Mockito.any(CustomFieldType.class),
-	// 			Mockito.any(CustomFieldSearcher.class),
-	// 			Mockito.<JiraContextNode>anyList(),
-	// 			Mockito.<IssueType>anyList() ) ).thenReturn(customFieldMock);
+		when( customFieldManager.createCustomField(
+				Mockito.anyString(),
+				Mockito.anyString(),
+				Mockito.any(CustomFieldType.class),
+				Mockito.any(CustomFieldSearcher.class),
+				Mockito.anyList(),
+				Mockito.anyList() ) ).thenReturn(customFieldMock);
 
-	// 	CustomField customField = screenConfigServiceMock.createCustomField("name test","type","search");
+		CustomField customField = screenConfigServiceMock.createCustomField("name test","type","search");
 
-  //   LOGGER.info("mumu");
-
-	// 	assertEquals("something went wrong", customField.getName(),customFieldMock.getName());
-	// 	//assertEquals(customField.getDescription(),customFieldMock.getDescription());
-	// }
+		assertEquals(customField.getName(),customFieldMock.getName());
+		//assertEquals(customField.getDescription(),customFieldMock.getDescription());
+	}
 
 	@Ignore
 	public void testGetRemediationItemCustomField() throws Exception {
@@ -209,8 +204,6 @@ public class ScreenConfigServiceTest {
 	
 	@Test
 	public void testGetIssueTypeSchema() {
-      //when(i18nResolver.getText("ci.constant.custom.remediationId")).thenReturn("Remediation Id test");
-
 		List<FieldConfigScheme> issuTypeSchemas = new ArrayList<FieldConfigScheme>();
 		MockFieldConfigScheme issueTypeSchema = new  MockFieldConfigScheme();
 		issueTypeSchema.setName("issue type schema test");
