@@ -77,7 +77,7 @@ function statusController( user ) {
                             }
                         }
 
-                        if ( status.ci === "disposed" || status.ci == "complete" || status.ci === "verified" ) {
+                        if ( status.ci === "disposed" || status.ci == "complete" ) {
                            if( status.jira != "Closed" && status.jira != "Resolved"){
                                 var transation = jiraService.Issue().doTransition( status.issueId, 'close', AJS.I18n.getText("ci.partials.statuspanel.js.msg.syncronize.close") );
 
