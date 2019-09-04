@@ -45,7 +45,7 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
         reschedule(interval);
     }
 
-    @SuppressWarnings("serial")
+    @SuppressWarnings({ "serial", "deprecation" })
 	public void reschedule(long interval) {
 
         this.interval = interval;
@@ -62,4 +62,10 @@ public class AutoAssignScheduledImpl extends AbstractTaskMonitor implements Life
         logger.info(String.format(JOB_NAME+":: Scheduled to run every %dms, the first execution will be ignored.", interval));
 
     }
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public void onStop() {
+		pluginScheduler.unscheduleJob(JOB_NAME);
+	}
 }

@@ -5,9 +5,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alertlogic.plugins.jira.cloudinsight.entity.Filter;
+import com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig;
+import com.alertlogic.plugins.jira.cloudinsight.tasks.TaskRuleExecutionState;
 import com.atlassian.crowd.embedded.api.Group;
 import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
@@ -26,7 +31,7 @@ import com.atlassian.jira.issue.search.SearchResults;
 import com.atlassian.jira.jql.builder.JqlQueryBuilder;
 import com.atlassian.jira.project.Project;
 import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.user.ApplicationUsers;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.bean.PagerFilter;
 import com.opensymphony.workflow.loader.ActionDescriptor;
 
@@ -47,9 +52,9 @@ public class JIRAService {
 	 * @param user	The User reference
 	 * @param body	The string body of the comment
 	 */
-	public void commentIssue(Issue issue, User user, String body ) {
-		CommentManager componentManager = ComponentAccessor.getCommentManager();
-		componentManager.create(issue, ApplicationUsers.from(user), body, false);
+	public void commentIssue(Issue issue, ApplicationUser user, String body ) {
+		CommentManager commentManager = ComponentAccessor.getCommentManager();
+		commentManager.create(issue, user, body, false);
 	}
 
 	/**
@@ -73,8 +78,7 @@ public class JIRAService {
 	 * an for this reason we need to loggin the user in the jira context
 	 * @param user
 	 */
-	@SuppressWarnings("deprecation")
-	public void logginUser(User user) {
+	public void logginUser(ApplicationUser user) {
 		JiraAuthenticationContext jiraAutheticationContext = ComponentAccessor.getJiraAuthenticationContext();
     	jiraAutheticationContext.setLoggedInUser( user );
 	}
@@ -91,8 +95,7 @@ public class JIRAService {
 			SearchProvider searchProvider = ComponentAccessor.getComponentOfType(SearchProvider.class);
 
 			JqlQueryBuilder builder = JqlQueryBuilder.newBuilder();
-			@SuppressWarnings("deprecation")
-			User user = ComponentAccessor.getUserManager().getUser( userName );
+			ApplicationUser user = ComponentAccessor.getUserManager().getUserByName( userName );
 			logginUser( user );
 
 			builder.where().customField(remediationItemCustomField.getIdAsLong()).like( remediationItemValue );
@@ -127,7 +130,7 @@ public class JIRAService {
 	 * @return String Return the priority id
 	 */
 	public String getPriorityId( String ciLevel ){
-		Collection<Priority> priorities = ComponentAccessor.getConstantsManager().getPriorityObjects();
+		Collection<Priority> priorities = ComponentAccessor.getConstantsManager().getPriorities();
 		ArrayList<Priority> prioritiesArray = new ArrayList<Priority>();
 
 		if(priorities.size() > 0){
@@ -199,7 +202,7 @@ public class JIRAService {
             throw new Exception("CI Plugin: this project is not configured properly :"+projectID);
 		}
 
-		User user =  getUserByName(userName);
+		ApplicationUser user =  getUserByName(userName);
 		//Validation the user exist
 		if( user == null ) {
 			throw new Exception("CI Plugin: the user does not exist or is inactive :"+userName);
@@ -249,9 +252,8 @@ public class JIRAService {
 	 * @param userName
 	 * @return User
 	 */
-	public User getUserByName(String userName){
-		@SuppressWarnings("deprecation")
-		User user =  ComponentAccessor.getUserManager().getUser(userName);
+	public ApplicationUser getUserByName(String userName){
+		ApplicationUser user =  ComponentAccessor.getUserManager().getUserByName(userName);
 		//Validation the user exist
 		if( user == null ) {
 			log.error("CI Plugin: the user does not exist :" + userName );
@@ -275,10 +277,9 @@ public class JIRAService {
 	 * @param user
 	 * @return result the transation
 	 */
-	@SuppressWarnings("deprecation")
 	public boolean doTransitionIssue(Issue issue, int state, String userName,String msg) {
 
-		User user = getUserByName(userName);
+		ApplicationUser user = getUserByName(userName);
 	    IssueService issueService = ComponentAccessor.getIssueService();
 	    IssueInputParameters issueInputParameters = new IssueInputParametersImpl();
 
@@ -287,8 +288,8 @@ public class JIRAService {
 	    	IssueResult transResult = issueService.transition(user, validationResult);
 	    	if(transResult.isValid()){
 
-	    		commentIssue(transResult.getIssue(),
-	    				transResult.getIssue().getProjectObject().getLead(),
+	    		commentIssue(transResult.getIssue(), 
+	    				transResult.getIssue().getProjectObject().getProjectLead(),
 						msg);
 
 	    		return true;
@@ -334,5 +335,29 @@ public class JIRAService {
 	 */
 	public Collection<Group> getGroupsForUser(String user){
 		return ComponentAccessor.getGroupManager().getGroupsForUser(user);
+	}
+
+	/**
+	 * Get the all groups
+	 * This function was introduce because the api not support get all groups
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
+	public JSONObject getGroups(){
+		 
+		Collection<Group> groups = ComponentAccessor.getGroupManager().getAllGroups();
+		JSONArray groupsArray  =  new JSONArray();
+		JSONObject groupsJSON  =  new JSONObject();
+		 
+		for( Group group: groups ){
+			JSONObject obj  =  new JSONObject();
+			obj.put("name",group.getName());
+			
+			groupsArray.put ( obj );
+		}
+		
+		groupsJSON.put("groups", groupsArray);
+
+		return groupsJSON;
 	}
 }

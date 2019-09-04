@@ -19,6 +19,7 @@ import com.alertlogic.plugins.jira.cloudinsight.service.ScreenConfigService;
 import com.atlassian.jira.issue.comments.CommentManager;
 import com.atlassian.jira.mock.component.MockComponentWorker;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.user.MockApplicationUser;
 import com.atlassian.jira.user.MockUser;
 import com.atlassian.jira.user.util.UserManager;
 
@@ -74,22 +75,22 @@ public class JIRAServiceTest {
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testGetUserByName() {
-		MockUser user = new MockUser("fred");
+		MockApplicationUser appUser = new MockApplicationUser("fred");
 		
 		//user not exist
-		when(userManager.getUser(Mockito.anyString())).thenReturn(null);
+		when(userManager.getUserByName(Mockito.anyString())).thenReturn(null);
 		assertNull(jiraService.getUserByName("fred"));
         
 		//user exists and is activate
-		when(userManager.getUser(Mockito.anyString())).thenReturn(user);
-		assertSame(jiraService.getUserByName("fred"),user);
+		when(userManager.getUserByName(Mockito.anyString())).thenReturn(appUser);
+		assertSame(jiraService.getUserByName("fred"),appUser);
     }
 
 	@SuppressWarnings("deprecation")
 	@Test
 	public void testLogginUser() {
-		MockUser user = new MockUser("fred");
-		jiraService.logginUser(user);
-		verify(jiraAuthenticationContext, times(1)).setLoggedInUser(user);
+		MockApplicationUser appUser = new MockApplicationUser("fred");
+		jiraService.logginUser(appUser);
+		verify(jiraAuthenticationContext, times(1)).setLoggedInUser(appUser);
     }
 }

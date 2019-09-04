@@ -60,4 +60,10 @@ public class SynchronizationScheduledImpl extends AbstractTaskMonitor implements
 
         logger.info(String.format(JOB_NAME+":: Scheduled to run every %dms, the first execution will be ignored.", interval));
     }
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		pluginScheduler.unscheduleJob(JOB_NAME);
+	}
 }

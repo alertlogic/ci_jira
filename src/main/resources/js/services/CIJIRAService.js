@@ -364,7 +364,7 @@ var CIJIRAService = function() {
             getAll: function() {
                 return jQuery.ajax({
                     type: "GET",
-                    url: urlBase + '/groups/picker',
+                    url: urlBaseHost + "/plugins/servlet/groupsservlet",
                     dataType: "json",
                     contentType: "application/json"
                 });

@@ -132,7 +132,7 @@
 	</web-item>
 
 	<!-- Configuration of Servlets -->
-    <servlet name="ci.atlassianplugin.servlet.projectsetup.name" 
+    <servlet name="ci.atlassianplugin.servlet.projectsetup.name"
 		i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
 		key="projectsetup-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.SetupProjectServlet">
@@ -198,6 +198,13 @@
         class="com.alertlogic.plugins.jira.cloudinsight.servlet.PermissionConfigurationServlet">
         <description key="ci.atlassianplugin.servlet.permission.description">Permissions configuration</description>
         <url-pattern>/permissionservlet</url-pattern>
+    </servlet>
+
+    <servlet name="Groups servlet"
+        i18n-name-key="ci.atlassianplugin.servlet.groups" key="groups-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.JiraProxiGroupsServlet">
+        <description key="ci.atlassianplugin.servlet.groups.description">Groups servlet</description>
+        <url-pattern>/groupsservlet</url-pattern>
     </servlet>
 
 	<!-- JS Services -->
@@ -364,11 +371,11 @@
         <label key="ci.atlassianplugin.project.template.name"/>
         <description key="ci.atlassianplugin.project.template.description"/>
         <longDescription key="ci.atlassianplugin.project.template.description.long"/>
-
+        <projectTypeKey>business</projectTypeKey>
         <infoPage soy-template="JIRA.Templates.ProjectTemplates.CI.renderCustomProjectTemplateExplanation" />
 
         <icon location="images/al-logo.png"/>
-        <backgroundIcon location="images/al-logo.png"/>
+		<backgroundIcon location="images/al-logo-background.png"/>
 
         <add-project>
             <hook class="com.alertlogic.plugins.jira.cloudinsight.util.CustomProjectAddProjectHook"/>

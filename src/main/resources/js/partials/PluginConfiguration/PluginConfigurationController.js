@@ -6,6 +6,7 @@ var pluginConfigurationController;
 AJS.$( document ).ready( function() {
     var self = pluginConfigurationController = this;
     jiraService.startService();
+
     var ciResponseTest = '';
 
     var credentials = {};
@@ -175,7 +176,6 @@ AJS.$( document ).ready( function() {
 
         credentialsService.deleteCredential( id ).
         done( function() {
-
             self.activeTestButton();
 
             AUIUtils.showMsgSuccess(

@@ -9,7 +9,7 @@
 	<logo image="images/marketing/01_al-logo.png"/>
 
 	<highlights>
-        <highlight image="images/marketing/03_highlight_remediations.png" cropped="images/marketing/04_highlight_remediations_cropped.png" />
+        <highlight image="images/marketing/02_highlight_remediations.png" cropped="images/marketing/04_highlight_remediations_cropped.png" />
         <highlight image="images/marketing/05_highlight_issue.png" cropped="images/marketing/06_highlight_issue_cropped.png" />
         <highlight image="images/marketing/07_highlight_details.png" cropped="images/marketing/08_highlight_details_cropped.png"/>
 	</highlights>

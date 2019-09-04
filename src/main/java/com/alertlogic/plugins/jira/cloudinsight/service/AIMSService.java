@@ -67,7 +67,7 @@ public class AIMSService {
      	} else {
      		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
      	}
-
+     	
      	return null;
     }
 
