@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alertlogic.plugins.jira.cloudinsight</groupId>
     <artifactId>jira-cloud-insight</artifactId>
-    <version>7.2.2.8-SNAPSHOT</version>
+    <version>7.2.3.0-SNAPSHOT</version>
+
     <organization>
         <name>Alert logic</name>
         <url>https://www.alertlogic.com/</url>
     </organization>
+
     <name>cloud-insight-for-jira</name>
     <description>
         The Cloud Insight add-on for Jira integrates Cloud Insight remediations as Jira issues, which allows you to configure, manage, and assign issues to Jira teams. Jira team members can use the add-on to review, and then dispose assigned remediations.
     </description>
     <packaging>atlassian-plugin</packaging>
-    <!--repositories>
-        <repository>
-            <id>atlassian-public</id>
-            <url>https://maven.atlassian.com/repository/public</url>
-        </repository>
-    </repositories-->
+
     <dependencies>
         <dependency>
             <groupId>com.atlassian.jira</groupId>
@@ -36,14 +36,6 @@
             <version>${jira.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Add dependency for customising project template. 2.18 just for the add-on in version jira 6-->
-        <!--dependency>
-            <groupId>com.atlassian.jira.plugins</groupId>
-            <artifactId>project-templates-api</artifactId>
-            <version>2.18</version>
-            <scope>provided</scope>
-        </dependency -->
 
         <dependency>
             <groupId>junit</groupId>
@@ -107,19 +99,15 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${jersey.version}</version>
+            <scope>provided</scope>
         </dependency>
-        <!--is a client http -->
-        <!--dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
-            <version>1.8</version>
-        </dependency-->
 
         <!--JSON jersey is for get the object by name from java interacting with jsons-->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20141113</version>
+            <scope>provided</scope>
         </dependency>
 
         <!--This for work with listeners on issues-->
@@ -154,7 +142,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -214,18 +202,20 @@
         <plugins>
             <plugin>
                 <groupId>com.atlassian.maven.plugins</groupId>
-                <artifactId>maven-jira-plugin</artifactId>
+                <artifactId>jira-maven-plugin</artifactId>
                 <version>${amps.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <productVersion>${jira.version}</productVersion>
                     <productDataVersion>${jira.version}</productDataVersion>
                     <instructions>
-				    	<!-- OSGi instructions go here -->
-				    	<Export-Package>
-						    com.alertlogic.plugins.jira.cloudinsight*;version="7.2.2.8"
-						</Export-Package>
-				    </instructions>
+				    	      <!-- OSGi instructions go here -->
+				    	          <Export-Package>
+						                com.alertlogic.plugins.jira.cloudinsight,
+						            </Export-Package>
+                        <!-- Ensure plugin is spring powered -->
+                        <Spring-Context>*</Spring-Context>
+				            </instructions>
                     <!-- Uncomment to install TestKit backdoor in JIRA. -->
                     <!--
                     <pluginArtifacts>
@@ -251,26 +241,50 @@
                     <log4jProperties>src/aps/log4j.properties</log4jProperties>
                 </configuration>
             </plugin>
+            <!-- <plugin> -->
+            <!--     <artifactId>maven-compiler-plugin</artifactId> -->
+            <!--     <!-\- the next line is to avoid a warning-\-> -->
+            <!--     <version>3.8.1</version> -->
+            <!--     <configuration> -->
+            <!--         <source>1.7</source> -->
+            <!--         <target>1.7</target> -->
+            <!--     </configuration> -->
+            <!-- </plugin> -->
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <!-- the next line is for avoid a warning-->
-                <version>3.3</version>
+                <groupId>com.atlassian.plugin</groupId>
+                <artifactId>atlassian-spring-scanner-maven-plugin</artifactId>
+                <version>${atlassian.spring.scanner.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>atlassian-spring-scanner</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <scannedDependencies>
+                        <dependency>
+                            <groupId>com.atlassian.plugin</groupId>
+                            <artifactId>atlassian-spring-scanner-external-jar</artifactId>
+                        </dependency>
+                    </scannedDependencies>
+                    <verbose>false</verbose>
                 </configuration>
             </plugin>
         </plugins>
     </build>
     <properties>
-        <jira.version>7.0.0</jira.version>
-        <amps.version>5.1.16</amps.version>
+        <jira.version>7.13.0</jira.version>
+        <amps.version>8.0.2</amps.version>
+        <plugin.testrunner.version>2.0.1</plugin.testrunner.version>
         <ao.version>1.0.0</ao.version>
         <jersey.version>1.8-atlassian-15</jersey.version>
-        <plugin.testrunner.version>1.2.3</plugin.testrunner.version>
+        <atlassian.spring.scanner.version>1.2.13</atlassian.spring.scanner.version>
         <!-- TestKit version 6.x for JIRA 6.x -->
         <testkit.version>6.3.11</testkit.version>
-        <!-- this next line is for avoid a warning -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 </project>
