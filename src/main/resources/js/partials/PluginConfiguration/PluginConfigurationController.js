@@ -636,7 +636,7 @@ AJS.$( document ).ready( function() {
     var availableEndPoints = [
         { "url": "https://api.cloudinsight.alertlogic.com" }
         ,{ "url":"https://api.cloudinsight.alertlogic.co.uk"}
-        //,{ "url": "https://api.product.dev.alertlogic.com"}
+        ,{ "url": "https://api.product.dev.alertlogic.com"}
     ];
 
     AUIUtils.addOptions( "#ciUrl", availableEndPoints, "url", "url" );

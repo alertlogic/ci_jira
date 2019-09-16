@@ -18,6 +18,7 @@ import com.atlassian.crowd.embedded.api.User;
 import com.atlassian.jira.bc.issue.IssueService;
 import com.atlassian.jira.bc.issue.IssueService.IssueResult;
 import com.atlassian.jira.bc.issue.IssueService.TransitionValidationResult;
+import com.atlassian.jira.bc.issue.search.SearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.IssueInputParameters;
@@ -92,7 +93,7 @@ public class JIRAService {
 		try {
 			screenConfigService.assigValuesToVariables();
 			CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
-			SearchProvider searchProvider = ComponentAccessor.getComponentOfType(SearchProvider.class);
+      SearchService searchService = ComponentAccessor.getComponentOfType(SearchService.class);
 
 			JqlQueryBuilder builder = JqlQueryBuilder.newBuilder();
 			ApplicationUser user = ComponentAccessor.getUserManager().getUserByName( userName );
@@ -100,8 +101,8 @@ public class JIRAService {
 
 			builder.where().customField(remediationItemCustomField.getIdAsLong()).like( remediationItemValue );
 
-	        SearchResults results = searchProvider.search(builder.buildQuery(), user, PagerFilter.getUnlimitedFilter() , null);
-	        return  results.getIssues();
+          SearchResults<Issue> results = searchService.search(user, builder.buildQuery(), PagerFilter.getUnlimitedFilter());
+	        return  results.getResults();
 	    } catch (Exception e) {
 	    	log.error("CI Plugin:"+e.toString());
 			e.printStackTrace();
