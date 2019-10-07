@@ -14,7 +14,7 @@ var EnvironmentsService = function() {
     	var urlBase = ciAIMSService.getSessionData().endpoint
     	+"/sources/"+configService.serviceVersion
     	+"/"+ciAIMSService.getSessionData().accountId
-    	+"/sources?source.config.aws.defender_support=!true&source.type=environment&source.config.collection_type=aws&source.config.collection_method=api";
+    	+"/sources?source.config.aws.defender_support=!true&source.config.azure.defender_support=!true&source.config.datacenter.defender_support=!true&source.type=environment&source.config.collection_type=aws,azure,datacenter&source.config.collection_method=api";
 
         AJS.$.ajax({
             type: "GET",

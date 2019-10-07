@@ -128,33 +128,32 @@ function remediationDetailsController( issueId ) {
                             lastElementSelected[ key ] = value;
                             return false;
                         }
-                    }
+                    };
 
                     /**
-                     * Review if a row sloud be shown or hide
+                     * Review if a row should be shown or hide
                      * @param  {string} key   element key
                      * @param  {string} item filtered it can be  (vulnerabilities,evidences,assets)
                      */
                     self.shoulBeFiltered = function( key, filter){
-
                         if( lastElementSelected.vulnerability && filter != 'vulnerabilities'){
                             if( remediationComplements.vulnerabilities.hasOwnProperty( lastElementSelected.vulnerability ) ){
                                 if( remediationComplements.vulnerabilities[ lastElementSelected.vulnerability ][ filter ].indexOf( key ) == -1){
-                                    return true
+                                    return true;
                                 }
                             }
                         }
                         if( lastElementSelected.evidence && filter != 'evidences'){
                             if( remediationComplements.evidences.hasOwnProperty( lastElementSelected.evidence ) ){
                                 if( remediationComplements.evidences[ lastElementSelected.evidence ][ filter ].indexOf( key ) == -1){
-                                    return true
+                                    return true;
                                 }
                             }
                         }
                         if( lastElementSelected.asset && filter != 'assets'){
                             if( remediationComplements.assets.hasOwnProperty( lastElementSelected.asset ) ){
                                 if( remediationComplements.assets[ lastElementSelected.asset ][ filter ].indexOf( key ) == -1){
-                                    return true
+                                    return true;
                                 }
                             }
                         }
@@ -235,9 +234,9 @@ function remediationDetailsController( issueId ) {
                                 html +=     "<div class='" + classCss + " vulnerabilities-row'>"+ vul.description + "</div>";
                                 html +=     "<div class='detailsVulnerability hidden'>";
                                 html +=         "<p><strong>"+ labelImpact +"</strong></p>";
-                                html +=            "<span><small>" + vul.impact + "</small></span>";
+                                html +=            "<span><small>" + AUIUtils.htmlLize(vul.impact) + "</small></span>";
                                 html +=         "<p><strong>"+ labelResolution + "</strong></p>";
-                                html +=         "<span><small>" + vul.resolution + "</small></span>";
+                                html +=         "<span><small>" + AUIUtils.htmlLize(vul.resolution) + "</small></span>";
                                 html +=     "</div>";
                                 html += "</div>";
 
@@ -479,7 +478,7 @@ function remediationDetailsController( issueId ) {
                         description.fail( function() {
                             assetsAffected.done( function( data ){
                                 remediationDetails.basic = remediationSupportService.getDescriptionFromAssets ( data , remediationKey );
-                            })
+                            });
                             assetsAffected.fail( function(){
                                 self.showError( '#detailsPanel', AJS.I18n.getText("ci.partials.remediationdetails.js.error.description.notfound") );
                             });

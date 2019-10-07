@@ -226,6 +226,11 @@
                         </pluginArtifact>
                     </pluginArtifacts>
                     -->
+                    <!-- Testing -->
+                    <enableQuickReload>true</enableQuickReload>
+                    <enableFastdev>false</enableFastdev>
+                    <jvmArgs>-Dplugin.resource.directories=/src/main/resources</jvmArgs>
+                    <!-- /Testing -->
                     <pluginArtifacts>
                         <pluginArtifact>
                             <groupId>com.atlassian.activeobjects</groupId>

@@ -95,7 +95,7 @@ var RemediationSupportService = function() {
                     var targets = [];
 
                     for (var k = 0; k < vulnerability.vinstances.length; k++ ) {
-                        targets.push( vulnerability.vinstances[k].target.key )
+                        targets.push( vulnerability.vinstances[k].target.key );
                     }
 
                     vulnsAsset[ vulnerability.vulnerability_id ] = {
@@ -304,6 +304,9 @@ var RemediationSupportService = function() {
     */
     self.getVulnerabilitiesDetails = function( dataVuln , vulnFromAssets) {
         var vulns = [];
+        var vulnIdsFromAssets = [];
+        for (var index in vulnFromAssets) vulnIdsFromAssets.push(index);
+
         for ( var i = 0; i < dataVuln.vulnerabilities.length; i++ ) {
             if( vulnFromAssets[ dataVuln.vulnerabilities[i].id ] ){
                 //Search if the vulnerability exist on the assets
@@ -316,7 +319,22 @@ var RemediationSupportService = function() {
                 };
 
                 vulns.push( vuln );
+                vulnIdsFromAssets.splice(vulnIdsFromAssets.indexOf(dataVuln.vulnerabilities[i].id), 1);
             }
+        }
+
+        for (var i = 0; i < vulnIdsFromAssets.length; i++) {
+            var vulnDetailsFromAssets = remediationsService.getVulnerabilityDetails(vulnIdsFromAssets[i]);
+            vulnDetailsFromAssets.always( function(vulnData) {
+                var vuln = {
+                    "id": vulnData.id,
+                    "description": vulnData.description,
+                    "impact": vulnData.impact,
+                    "resolution": vulnData.resolution,
+                    "severity": vulnData.severity
+                };
+                vulns.push( vuln );
+            });
         }
 
         vulns.sort(function(a,b){
