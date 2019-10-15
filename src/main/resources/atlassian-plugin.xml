@@ -131,6 +131,13 @@
 		<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
 	</web-item>
 
+    <web-item key="incidents_link" name="Incidents"
+              section="my_links_link/my_links_section" weight="10">
+        <label key="ci.atlassianplugin.menu.item.incidents"/>
+        <link linkId="incidents_link">/plugins/servlet/incidentssyncservlet</link>
+        <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
+    </web-item>
+
 	<!-- Configuration of Servlets -->
     <servlet name="ci.atlassianplugin.servlet.projectsetup.name"
 		i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
@@ -169,6 +176,14 @@
 		<description>The Remediations Sync Servlet Plugin</description>
 		<url-pattern>/remediationssyncservlet</url-pattern>
 	</servlet>
+
+    <servlet name="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
+             i18n-name-key="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
+             key="incidents-sync-servlet"
+             class="com.alertlogic.plugins.jira.cloudinsight.servlet.IncidentsSyncServlet">
+        <description>The Incidents Sync Servlet Plugin</description>
+        <url-pattern>/incidentssyncservlet</url-pattern>
+    </servlet>
 
 	<!-- Dispose servlet -->
 	<servlet name="Dispose Servlet" i18n-name-key="dispose-servlet.name" key="dispose-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.DisposeRemediationServlet">
@@ -345,7 +360,7 @@
         </transformation>
 
         <resource type="download" name="CustomProjectTemplate.soy.js" location="/js/partials/Project/CustomProjectTemplate.soy"/>
-        
+
         <resource type="download" name="images/" location="/images">
             <param name="content-type" value="image/png; charset=binary"/>
         </resource>
@@ -397,7 +412,7 @@
         </transformation>
     	<resource type="download" name="RemediationDetailsController.js" location="/js/partials/RemediationDetails/RemediationDetailsController.js"/>
   	</web-resource>
-  	
+
   	<web-resource name="RemediationSyncDetailsController" key="remediationSyncDetailsController">
     	<context>atl.general</context>
     	<transformation extension="js">
