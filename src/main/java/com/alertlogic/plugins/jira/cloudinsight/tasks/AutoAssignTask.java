@@ -158,9 +158,9 @@ public class AutoAssignTask implements PluginJob {
 		String exceptionAsString = sw.toString();
 
 		//If error happens last important log becomes the previous one.
-		String lastImportantLog = rule.getString("lastLog");
-		String ruleName = rule.getString("name");
-		int ruleId = rule.getInt("id");
+		String lastImportantLog = rule.has("lastLog") ? rule.getString("lastLog") : "No last log available.";
+		String ruleName = rule.has("name") ? rule.getString("name") : "No name available.";
+		int ruleId = rule.has("id") ? rule.getInt("id") : 0;
 
 		//Is the second time it fails?
 		if (statusBeforeRun == TaskRuleExecutionState.ERROR) 
