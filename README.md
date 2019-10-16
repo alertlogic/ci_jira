@@ -3,15 +3,14 @@ Cloud Insight Add-on for JIRA
 
 The Cloud Insight Add-on for JIRA integrates Cloud Insight remediations as JIRA issues, which allows you to configure, manage, and assign issues to JIRA teams. JIRA team members can use the add-on to review, and then dispose assigned remediations.
 
-##Supported JIRA Versions
- * From 6.3.9 to 6.4.12 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_6/download).
+## Supported JIRA Versions
  * 7.0.0 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_7/download)
 
-##Add-on Install User Guide
+## Add-on Install User Guide
 
 See [Install user guide here](INSTALL.md).
 
-##Add-on Developer Environment Installation
+## Add-on Developer Environment Installation
 
 Configure the environment as directed in the follow guide:
 https://developer.atlassian.com/docs/getting-started/set-up-the-atlassian-plugin-sdk-and-build-a-project
@@ -25,7 +24,7 @@ https://developer.atlassian.com/docs/getting-started/set-up-the-atlassian-plugin
 * In the console, run the following command:
     `atlas-run`
 
-##Other commands:
+## Other commands:
 
 * `atlas-run`: installs this add-on into the product, and starts it on localhost
 * `atlas-debug`: same as `atlas-run,` and allows a debugger to attach at port 5005

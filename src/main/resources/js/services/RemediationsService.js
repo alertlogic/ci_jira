@@ -295,6 +295,25 @@ var RemediationsService = function() {
             }
         });
     };
+
+    /**
+     * Get vulnerability details
+     */
+    self.getVulnerabilityDetails = function( vulnerabilityId ) {
+        var urlBase = ciAIMSService.getSessionData().endpoint
+            +"/vulnerability/"+configService.serviceVersion
+            +"//"+vulnerabilityId;
+        return jQuery.ajax({
+            type: "GET",
+            url: urlBase,
+            dataType: 'json',
+            async: false,
+            headers: {
+                "x-aims-auth-token":ciAIMSService.getSessionData().token
+            }
+        });
+    };
+
 };
 /**
  * Creates the service instance.
