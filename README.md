@@ -5,7 +5,7 @@ The Cloud Insight Add-on for JIRA integrates Cloud Insight remediations as JIRA 
 
 ## Supported JIRA Versions
 
- * 7.0.0 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_7/download) (Support only AWS Deployments)
+ * 7.0.0 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_7/download) (Support AWS Deployments only)
  
  * 7.13.5 the download link [jar file](https://github.com/alertlogic/ci_jira/releases/download/7.2.3.1/jira-cloud-insight-7.2.3.1-SNAPSHOT.jar)
  * 8.2.3 the download link [jar file](https://github.com/alertlogic/ci_jira/releases/download/8.2.3.1/jira-cloud-insight-8.2.3.1-SNAPSHOT.jar)
