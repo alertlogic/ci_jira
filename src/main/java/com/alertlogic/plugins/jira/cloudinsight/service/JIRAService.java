@@ -93,7 +93,7 @@ public class JIRAService {
 		try {
 			screenConfigService.assigValuesToVariables();
 			CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
-      SearchService searchService = ComponentAccessor.getComponentOfType(SearchService.class);
+			SearchProvider searchProvider = ComponentAccessor.getComponentOfType(SearchProvider.class);
 
 			JqlQueryBuilder builder = JqlQueryBuilder.newBuilder();
 			ApplicationUser user = ComponentAccessor.getUserManager().getUserByName( userName );
@@ -101,8 +101,8 @@ public class JIRAService {
 
 			builder.where().customField(remediationItemCustomField.getIdAsLong()).like( remediationItemValue );
 
-          SearchResults<Issue> results = searchService.search(user, builder.buildQuery(), PagerFilter.getUnlimitedFilter());
-	        return  results.getResults();
+			SearchResults results = searchProvider.search(builder.buildQuery(), user, PagerFilter.getUnlimitedFilter() , null);
+			return  results.getIssues();
 	    } catch (Exception e) {
 	    	log.error("CI Plugin:"+e.toString());
 			e.printStackTrace();
