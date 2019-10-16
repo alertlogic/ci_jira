@@ -4,8 +4,8 @@ Cloud Insight Add-on for JIRA
 The Cloud Insight Add-on for JIRA integrates Cloud Insight remediations as JIRA issues, which allows you to configure, manage, and assign issues to JIRA teams. JIRA team members can use the add-on to review, and then dispose assigned remediations.
 
 ## Supported JIRA Versions
- (Deprecated use 7.13.5)
- * 7.0.0 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_7/download)
+
+ * 7.0.0 the download link [jar file](https://github.com/alertlogic/ci_jira/tree/for_jira_version_7/download) (Support only AWS Deployments)
  
  * 7.13.5 the download link [jar file](https://github.com/alertlogic/ci_jira/releases/download/7.2.3.1/jira-cloud-insight-7.2.3.1-SNAPSHOT.jar)
  * 8.2.3 the download link [jar file](https://github.com/alertlogic/ci_jira/releases/download/8.2.3.1/jira-cloud-insight-8.2.3.1-SNAPSHOT.jar)
