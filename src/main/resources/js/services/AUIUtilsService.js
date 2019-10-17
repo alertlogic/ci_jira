@@ -228,7 +228,7 @@ var AUIUtilsService = function() {
                     }
                     return filter.name;
                 }
-                return "("+filter.bucket_name+")";
+                return "("+self.getLastDetailFromKey(filter.key)+")";
             }
 
             if (filter.type === "region") {
