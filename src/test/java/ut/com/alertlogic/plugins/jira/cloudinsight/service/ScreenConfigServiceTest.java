@@ -181,9 +181,9 @@ public class ScreenConfigServiceTest {
 	@Test
 	public void testCreateSchema() {
 		when(i18nResolver.getText("ci.constant.scheme.name")).thenReturn("Scheme");
-		FieldScreenScheme fieldScreenScheme = screenConfigServiceMock.createSchema("KEY");
+		FieldScreenScheme fieldScreenScheme = screenConfigServiceMock.createSchema("KEY", screenConfigServiceMock.remediationsProduct);
 
-		assertEquals(fieldScreenScheme.getName(),"KEY : Scheme");
+		assertEquals(fieldScreenScheme.getName(),"KEY : Scheme"+" - remediations");
 	}
 
 	@Ignore
@@ -228,7 +228,7 @@ public class ScreenConfigServiceTest {
 		when(screenConfigServiceMock.getRemediationIdCustomField()).thenReturn(customFieldMock);
 		when(screenConfigServiceMock.getGroupCustomField()).thenReturn(customFieldMock);
 		
-		String[] fields = screenConfigServiceMock.getFieldsCreateScreen();
+		String[] fields = screenConfigServiceMock.getFieldsCreateScreen(screenConfigServiceMock.remediationsProduct);
 		assertEquals(fields.length,8);
 	}
 
@@ -241,17 +241,17 @@ public class ScreenConfigServiceTest {
 	@Ignore
 	public void testHasIssueTypeConfigurated() {
 		
-		when(screenConfigServiceMock.getIssueTypeCI()).thenReturn(issueTypeMock);
+		when(screenConfigServiceMock.getIssueTypeCI(screenConfigServiceMock.remediationsProduct)).thenReturn(issueTypeMock);
 		Project project= mock(Project.class);
 		List<IssueType> issueTypes = new ArrayList<IssueType>();
 		
 		when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(issueTypes);
-		boolean hasnot = screenConfigServiceMock.hasIssueTypeConfigurated(project);
+		boolean hasnot = screenConfigServiceMock.hasIssueTypeConfigurated(project, screenConfigServiceMock.remediationsProduct);
 		assertFalse(hasnot);
 		
 		issueTypes.add(issueTypeMock);
 		when(issueTypeSchemeManager.getIssueTypesForProject(project)).thenReturn(issueTypes);
-		boolean has = screenConfigServiceMock.hasIssueTypeConfigurated(project);		
+		boolean has = screenConfigServiceMock.hasIssueTypeConfigurated(project, screenConfigServiceMock.remediationsProduct);		
 		assertTrue(has);	
 	}
 }

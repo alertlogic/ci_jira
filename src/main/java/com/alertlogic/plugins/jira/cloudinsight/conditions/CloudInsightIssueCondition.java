@@ -27,7 +27,7 @@ public class CloudInsightIssueCondition extends AbstractIssueWebCondition {
 	@Override
 	public boolean shouldDisplay(ApplicationUser arg0, Issue arg1, JiraHelper arg2) {
 		try {
-			IssueType issueTypeCI = screenConfigService.getIssueTypeCI();
+			IssueType issueTypeCI = screenConfigService.getIssueTypeCI( ScreenConfigService.remediationsProduct);
 			if (issueTypeCI != null) {
 				//Is this issue an CI issue type?
 				if (arg1.getIssueTypeId().equals(issueTypeCI.getId())){
