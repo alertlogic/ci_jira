@@ -176,6 +176,15 @@ public class ScreenConfigService {
 	}
 
 	/**
+	 * Get an incident Custom Field (only if it exits)
+	 * @return CustomField The custom field to return
+	 * @throws Exception
+	 */
+	public CustomField getIncidentCustomFieldIfExists() throws Exception{
+		return customFieldManager.getCustomFieldObjectByName(INCIDENT_ID_CUSTOM_FIELD_NAME);
+	}
+
+	/**
 	 * Create a new screen
 	 * @param name 		The name of the screen
      * @param fields 	The fields to add to the screen
