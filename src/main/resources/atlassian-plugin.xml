@@ -222,6 +222,12 @@
         <url-pattern>/groupsservlet</url-pattern>
     </servlet>
 
+	<!-- Snooze incident servlet -->
+	<servlet name="Snooze Incident Servlet" i18n-name-key="snooze-incident-servlet.name" key="snooze-incident-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.SnoozeIncidentServlet">
+    	<description key="snooze-incident.description">Allow snooze an incident</description>
+    	<url-pattern>/snoozeincidentservlet</url-pattern>
+  	</servlet>
+
 	<!-- JS Services -->
     <web-resource key="ciServices" name="CIServices" >
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
@@ -298,6 +304,14 @@
             <transformer key="jsI18n"/>
         </transformation>
     </web-resource>
+
+	<web-resource name="SnoozeIncidentController" key="snoozeIncidentController">
+    	<context>atl.general</context>
+    	<transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+    	<resource type="download" name="SnoozeIncidentController.js" location="/js/partials/SnoozeIncident/SnoozeIncidentController.js"/>
+  	</web-resource>
     <!-- End of page controllers -->
 
 
@@ -350,6 +364,16 @@
     	<link linkId="remediation_details_link">/plugins/servlet/remediationdetailsservlet?id=${issue.id}
     	</link>
     	<styleClass>issueaction-showdetail</styleClass>
+    </web-item>
+
+	<web-item section="transitions-all" weight="10" name="Snooze button on issue details" key="snooze_incident_link">
+        <label>Snooze</label>
+        <conditions type="AND">
+		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
+		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
+		</conditions>
+        <link linkId="snooze_incident">/plugins/servlet/snoozeincidentservlet?id=${issue.id}</link>
+        <styleClass>issueaction-snooze</styleClass>
     </web-item>
 
   	<web-resource key="ci-project-template-resources" name="ci-project-template-resources">
