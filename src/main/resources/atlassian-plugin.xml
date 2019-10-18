@@ -195,7 +195,7 @@
 	<servlet name="Proxy Auth Servlet"
 		i18n-name-key="proxy-auth-servlet.name" key="proxy-auth-servlet"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CIProxyAuthServlet">
-    	<description key="proxy-auth-servlet.description">Allow authentication in Alert Logict</description>
+    	<description key="proxy-auth-servlet.description">Allow authentication in Alert Logic</description>
     	<url-pattern>/proxyauthservlet</url-pattern>
   	</servlet>
 
