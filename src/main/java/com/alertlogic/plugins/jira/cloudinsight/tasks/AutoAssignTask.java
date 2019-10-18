@@ -313,7 +313,7 @@ public class AutoAssignTask implements PluginJob {
 	{
 		List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem( remediationItem.getString("key"), rule.getString("user"));
 		if( issues.size() == 0 ){
-		    monitor.getJIRAService().createIssue(
+		    monitor.getJIRAService().createRemediationIssue(
     			remediation.getString("name"),
     			this.remediationsService.getRemediationsDescriptionsById(descriptions, remediation.getString("remediation_id")),
     			rule.getLong("project"),

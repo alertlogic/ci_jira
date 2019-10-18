@@ -62,10 +62,14 @@ public class ScreenConfigService {
     private String GENERIC_NAME_SCREEN;
     private String REMEDIATION_ITEM_CUSTOM_FIELD_NAME;
 	private String REMEDIATION_ID_CUSTOM_FIELD_NAME;
+	private String INCIDENT_ID_CUSTOM_FIELD_NAME;
 	private String GROUP_CUSTOM_FIELD_NAME;
 	private static final Logger log = LoggerFactory.getLogger(ScreenConfigService.class);
 	private FieldConfigSchemeManager  fieldConfigSchemeManager;
 	private final IssueTypeManager issueTypeManager;
+	public static final String incidentsProduct = "incidents";
+	public static final String remediationsProduct = "remediations";
+	private String[] products = { remediationsProduct, incidentsProduct };
 
 	public ScreenConfigService(
 			CustomFieldManager customFieldManager,
@@ -152,12 +156,32 @@ public class ScreenConfigService {
 	}
 
 	/**
+	 * Get a incident id Custom Field (create or get)
+	 * @throws GenericEntityException
+	 * @return CustomField
+	 */
+	public CustomField getIncidentIdCustomField() throws Exception{
+		return createCustomField(INCIDENT_ID_CUSTOM_FIELD_NAME,
+				 "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield",
+				 "com.atlassian.jira.plugin.system.customfieldtypes:textsearcher");
+	}
+
+	/**
 	 * Get a remediation Custom Field (only if it exits)
 	 * @return	CustomField The custom field to return
 	 * @throws Exception
 	 */
 	public CustomField getRemediationCustomFieldIfExists() throws Exception{
 		return customFieldManager.getCustomFieldObjectByName(REMEDIATION_ITEM_CUSTOM_FIELD_NAME);
+	}
+
+	/**
+	 * Get an incident Custom Field (only if it exits)
+	 * @return CustomField The custom field to return
+	 * @throws Exception
+	 */
+	public CustomField getIncidentCustomFieldIfExists() throws Exception{
+		return customFieldManager.getCustomFieldObjectByName(INCIDENT_ID_CUSTOM_FIELD_NAME);
 	}
 
 	/**
@@ -186,12 +210,12 @@ public class ScreenConfigService {
 	 * Create a new schema
 	 * @return FieldScreenScheme
 	 */
-	public FieldScreenScheme createSchema(String projectKey){
+	public FieldScreenScheme createSchema(String projectKey, String product){
 
 		FieldScreenScheme myScheme = new FieldScreenSchemeImpl( fieldScreenSchemeManager, null );
 
-		myScheme.setName( projectKey +" : "+ i18n.getText("ci.constant.scheme.name") ); 
-		myScheme.setDescription( i18n.getText("ci.constant.scheme.description") ); 
+		myScheme.setName( projectKey +" : "+ i18n.getText("ci.constant.scheme.name") +" - "+ product );
+		myScheme.setDescription( i18n.getText("ci.constant.scheme.description") );
 		myScheme.store();
 
 		return myScheme;
@@ -218,14 +242,14 @@ public class ScreenConfigService {
 	 * @param String description of issue type
 	 * @return IssueTypeScreenScheme
 	 */
-	public IssueTypeScreenScheme createIssueTypeScreenScheme(FieldScreenScheme myScheme, String projectKey){
+	public IssueTypeScreenScheme createIssueTypeScreenScheme(FieldScreenScheme myScheme, String projectKey, String product){
 
 		IssueTypeScreenScheme myIssueTypeScreenScheme = new IssueTypeScreenSchemeImpl(issueTypeScreenSchemeManager, null);
-		myIssueTypeScreenScheme.setName( projectKey + " : "+ i18n.getText("ci.constant.issuetypescreen.name")  );
+		myIssueTypeScreenScheme.setName( projectKey + " : "+ i18n.getText("ci.constant.issuetypescreen.name") + " - " + product );
 		myIssueTypeScreenScheme.setDescription( i18n.getText("ci.constant.issuetypescreen.description") );
 		myIssueTypeScreenScheme.store();
 
-		IssueTypeScreenSchemeEntity myEntity = createIssueTypeScreenSchemeEntity(myScheme);
+		IssueTypeScreenSchemeEntity myEntity = createIssueTypeScreenSchemeEntity(myScheme, product);
 		myIssueTypeScreenScheme.addEntity( myEntity );
 
 		return myIssueTypeScreenScheme;
@@ -247,6 +271,7 @@ public class ScreenConfigService {
 	public void assigValuesToVariables(){
 		REMEDIATION_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationId");
 		REMEDIATION_ITEM_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationItem");
+		INCIDENT_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.incidentId");
 		GROUP_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.groupAssigned");
 		GENERIC_NAME_SCREEN = i18n.getText("ci.constant.screen.name");
 	}
@@ -255,17 +280,24 @@ public class ScreenConfigService {
 	 * Get issue type Cloud insight or create if not exists
 	 * @return IssueType
 	 */
-	public IssueType getIssueTypeCI() {
+	public IssueType getIssueTypeCI(String product) {
 		Collection<IssueType> issueTypes = issueTypeManager.getIssueTypes();
+		String issueTypeName = "ci.constant.issuetype.name";
+		String issueTypeDescription = "ci.constant.issuetype.description";
+
+		if( product.equals( incidentsProduct ) ) {
+			issueTypeName = "ci.constant.issuetype.incident.name";
+			issueTypeDescription = "ci.constant.issuetype.incident.description";
+		}
 
 		for(IssueType issueType : issueTypes) {
-			if( issueType.getName().equals( i18n.getText("ci.constant.issuetype.name") ) ){
+			if( issueType.getName().equals( i18n.getText(issueTypeName)) ){
             	return issueType;
             }
 	    }
 
 		try{
-			return createIssueType( i18n.getText("ci.constant.issuetype.name") , i18n.getText("ci.constant.issuetype.description") );
+			return createIssueType( i18n.getText(issueTypeName), i18n.getText(issueTypeDescription) );
 		}catch(Exception e){
 			log.error("CI Plugin: Creating issue type");
 		}
@@ -312,14 +344,14 @@ public class ScreenConfigService {
 	 * @return FieldConfigScheme return the FieldConfigScheme
 	 * @throws CreateException
 	 */
-	public FieldConfigScheme createIssueTypeSchema(String projectKey) throws CreateException {
-		IssueType issueType = getIssueTypeCI();
+	public FieldConfigScheme createIssueTypeSchema(String projectKey, String product) throws CreateException {
+		IssueType issueType = getIssueTypeCI(product);
 
 		List<String> issueTypeList = new ArrayList<String>();
 		issueTypeList.add( issueType.getId() );
 		return ComponentAccessor.getIssueTypeSchemeManager().create(
-				projectKey+" : "+i18n.getText("ci.constant.issuetypeschema.name"),
-				i18n.getText("ci.constant.issuetypeschema.description"), 
+				projectKey+" : "+i18n.getText("ci.constant.issuetypeschema.name") + " - " + product,
+				i18n.getText("ci.constant.issuetypeschema.description"),
 				issueTypeList);
 	}
 
@@ -349,11 +381,11 @@ public class ScreenConfigService {
 	 * @param myScheme
 	 * @return
 	 */
-	public IssueTypeScreenSchemeEntity createIssueTypeScreenSchemeEntity(FieldScreenScheme myScheme){
+	public IssueTypeScreenSchemeEntity createIssueTypeScreenSchemeEntity(FieldScreenScheme myScheme, String product){
 
 		IssueTypeScreenSchemeEntity myEntity = new IssueTypeScreenSchemeEntityImpl( 
 				issueTypeScreenSchemeManager, (GenericValue) null, fieldScreenSchemeManager, constantsManager);
-		IssueType issueType = getIssueTypeCI();
+		IssueType issueType = getIssueTypeCI(product);
 		myEntity.setIssueTypeId( issueType.getId() );
 		myEntity.setFieldScreenScheme( myScheme );
 
@@ -365,7 +397,7 @@ public class ScreenConfigService {
 	 * @param project
 	 * @param issueTypeScheme
 	 */
-	public void updateIssueTypeSchemeForProject(Project project, FieldConfigScheme issueTypeScheme){
+	public void updateIssueTypeSchemeForProject(Project project, FieldConfigScheme issueTypeScheme, String product){
 		Collection<IssueType> associatedIssueTypeIds =  ComponentAccessor.getIssueTypeSchemeManager().getIssueTypesForProject( project );
 
 		List<String> newIssueTypes = new ArrayList<String>();
@@ -374,7 +406,7 @@ public class ScreenConfigService {
 			newIssueTypes.add(associatedIssueTypeId.getId());
 		}
 
-		IssueType issueType = getIssueTypeCI();
+		IssueType issueType = getIssueTypeCI(product);
 
 		newIssueTypes.add(issueType.getId());
 
@@ -385,22 +417,31 @@ public class ScreenConfigService {
 	 * Return the fields necessary for a create screen
 	 * @return String[] array with fields
 	 */
-	public String[] getFieldsCreateScreen(){
+	public String[] getFieldsCreateScreen(String product){
 		String[] fieldsCreateScreen = new String[8];
 
 		try {
-			CustomField remediationItemCustomField = getRemediationItemCustomField();
 			CustomField groupCustomField = getGroupCustomField();
-			CustomField remediationIdCustomField = getRemediationIdCustomField();
 
 			fieldsCreateScreen[0] = IssueFieldConstants.SUMMARY;
 			fieldsCreateScreen[1] = IssueFieldConstants.PRIORITY;
 			fieldsCreateScreen[2] = IssueFieldConstants.DESCRIPTION;
 			fieldsCreateScreen[3] = IssueFieldConstants.STATUS;
 			fieldsCreateScreen[4] = IssueFieldConstants.ASSIGNEE;
-			fieldsCreateScreen[5] = remediationItemCustomField.getId();//250 characters is the limit
-			fieldsCreateScreen[6] = remediationIdCustomField.getId();
-			fieldsCreateScreen[7] = groupCustomField.getId();
+			if( product.equals(remediationsProduct) ){
+				CustomField remediationItemCustomField = getRemediationItemCustomField();
+				CustomField remediationIdCustomField = getRemediationIdCustomField();
+
+				fieldsCreateScreen[5] = remediationItemCustomField.getId();//250 characters is the limit
+				fieldsCreateScreen[6] = remediationIdCustomField.getId();
+				fieldsCreateScreen[7] = groupCustomField.getId();
+			}
+			if( product.equals(incidentsProduct) ){
+				CustomField incidentIdCustomField = getIncidentIdCustomField();
+
+				fieldsCreateScreen[5] = incidentIdCustomField.getId();//250 characters is the limit
+				fieldsCreateScreen[6] = groupCustomField.getId();
+			}
 			//fieldsCreateScreen[8] = IssueFieldConstants.CREATOR;
 
 		} catch (Exception e) {
@@ -431,9 +472,9 @@ public class ScreenConfigService {
 	 * Add the default workflow to project for a CI issue type
 	 * @param project	The project reference
 	 */
-	public void workflowConfiguration(Project project) {
+	public void workflowConfiguration(Project project, String product) {
 
-		IssueType issueType = getIssueTypeCI();
+		IssueType issueType = getIssueTypeCI(product);
 
 		//Get the JIRA default workflow
 		JiraWorkflow workflow = ComponentAccessor.getWorkflowManager().getDefaultWorkflow();
@@ -459,8 +500,8 @@ public class ScreenConfigService {
 	 * @param project
 	 * @return if  a project has the issue type configured
 	 */
-	public boolean hasIssueTypeConfigurated(Project project) {
-		IssueType issueType = getIssueTypeCI();
+	public boolean hasIssueTypeConfigurated(Project project, String product) {
+		IssueType issueType = getIssueTypeCI(product);
 		Collection<IssueType> associatedIssueTypeIds =  ComponentAccessor.getIssueTypeSchemeManager().getIssueTypesForProject( project );
 
 		for (IssueType associatedIssueType : associatedIssueTypeIds) {
@@ -472,11 +513,11 @@ public class ScreenConfigService {
 	}
 
 	/**
-	 * Add the screens to a existing project
+	 * Add the screens to a existing project by id
 	 * @param projectKey
 	 * @throws Exception
 	 */
-	public void configProject(Long projectId) throws Exception{
+	public void configProjectById(Long projectId) throws Exception{
 
 		ProjectManager projectManager = ComponentAccessor.getProjectManager();
 		Project project = projectManager.getProjectObj(projectId);
@@ -484,48 +525,68 @@ public class ScreenConfigService {
 		log.debug( i18n.getText("ci.service.screen.msg.log.debug.configuring.projectid") + projectId);
 		log.debug( i18n.getText("ci.service.screen.msg.log.debug.configuring.project") + project.getKey());
 
-		if( !hasIssueTypeConfigurated(project) ){
+		for(String product : products ) {
+			configProject(project, product);
+		}
+	}
+
+	/**
+	 * Create a custom schema for a product
+	 */
+	public FieldScreenScheme createCustomSchema(String product, Project project){
+		assigValuesToVariables();
+		log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.field") );
+
+		String[] fieldsCreateScreen = getFieldsCreateScreen(product);
+		String[] fieldsEditScreen = getFieldsCreateScreen(product);
+		String[] fieldsViewScreen = getFieldsViewScreen();
+
+		// creating screens
+		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.screen") );
+		FieldScreen myCreateScreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN  + " - "+ product + " Create", fieldsCreateScreen);
+		FieldScreen myEditSreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN  + " - "+ product + " Edit", fieldsEditScreen);//the same fields
+		FieldScreen myViewScreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN  + " - "+ product + " View", fieldsViewScreen);
+
+		//creating schema
+		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.scheme") );
+		FieldScreenScheme myScheme = createSchema( project.getKey(), product );
+
+		//add screen to schema
+		log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.screen.scheme") );
+		addScreenToScheme( myScheme, IssueOperations.CREATE_ISSUE_OPERATION, myCreateScreen.getId());
+		addScreenToScheme( myScheme, IssueOperations.EDIT_ISSUE_OPERATION, myEditSreen.getId());
+		addScreenToScheme( myScheme, IssueOperations.VIEW_ISSUE_OPERATION, myViewScreen.getId());
+		return myScheme;
+	}
+
+	/**
+	 * Add the screens to a existing project
+	 * @param project
+	 * @throws Exception
+	 */
+	public void configProject(Project project,String product) throws Exception{
+
+		if( !hasIssueTypeConfigurated(project, product) ){
 			log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.project.config") );
 
 			FieldConfigScheme fieldConfigScheme = ComponentAccessor.getIssueTypeSchemeManager().getConfigScheme( project );
 			IssueTypeScreenSchemeManager issueTypeScreenSchemeManager = ComponentAccessor.getIssueTypeScreenSchemeManager();
 			IssueTypeScreenScheme issueTypeScreenScheme = issueTypeScreenSchemeManager.getIssueTypeScreenScheme(project);
 
-			assigValuesToVariables();
-			log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.field") );
-
-			String[] fieldsCreateScreen = getFieldsCreateScreen();
-			String[] fieldsEditScreen = getFieldsCreateScreen();
-			String[] fieldsViewScreen = getFieldsViewScreen();
-
-			// creating screens
-			log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.screen") );
-			FieldScreen myCreateScreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN + " Create", fieldsCreateScreen);
-			FieldScreen myEditSreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN + " Edit", fieldsEditScreen);//the same fields
-			FieldScreen myViewScreen = createScreen( project.getKey() + " : " + GENERIC_NAME_SCREEN + " View", fieldsViewScreen);
-
-			//creating schema
-			log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.scheme") );
-			FieldScreenScheme myScheme = createSchema( project.getKey() );
-
-			//add screen to schema
-			log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.screen.scheme") );
-			addScreenToScheme( myScheme, IssueOperations.CREATE_ISSUE_OPERATION, myCreateScreen.getId());
-			addScreenToScheme( myScheme, IssueOperations.EDIT_ISSUE_OPERATION, myEditSreen.getId());
-			addScreenToScheme( myScheme, IssueOperations.VIEW_ISSUE_OPERATION, myViewScreen.getId());
+			FieldScreenScheme myScheme = createCustomSchema(product, project);
 
 			log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.entity") );
-			IssueTypeScreenSchemeEntity myEntity = createIssueTypeScreenSchemeEntity(myScheme);
+			IssueTypeScreenSchemeEntity myEntity = createIssueTypeScreenSchemeEntity(myScheme, product);
 			issueTypeScreenScheme.addEntity( myEntity );
 
-			log.debug( i18n.getText("ci.service.screen.msg.log.debug.update.fieldconfigscheme") );			
-			updateIssueTypeSchemeForProject(project, fieldConfigScheme);
+			log.debug( i18n.getText("ci.service.screen.msg.log.debug.update.fieldconfigscheme") );
+			updateIssueTypeSchemeForProject(project, fieldConfigScheme, product);
 
 			log.debug("ci.service.screen.msg.log.debug.add.workflow");
-			workflowConfiguration( project );
+			workflowConfiguration( project, product );
 
 		}else{
-			log.debug("ci.service.screen.msg.log.debug.project.configured");
+			log.debug("ci.service.screen.msg.log.debug.project.configured"+" : "+product);
 		}
 	}
 
@@ -533,46 +594,32 @@ public class ScreenConfigService {
 	 * Create all the configuration for a project
 	 * @param myProject		The project reference
 	 */
-	public void createProjectConfigurationTemplate(Project myProject) throws Exception{
+	public void createProjectConfigurationTemplate(Project project) throws Exception{
 
-		assigValuesToVariables();
 		// creating issue type and schemes
 		log.debug("CI Plugin: Creating issue type scheme");
 
-		//configuring fields
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.field") );
+		// for remediations
+			String product = remediationsProduct;
+			FieldScreenScheme myScheme = createCustomSchema(product, project);
 
-		String[] fieldsCreateScreen = getFieldsCreateScreen();
-		String[] fieldsEditScreen = getFieldsCreateScreen();
-		String[] fieldsViewScreen = getFieldsViewScreen();
+			//Creating issue type
+			log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.issuetype") );
+			IssueTypeScreenScheme myIssueTypeScreenScheme = createIssueTypeScreenScheme( myScheme, project.getKey(), product );
 
-		// creating screens
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.screen") );
-		FieldScreen myCreateScreen = createScreen( myProject.getKey() + " : " + GENERIC_NAME_SCREEN + " Create", fieldsCreateScreen);
-		FieldScreen myEditSreen = createScreen( myProject.getKey() + " : " + GENERIC_NAME_SCREEN + " Edit", fieldsEditScreen);//the same fields
-		FieldScreen myViewScreen = createScreen( myProject.getKey() + " : " + GENERIC_NAME_SCREEN + " View", fieldsViewScreen);
+			//Association to project
+			log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.project.screen") );
+			associationProjectScreen(project,myIssueTypeScreenScheme);
 
-		//creating scheme
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.scheme") );
-		FieldScreenScheme myScheme = createSchema( myProject.getKey() );
+			FieldConfigScheme fieldConfigScheme = createIssueTypeSchema( project.getKey(), product );
 
-		//add screen to schema
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.screen.scheme") );
-		addScreenToScheme( myScheme, IssueOperations.CREATE_ISSUE_OPERATION, myCreateScreen.getId());
-		addScreenToScheme( myScheme, IssueOperations.EDIT_ISSUE_OPERATION, myEditSreen.getId());
-		addScreenToScheme( myScheme, IssueOperations.VIEW_ISSUE_OPERATION, myViewScreen.getId());
+			log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.project.issuetype") );
+			associateIssueTypeSchemeWithProject( fieldConfigScheme, project);
 
-		//Creating issue type
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.create.issuetype") );
-		IssueTypeScreenScheme myIssueTypeScreenScheme = createIssueTypeScreenScheme( myScheme, myProject.getKey() );
+		// for incidents
+			product = incidentsProduct;
+			configProject(project, product);
 
-		//Association to project
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.project.screen") );
-		associationProjectScreen(myProject,myIssueTypeScreenScheme);
-
-		FieldConfigScheme fieldConfigScheme = createIssueTypeSchema( myProject.getKey() );
-
-		log.debug( i18n.getText("ci.service.screen.msg.log.debug.association.project.issuetype") );
-		associateIssueTypeSchemeWithProject( fieldConfigScheme, myProject);
 	}
+
 }

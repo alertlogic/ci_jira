@@ -50,7 +50,7 @@ public class SetupProjectServlet extends HttpServlet{
     	if (project != null){
     		if (!project.isEmpty()) {
     			try {
-					screenConfigService.configProject(Long.parseLong(project,10));
+					screenConfigService.configProjectById(Long.parseLong(project,10));
 					res.setStatus(HttpServletResponse.SC_CREATED);
 				} catch (Exception e) {
 					e.printStackTrace();
