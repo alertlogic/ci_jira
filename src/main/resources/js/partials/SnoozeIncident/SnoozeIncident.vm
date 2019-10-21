@@ -48,7 +48,7 @@
 				</form>
 				<div class="button-align-right">
 			       	<button class="aui-button aui-button-primary" type="button" id="snoozeIncidentButton"> $i18n.getText('ci.partials.snooze.incident.vm.button.snooze') </button>
-			        <button class="aui-button" type="button" id="snoozeIncidentCancelButton"> $i18n.getText('ci.partials.snooze.incident.vm.button.cancel') </a>
+			        <button class="aui-button" type="button" id="snoozeIncidentCancelButton"> $i18n.getText('ci.partials.snooze.incident.vm.button.cancel') </button>
 				</div>
 		    </div>
 		</div>

@@ -16,6 +16,9 @@ AJS.$(function () {
  */
 function snoozeIncidentController() {
     AJS.$(document).ready( function() {
+        // initialize the url bases
+        jiraService.startService();
+        // important
         var jiraIssueId = AJS.$('#jiraIssueId').val();
         var issue = jiraService.Issue().getById( jiraIssueId );
 
@@ -44,23 +47,39 @@ function snoozeIncidentController() {
 
                         var expirationOptions = {
                             "tomorrow": 86400,
-                            "two_days": 86400,
+                            "two_days": 172800,
                             "next_week": 604800,
-                            "two_weeks": 2592000
+                            "two_weeks": 1209600
                         };
 
                         var expirationTS = AUIUtils.todayToTimestamp() + ( expirationOptions[snoozeUntil] * 1000 );
 
                         if( incidentIdCustomName != null )
                         {
-                            JIRA.Messages.showSuccessMsg( "Development In progress" );
-                            // TODO handle the logic to snooze incidents
-                            // posible msg to use
-                            // ci.partials.snooze.incident.js.msg.error.issue.not.found =Error. We could not find the selected incident.
-                            // ci.partials.snooze.incident.js.msg.error.issue.not.snoozed =Error. We could not mark the incident as snoozed.
-                            // ci.partials.snooze.incident.js.msg.success.snoozed =Snoozed
-                            // ci.partials.snooze.incident.js.msg.success.comment.snoozed =CI Plugin Bot: The incident was snoozed
-                            // ci.partials.snooze.incident.js.msg.close.issue =CI Plugin Bot: The incident was closed.
+                            var incidentId =  data.fields[ incidentIdCustomName ];
+                            var paiload = {
+                                incident: incidentId,
+                                period_ms: expirationTS,
+                                reason_code: this.snoozeUntil,
+                                notes: this.snoozeComment,
+                            };
+                            var irisSnooze = irisService.snoozeIncident( paiload);
+
+                            irisSnooze.success( function( data ){
+                                JIRA.Dialogs.snoozeIncidentIssue.hide();
+                                JIRA.Messages.showSuccessMsg(  AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.snoozed") );
+                                jiraService.Issue().comment( jiraIssueId, AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.comment.snoozed")+" "+snoozeComment).done(function(){
+                                    var transaction = jiraService.Issue().doTransition( jiraIssueId, 'close', AJS.I18n.getText("ci.partials.snooze.incident.js.msg.close.issue"));
+
+                                    transaction.done( function(){
+                                        JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                    });
+                                });
+                            });
+
+                            irisSnooze.error( function( data ){
+                                JIRA.Messages.showErrorMsg( AJS.I18n.getText("ci.partials.snooze.incident.js.msg.error.issue.not.snoozed") );
+                            });
                         }
                     });
                 });

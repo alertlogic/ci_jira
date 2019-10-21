@@ -44,8 +44,7 @@ public class SnoozeIncidentServlet extends HttpServlet{
     	String pluginKey = CommonJiraPluginUtils.getPluginKey(pluginRetrievalService);
 
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
-        // TODO load incident service
-        // pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
+        pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":snoozeIncidentController");
     }
 

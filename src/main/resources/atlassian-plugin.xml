@@ -246,6 +246,7 @@
         <resource type="download" name="AUIUtilsService.js"             location="/js/services/AUIUtilsService.js" />
         <resource type="download" name="EnvironmentsService.js"         location="/js/services/EnvironmentsService.js" />
         <resource type="download" name="RemediationsService.js"         location="/js/services/RemediationsService.js" />
+        <resource type="download" name="IrisService.js"                 location="/js/services/IrisService.js" />
         <resource type="download" name="DashboardService.js"            location="/js/services/DashboardService.js" />
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
