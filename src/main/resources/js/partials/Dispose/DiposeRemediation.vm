@@ -56,7 +56,7 @@
 				</form>
 				<div class="button-align-right">
 			       	<button class="aui-button aui-button-primary" type="button" id="disposeRemediationButton"> $i18n.getText('ci.partials.dispose.vm.button.dispose') </button>
-			        <button class="aui-button" type="button" id="disposeCancelButton"> $i18n.getText('ci.partials.dispose.vm.button.cancel') </a>
+			        <button class="aui-button" type="button" id="disposeCancelButton"> $i18n.getText('ci.partials.dispose.vm.button.cancel') </button>
 				</div>
 		    </div>
 		</div>
