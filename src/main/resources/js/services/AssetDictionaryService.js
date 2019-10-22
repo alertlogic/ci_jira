@@ -364,6 +364,24 @@ var AssetDictionaryService = function() {
             getTypeName: function() {
                 return gettext( "Redshift Cluster" );
             }
+        },
+
+        "deployment" : {
+            getTypeName: function() {
+                return gettext( "Deployment" );
+            }
+        },
+
+        "category" : {
+            getTypeName: function() {
+                return gettext( "Category" );
+            }
+        },
+
+        "group" : {
+            getTypeName: function() {
+                return gettext( "Group" );
+            }
         }
     };
 
