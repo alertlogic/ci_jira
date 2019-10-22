@@ -297,7 +297,7 @@ public class JIRAService {
      * @return JSONObject with a log and if it was success or not
      * @throws Exception
      */
-    public void createIncidentIssue(String summary, String description, long projectID,  String incidentId, String jiraGroup, String level, String userName) throws Exception {
+    public void createIncidentIssue(String summary, String description, long projectID,  String incidentId, String accountId,String jiraGroup, String level, String userName) throws Exception {
 
         Project project = getProject(projectID);
 
@@ -307,13 +307,15 @@ public class JIRAService {
 
         //Get values of customs and issue type configured for cloud insight
         IssueType incidentIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.incidentsProduct );
-        CustomField incidentIdCustomField =screenConfigService.getIncidentIdCustomField();
+        CustomField incidentIdCustomField = screenConfigService.getIncidentIdCustomField();
+        CustomField accountIdCustomField = screenConfigService.getAccountIdCustomField();
 
         //setting values
         IssueInputParameters issueInputParameters = createBaseIssueInputParameters( summary, description, project, incidentIssueType, jiraGroup, level);
 
         // adding data for remediations
         issueInputParameters.addCustomFieldValue( incidentIdCustomField.getId(), incidentId);
+        issueInputParameters.addCustomFieldValue( accountIdCustomField.getId(), accountId);
         //Perform the validation and create the issue
         createValidationResultData( user, issueInputParameters);
     }
