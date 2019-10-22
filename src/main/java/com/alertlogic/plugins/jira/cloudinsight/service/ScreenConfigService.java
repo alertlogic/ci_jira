@@ -62,6 +62,7 @@ public class ScreenConfigService {
     private String GENERIC_NAME_SCREEN;
     private String REMEDIATION_ITEM_CUSTOM_FIELD_NAME;
 	private String REMEDIATION_ID_CUSTOM_FIELD_NAME;
+	private String ACCOUNT_ID_CUSTOM_FIELD_NAME;
 	private String INCIDENT_ID_CUSTOM_FIELD_NAME;
 	private String GROUP_CUSTOM_FIELD_NAME;
 	private static final Logger log = LoggerFactory.getLogger(ScreenConfigService.class);
@@ -166,6 +167,16 @@ public class ScreenConfigService {
 				 "com.atlassian.jira.plugin.system.customfieldtypes:textsearcher");
 	}
 
+	/**
+	 * Get an account id Custom Field (create or get)
+	 * @throws GenericEntityException
+	 * @return CustomField
+	 */
+	public CustomField getAccountIdCustomField() throws Exception{
+		return createCustomField(ACCOUNT_ID_CUSTOM_FIELD_NAME,
+				 "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield",
+				 "com.atlassian.jira.plugin.system.customfieldtypes:textsearcher");
+	}
 	/**
 	 * Get a remediation Custom Field (only if it exits)
 	 * @return	CustomField The custom field to return
@@ -272,6 +283,7 @@ public class ScreenConfigService {
 		REMEDIATION_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationId");
 		REMEDIATION_ITEM_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.remediationItem");
 		INCIDENT_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.incidentId");
+		ACCOUNT_ID_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.accountId");
 		GROUP_CUSTOM_FIELD_NAME = i18n.getText("ci.constant.custom.groupAssigned");
 		GENERIC_NAME_SCREEN = i18n.getText("ci.constant.screen.name");
 	}
@@ -438,15 +450,17 @@ public class ScreenConfigService {
 			}
 			if( product.equals(incidentsProduct) ){
 				CustomField incidentIdCustomField = getIncidentIdCustomField();
+				CustomField accountIdCustomField = getAccountIdCustomField();
 
 				fieldsCreateScreen[5] = incidentIdCustomField.getId();//250 characters is the limit
-				fieldsCreateScreen[6] = groupCustomField.getId();
+				fieldsCreateScreen[6] = accountIdCustomField.getId();//250 characters is the limit
+				fieldsCreateScreen[7] = groupCustomField.getId();
 			}
 			//fieldsCreateScreen[8] = IssueFieldConstants.CREATOR;
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("CI Plugin: get Fiel screen");
+			log.error("CI Plugin: get Field screen");
 		}
 
 		return fieldsCreateScreen;
@@ -534,7 +548,6 @@ public class ScreenConfigService {
 	 * Create a custom schema for a product
 	 */
 	public FieldScreenScheme createCustomSchema(String product, Project project){
-		assigValuesToVariables();
 		log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.field") );
 
 		String[] fieldsCreateScreen = getFieldsCreateScreen(product);
@@ -567,6 +580,7 @@ public class ScreenConfigService {
 	public void configProject(Project project,String product) throws Exception{
 
 		if( !hasIssueTypeConfigurated(project, product) ){
+			assigValuesToVariables();
 			log.debug( i18n.getText("ci.service.screen.msg.log.debug.get.project.config") );
 
 			FieldConfigScheme fieldConfigScheme = ComponentAccessor.getIssueTypeSchemeManager().getConfigScheme( project );
@@ -598,6 +612,16 @@ public class ScreenConfigService {
 
 		// creating issue type and schemes
 		log.debug("CI Plugin: Creating issue type scheme");
+		// create field
+		log.debug("CI Plugin: Creating types");
+		assigValuesToVariables();
+		CustomField remediationItemCustomField = getRemediationItemCustomField();
+		CustomField remediationIdCustomField = getRemediationIdCustomField();
+		CustomField incidentIdCustomField = getIncidentIdCustomField();
+		CustomField accountIdCustomField = getAccountIdCustomField();
+		CustomField groupCustomField = getGroupCustomField();
+		log.debug("CI Plugin: Creating types end");
+		// end of creating fields
 
 		// for remediations
 			String product = remediationsProduct;

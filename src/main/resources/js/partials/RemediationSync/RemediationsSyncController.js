@@ -285,6 +285,8 @@ AJS.$(document).ready(
 				AUIUtils.addOptions( "#filter-types", filtersTypeList, "type", "displayName" );
 
 				AJS.$( "#filter-types" ).val(previousVal).trigger("change");
+				// refresh the filter selected to show the proper color.
+				self.updateSelectedFilterList();
 			};
 
 			/**
@@ -296,6 +298,9 @@ AJS.$(document).ready(
 				if (selectedFilters) {
 					for (var i = 0; i < selectedFilters.length; i++) {
 						if (selectedFilters[i].key === filter.key) {
+							// add threat_level information in filter selected.
+							selectedFilters[i].threat_level = filter.threat_level;
+
 							return true;
 						}
 
