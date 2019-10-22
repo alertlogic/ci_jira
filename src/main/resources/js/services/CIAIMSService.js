@@ -79,6 +79,9 @@ var CIAIMSService = function() {
         return AJS.$.ajax({
             type: "POST",
             url: urlBase,
+            data: JSON.stringify({
+                "label" : "Jira Add-on Access Key"
+            }),
             dataType: 'json',
             headers: {
                 "x-aims-auth-token":token
@@ -124,6 +127,32 @@ var CIAIMSService = function() {
             dataType: 'json',
             headers: {
                 "x-aims-auth-token": token
+            }
+        });
+    };
+
+     /**
+     * Retrieves only the managed active accounts for the specified account ID.
+     */
+    self.getManagedAccounts = function( urlEndPoint, accountId ) {
+        if ( !accountId ) {
+            throw new Error("Invalid call: AIMS account method may not be used without specifying the account ID." );
+        }
+
+        var urlBase =  urlEndPoint
+        +"/aims/" + configService.serviceVersion
+        +"/" + accountId
+        +"/accounts/managed";
+
+        return AJS.$.ajax({
+            type: "GET",
+            url: urlBase,
+            data: {
+                "active" : "true"
+            },
+            dataType: 'json',
+            headers: {
+                "x-aims-auth-token": ciAIMSService.getSessionData().token
             }
         });
     };
