@@ -421,4 +421,8 @@
     	<resource type="download" name="RemediationSyncDetailsController.js" location="/js/partials/RemediationSync/RemediationSyncDetailsController.js"/>
   	</web-resource>
 
+    <message-handler i18n-name-key="incidentMailHandler.name" key="demoHandler"
+                     class="com.alertlogic.plugins.jira.cloudinsight.IncidentMailHandler"
+                     add-edit-url="/secure/admin/EditHandlerDetailsUsingParams!default.jspa" weight="0"/>
+
 </atlassian-plugin>
