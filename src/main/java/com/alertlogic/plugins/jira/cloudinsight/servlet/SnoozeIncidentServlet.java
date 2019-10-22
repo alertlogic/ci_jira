@@ -41,35 +41,35 @@ public class SnoozeIncidentServlet extends HttpServlet{
      * Loads the web resources required by the dispose servlet.
      */
     private void loadWebResources() {
-    	String pluginKey = CommonJiraPluginUtils.getPluginKey(pluginRetrievalService);
+        String pluginKey = CommonJiraPluginUtils.getPluginKey(pluginRetrievalService);
 
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
+        pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
         pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":snoozeIncidentController");
+        pageBuilderService.assembler().resources().requireWebResource(pluginKey+":snoozeIncidentController");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
     {
-    	if (userManager != null) {
+        if (userManager != null) {
 
-	    	if (!CommonJiraPluginUtils.isAnAuthorizedJiraUser(req, userManager)) {
-				CommonJiraPluginUtils.unauthorize(res, templateRenderer);
-				return;
-		    }
+            if (!CommonJiraPluginUtils.isAnAuthorizedJiraUser(req, userManager)) {
+                CommonJiraPluginUtils.unauthorize(res, templateRenderer);
+                return;
+            }
 
-			loadWebResources();
+            loadWebResources();
 
-			Map<String, Object> context = Maps.newHashMap();
-			context.put("jiraIssueId",req.getParameter("id"));
+            Map<String, Object> context = Maps.newHashMap();
+            context.put("jiraIssueId",req.getParameter("id"));
 
-	        templateRenderer.render(CONFIG_BROWSER_TEMPLATE, context, res.getWriter());
-    	}
+            templateRenderer.render(CONFIG_BROWSER_TEMPLATE, context, res.getWriter());
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
     {
-    	doGet( req, res);
+        doGet( req, res);
     }
 }

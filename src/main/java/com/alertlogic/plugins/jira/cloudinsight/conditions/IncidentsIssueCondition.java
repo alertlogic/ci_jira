@@ -17,36 +17,36 @@ import com.atlassian.jira.user.ApplicationUser;
  */
 public class IncidentsIssueCondition extends AbstractIssueWebCondition {
 
-	private static final Logger log = LoggerFactory.getLogger(IncidentsIssueCondition.class);
-	private ScreenConfigService screenConfigService;
+    private static final Logger log = LoggerFactory.getLogger(IncidentsIssueCondition.class);
+    private ScreenConfigService screenConfigService;
 
-	public IncidentsIssueCondition(ScreenConfigService  screenConfigService) {
-		this.screenConfigService = screenConfigService;
-	}
+    public IncidentsIssueCondition(ScreenConfigService  screenConfigService) {
+        this.screenConfigService = screenConfigService;
+    }
 
-	@Override
-	public boolean shouldDisplay(ApplicationUser arg0, Issue arg1, JiraHelper arg2) {
-		try {
-			IssueType incidentsIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.incidentsProduct);
-			if (incidentsIssueType != null) {
-				//Is this issue an incidents issue type?
-				if (arg1.getIssueTypeId().equals(incidentsIssueType.getId())){
-					//Bring custom field names from properties.
-					screenConfigService.assigValuesToVariables();
+    @Override
+    public boolean shouldDisplay(ApplicationUser arg0, Issue arg1, JiraHelper arg2) {
+        try {
+            IssueType incidentsIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.incidentsProduct);
+            if (incidentsIssueType != null) {
+                //Is this issue an incidents issue type?
+                if (arg1.getIssueTypeId().equals(incidentsIssueType.getId())){
+                    //Bring custom field names from properties.
+                    screenConfigService.assigValuesToVariables();
 
-					//Validates that this issue has the required custom fields.
-					CustomField customField = screenConfigService.getIncidentCustomFieldIfExists();
-					if ( customField == null ) {
-						return false;
-					}
-					//OK this is a valid incident issue, show web components and incident stuff for this issue.
-					return true;
-				}
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage());
-		}
+                    //Validates that this issue has the required custom fields.
+                    CustomField customField = screenConfigService.getIncidentCustomFieldIfExists();
+                    if ( customField == null ) {
+                        return false;
+                    }
+                    //OK this is a valid incident issue, show web components and incident stuff for this issue.
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

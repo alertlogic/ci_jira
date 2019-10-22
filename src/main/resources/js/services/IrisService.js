@@ -19,7 +19,9 @@ var IrisService = function() {
             type: "POST",
             url: urlBase,
             dataType: 'json',
-            data: payload,
+            contentType: 'application/json',
+            processData: false,
+            data: JSON.stringify(payload),
             headers: {
             	"x-aims-auth-token":ciAIMSService.getSessionData().token
             }

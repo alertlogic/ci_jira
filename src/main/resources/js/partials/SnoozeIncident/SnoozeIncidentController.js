@@ -60,10 +60,10 @@ function snoozeIncidentController() {
                             var incidentId =  data.fields[ incidentIdCustomName ];
                             var accountId = data.fields[ accountIdCustomName ];
                             var payload = {
-                                incident: incidentId,
+                                incidents: [incidentId],
                                 period_ms: expirationTS,
-                                reason_code: this.snoozeUntil,
-                                notes: this.snoozeComment,
+                                reason_code: snoozeUntil,
+                                notes: snoozeComment,
                             };
                             var irisSnooze = irisService.snoozeIncident( accountId, payload);
 

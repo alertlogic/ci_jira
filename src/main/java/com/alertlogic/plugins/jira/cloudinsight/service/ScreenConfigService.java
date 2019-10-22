@@ -163,7 +163,8 @@ public class ScreenConfigService {
 	 */
 	public CustomField getIncidentIdCustomField() throws Exception{
 		return createCustomField(INCIDENT_ID_CUSTOM_FIELD_NAME,
-				 "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield",
+				 // "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield", // TODO + this is the correct
+				 "com.atlassian.jira.plugin.system.customfieldtypes:textfield", // TODO - remove this one this is temporal to test snooze
 				 "com.atlassian.jira.plugin.system.customfieldtypes:textsearcher");
 	}
 
@@ -174,7 +175,8 @@ public class ScreenConfigService {
 	 */
 	public CustomField getAccountIdCustomField() throws Exception{
 		return createCustomField(ACCOUNT_ID_CUSTOM_FIELD_NAME,
-				 "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield",
+				// "com.atlassian.jira.plugin.system.customfieldtypes:readonlyfield", // TODO + this is the correct
+				 "com.atlassian.jira.plugin.system.customfieldtypes:textfield",// TODO - remove this one this is temporal to test snooze
 				 "com.atlassian.jira.plugin.system.customfieldtypes:textsearcher");
 	}
 	/**

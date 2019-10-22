@@ -346,14 +346,14 @@
 
   	<!--with transitions-all give the position in the issue-->
   	<web-item section="transitions-all" weight="10" name="Dispose button on issue details" key="dipose_link">
-    	<label>Dispose</label>
-    	<conditions type="AND">
-		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightUserHasPermissionCondition"/>
-		</conditions>
-    	<link linkId="dispose_remediation">/plugins/servlet/disposeremediationservlet?id=${issue.id}</link>
-    	<styleClass>issueaction-dispose</styleClass>
+        <label>Dispose</label>
+        <conditions type="AND">
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightUserHasPermissionCondition"/>
+        </conditions>
+        <link linkId="dispose_remediation">/plugins/servlet/disposeremediationservlet?id=${issue.id}</link>
+        <styleClass>issueaction-dispose</styleClass>
     </web-item>
 
   	<web-item section="transitions-all" weight="10" name="Details" key="remedaition_details_link">
@@ -367,12 +367,12 @@
     	<styleClass>issueaction-showdetail</styleClass>
     </web-item>
 
-	<web-item section="transitions-all" weight="10" name="Snooze button on issue details" key="snooze_incident_link">
+    <web-item section="transitions-all" weight="10" name="Snooze button on issue details" key="snooze_incident_link">
         <label>Snooze</label>
         <conditions type="AND">
-		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
-		</conditions>
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
+        </conditions>
         <link linkId="snooze_incident">/plugins/servlet/snoozeincidentservlet?id=${issue.id}</link>
         <styleClass>issueaction-snooze</styleClass>
     </web-item>
