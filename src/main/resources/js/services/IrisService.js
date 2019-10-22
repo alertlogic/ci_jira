@@ -9,12 +9,10 @@ var IrisService = function() {
      *  @param incidentID
      *  @param payload
      */
-    self.snoozeIncident = function(
-                           payload
-                           ) {
+    self.snoozeIncident = function( accountId, payload ) {
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/iris/v2"
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+accountId
         +"/incident/snooze";
 
     	return jQuery.ajax({

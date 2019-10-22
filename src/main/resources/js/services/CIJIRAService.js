@@ -255,7 +255,8 @@ var CIJIRAService = function() {
                 if( storageService.getKey("field-remediation-item" ) == null ||
                     storageService.getKey("field-remediation-id" ) == null ||
                     storageService.getKey("field-group" ) == null ||
-                    storageService.getKey("field-incident-id" ) == null
+                    storageService.getKey("field-incident-id" ) == null ||
+                    storageService.getKey("field-account-id" ) == null
                 ){
                     self.Field().getAll().done( function( fields ) {
 
@@ -263,6 +264,7 @@ var CIJIRAService = function() {
                         var fieldRemediationId = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.remediationId"), fields);
                         var fieldGroupAssigned = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.groupAssigned"), fields);
                         var fieldIncidentId = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.incidentId"), fields);
+                        var fieldAccountId = self.Field().getIdByName( AJS.I18n.getText("ci.constant.custom.accountId"), fields);
 
                         if(fieldRemediationItem != null && fieldRemediationId != null)
                         {
@@ -277,6 +279,10 @@ var CIJIRAService = function() {
                         {
                             storageService.storeKey("field-incident-id", fieldIncidentId);
                         }
+                        if(fieldAccountId != null)
+                        {
+                            storageService.storeKey("field-account-id", fieldAccountId);
+                        }
                     });
                 }
             },
@@ -288,7 +294,8 @@ var CIJIRAService = function() {
                     "remediationId": storageService.getKey("field-remediation-id" ),
                     "remediationItem": storageService.getKey("field-remediation-item" ),
                     "group": storageService.getKey("field-group" ),
-                    "incidentId": storageService.getKey("field-incident-id" )
+                    "incidentId": storageService.getKey("field-incident-id" ),
+                    "accountId": storageService.getKey("field-account-id" )
                 };
             },
 

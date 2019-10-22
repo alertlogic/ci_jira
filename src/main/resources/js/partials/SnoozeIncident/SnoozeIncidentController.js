@@ -31,6 +31,7 @@ function snoozeIncidentController() {
                 var fields = jiraService.Field().getFields();
 
                 var incidentIdCustomName = fields.incidentId ;
+                var accountIdCustomName = fields.accountId ;
 
                 Bootstrap.onView("#snoozeIncidentCancelButton", function(){
                     AJS.$("#snoozeIncidentCancelButton").click(function(){
@@ -57,13 +58,14 @@ function snoozeIncidentController() {
                         if( incidentIdCustomName != null )
                         {
                             var incidentId =  data.fields[ incidentIdCustomName ];
-                            var paiload = {
+                            var accountId = data.fields[ accountIdCustomName ];
+                            var payload = {
                                 incident: incidentId,
                                 period_ms: expirationTS,
                                 reason_code: this.snoozeUntil,
                                 notes: this.snoozeComment,
                             };
-                            var irisSnooze = irisService.snoozeIncident( paiload);
+                            var irisSnooze = irisService.snoozeIncident( accountId, payload);
 
                             irisSnooze.success( function( data ){
                                 JIRA.Dialogs.snoozeIncidentIssue.hide();
