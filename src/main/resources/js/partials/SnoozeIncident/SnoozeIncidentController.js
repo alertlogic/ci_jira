@@ -22,8 +22,8 @@ function snoozeIncidentController() {
         var jiraIssueId = AJS.$('#jiraIssueId').val();
         var issue = jiraService.Issue().getById( jiraIssueId );
 
-        issue.done( function( data ){
-            var user = data.fields.reporter.name;
+        issue.done( function( issueData ){
+            var user = issueData.fields.reporter.name;
             var tomorrow = moment().add(1, 'days').hour(9).minute(0).second(0);
             var two_days = moment().add(2, 'days').hour(9).minute(0).second(0);
             var next_week = moment().weekday(8).hour(9).minute(0).second(0);
@@ -33,7 +33,7 @@ function snoozeIncidentController() {
                 var self = this;
 
                 var snoozeOptions = {
-                    // immediately: {description: "now, and cancel the snooze ", date_string:"" },
+                    immediately: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.immediately'), date_string:"" },
                     tomorrow: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.tomorrow'), date_string: tomorrow.format("H a") },
                     two_days: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.two_days') , date_string: two_days.format("dddd Do") },
                     next_week: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.next_week'), date_string: next_week.format("dddd Do") },
@@ -65,12 +65,12 @@ function snoozeIncidentController() {
                             "two_weeks": two_weeks
                         };
 
-                        var expirationTS =  ( expirationOptions[snoozeUntil].valueOf() - moment().valueOf());
+                        var expirationTS = snoozeUntil === "immediately" ? 0 : ( expirationOptions[snoozeUntil].valueOf() - moment().valueOf());
 
                         if( incidentIdCustomName != null )
                         {
-                            var incidentId =  data.fields[ incidentIdCustomName ];
-                            var accountId = data.fields[ accountIdCustomName ];
+                            var incidentId =  issueData.fields[ incidentIdCustomName ];
+                            var accountId = issueData.fields[ accountIdCustomName ];
                             var payload = {
                                 incidents: [incidentId],
                                 period_ms: expirationTS,
@@ -79,16 +79,33 @@ function snoozeIncidentController() {
                             };
                             var irisSnooze = irisService.snoozeIncident( accountId, payload);
 
-                            irisSnooze.success( function( data ){
+                            irisSnooze.success( function( irisData ){
                                 JIRA.Dialogs.snoozeIncidentIssue.hide();
-                                JIRA.Messages.showSuccessMsg(  AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.snoozed") );
-                                jiraService.Issue().comment( jiraIssueId, AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.comment.snoozed")+" "+snoozeComment).done(function(){
-                                    var transaction = jiraService.Issue().doTransition( jiraIssueId, 'close', AJS.I18n.getText("ci.partials.snooze.incident.js.msg.close.issue"));
+                                if(snoozeUntil !== "immediately"){
+                                    JIRA.Messages.showSuccessMsg(  AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.snoozed") );
+                                    jiraService.Issue().comment( jiraIssueId, AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.comment.snoozed")+" "+snoozeComment).done(function(){
 
-                                    transaction.done( function(){
-                                        JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                        if( issueData.fields["status"].name !== "Closed" ){
+                                            var transaction = jiraService.Issue().doTransition( jiraIssueId, 'close', AJS.I18n.getText("ci.partials.snooze.incident.js.msg.close.issue"));
+
+                                            transaction.done( function(){
+                                                JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                            });
+                                        }
                                     });
-                                });
+                                } else {
+                                    JIRA.Messages.showSuccessMsg(  AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.unsnoozed") );
+                                    jiraService.Issue().comment( jiraIssueId, AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.comment.unsnoozed")+" "+snoozeComment).done(function(){
+
+                                        if( issueData.fields["status"].name === "Closed" ){
+                                            var transaction = jiraService.Issue().doTransition( jiraIssueId, 're-open', AJS.I18n.getText("ci.partials.snooze.incident.js.msg.success.comment.unsnoozed"));
+
+                                            transaction.done( function(){
+                                                JIRA.trigger(JIRA.Events.REFRESH_ISSUE_PAGE, [JIRA.Issue.getIssueId()]);
+                                            });
+                                        }
+                                    });
+                                }
                             });
 
                             irisSnooze.error( function( data ){
@@ -97,7 +114,7 @@ function snoozeIncidentController() {
                         }
                     });
                 });
-                //loading
+
                 Bootstrap.onView("#snoozeMsg", function(){
 
                     if( incidentIdCustomName != null )
@@ -116,15 +133,17 @@ function snoozeIncidentController() {
 
                 self.loadOptions = function() {
                     var selectElement = AJS.$("#snoozeUntil");
-                    //clearSelect;
+                    if( issueData.fields["status"].name === "Closed" ){
+                        AUIUtils.addSelectOption( selectElement, 'immediately', snoozeOptions.immediately.description);
+                    }
                     AUIUtils.addSelectOption( selectElement, 'tomorrow', snoozeOptions.tomorrow.description + snoozeOptions.tomorrow.date_string);
                     AUIUtils.addSelectOption( selectElement, 'two_days', snoozeOptions.two_days.description + snoozeOptions.two_days.date_string);
                     AUIUtils.addSelectOption( selectElement, 'next_week', snoozeOptions.next_week.description + snoozeOptions.next_week.date_string);
                     AUIUtils.addSelectOption( selectElement, 'two_weeks', snoozeOptions.two_weeks.description + snoozeOptions.two_weeks.date_string);
-                    //selectElement.select('val','tomorrow');
                     selectElement.val($("#snoozeUntil option:first").val());
                 }
                 loadOptions();
+
             });
         });
 

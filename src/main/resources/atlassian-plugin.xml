@@ -370,7 +370,6 @@
     <web-item section="transitions-all" weight="10" name="Snooze button on issue details" key="snooze_incident_link">
         <label>Snooze</label>
         <conditions type="AND">
-            <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
             <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
         </conditions>
         <link linkId="snooze_incident">/plugins/servlet/snoozeincidentservlet?id=${issue.id}</link>
