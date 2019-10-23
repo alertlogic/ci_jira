@@ -24,9 +24,21 @@ function snoozeIncidentController() {
 
         issue.done( function( data ){
             var user = data.fields.reporter.name;
+            var tomorrow = moment().add(1, 'days').hour(9).minute(0).second(0);
+            var two_days = moment().add(2, 'days').hour(9).minute(0).second(0);
+            var next_week = moment().weekday(8).hour(9).minute(0).second(0);
+            var two_weeks = moment().weekday(15).hour(9).minute(0).second(0);
 
             Bootstrap.start( user, function(){
                 var self = this;
+
+                var snoozeOptions = {
+                    // immediately: {description: "now, and cancel the snooze ", date_string:"" },
+                    tomorrow: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.tomorrow'), date_string: tomorrow.format("H a") },
+                    two_days: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.two_days') , date_string: two_days.format("dddd Do") },
+                    next_week: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.next_week'), date_string: next_week.format("dddd Do") },
+                    two_weeks: {description: AJS.I18n.getText('ci.partials.snooze.incident.vm.until.two_weeks'), date_string: two_weeks.format("dddd Do") },
+                };
 
                 var fields = jiraService.Field().getFields();
 
@@ -47,13 +59,13 @@ function snoozeIncidentController() {
                         var snoozeComment = AJS.$('#snoozeComment').val() == "" ? AJS.I18n.getText("ci.partials.snooze.incident.js.comment.no") : AJS.$('#snoozeComment').val();
 
                         var expirationOptions = {
-                            "tomorrow": 86400,
-                            "two_days": 172800,
-                            "next_week": 604800,
-                            "two_weeks": 1209600
+                            "tomorrow": tomorrow,
+                            "two_days": two_days,
+                            "next_week": next_week,
+                            "two_weeks": two_weeks
                         };
 
-                        var expirationTS = AUIUtils.todayToTimestamp() + ( expirationOptions[snoozeUntil] * 1000 );
+                        var expirationTS =  ( expirationOptions[snoozeUntil].valueOf() - moment().valueOf());
 
                         if( incidentIdCustomName != null )
                         {
@@ -101,6 +113,18 @@ function snoozeIncidentController() {
                         }
                     }
                 });
+
+                self.loadOptions = function() {
+                    var selectElement = AJS.$("#snoozeUntil");
+                    //clearSelect;
+                    AUIUtils.addSelectOption( selectElement, 'tomorrow', snoozeOptions.tomorrow.description + snoozeOptions.tomorrow.date_string);
+                    AUIUtils.addSelectOption( selectElement, 'two_days', snoozeOptions.two_days.description + snoozeOptions.two_days.date_string);
+                    AUIUtils.addSelectOption( selectElement, 'next_week', snoozeOptions.next_week.description + snoozeOptions.next_week.date_string);
+                    AUIUtils.addSelectOption( selectElement, 'two_weeks', snoozeOptions.two_weeks.description + snoozeOptions.two_weeks.date_string);
+                    //selectElement.select('val','tomorrow');
+                    selectElement.val($("#snoozeUntil option:first").val());
+                }
+                loadOptions();
             });
         });
 

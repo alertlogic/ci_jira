@@ -33,10 +33,6 @@
                     <div class="field-group">
                         <label for="select-until"> $i18n.getText('ci.partials.snooze.incident.vm.until.label') </label>
                         <select class="select" id="snoozeUntil" name="snoozeUntil">
-                            <option value="tomorrow"> $i18n.getText('ci.partials.snooze.incident.vm.until.tomorrow') </option>
-                            <option value="two_days"> $i18n.getText('ci.partials.snooze.incident.vm.until.two_days') </option>
-                            <option value="next_week"> $i18n.getText('ci.partials.snooze.incident.vm.until.next_week') </option>
-                            <option value="two_weeks"> $i18n.getText('ci.partials.snooze.incident.vm.until.two_weeks') </option>
                          </select>
                     </div>
 
