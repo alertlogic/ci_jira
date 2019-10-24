@@ -65,8 +65,6 @@ var RulesService = function() {
             "option": "create"
         };
 
-        console.log("Create Rule data:",data);
-
         return jQuery.ajax({
             type: "PUT",
             url: urlProxyServlet,

@@ -25,9 +25,6 @@ import com.atlassian.templaterenderer.TemplateRenderer;
 import com.atlassian.webresource.api.assembler.PageBuilderService;
 import com.google.common.collect.Maps;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This servlet is for providing the basic operation
  * for handle the rules configuration
@@ -35,7 +32,6 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class RuleConfigurationServlet extends HttpServlet{
 
-    private static final Logger log = LoggerFactory.getLogger(RuleConfigurationServlet.class);
     private static final String VM_TEMPLATE = "/js/partials/RuleConfiguration/RuleConfigurationPage.vm";
     private PageBuilderService pageBuilderService;
     private PluginRetrievalService pluginRetrievalService;
