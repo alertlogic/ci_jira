@@ -6,7 +6,7 @@ var IrisService = function() {
 
     /**
      * Snooze an incidents
-     *  @param incidentID
+     *  @param accountId
      *  @param payload
      */
     self.snoozeIncident = function( accountId, payload ) {
@@ -22,6 +22,28 @@ var IrisService = function() {
             contentType: 'application/json',
             processData: false,
             data: JSON.stringify(payload),
+            headers: {
+            	"x-aims-auth-token":ciAIMSService.getSessionData().token
+            }
+        });
+    }
+
+    /**
+     * Get one incident by id
+     *  @param accountId
+     *  @param incidentId
+     */
+    self.getIncidentById = function( accountId, incidentId ) {
+        var urlBase = ciAIMSService.getSessionData().endpoint
+        +"/iris/v2"
+        +"/"+accountId
+        +"/"+incidentId
+        +"/incident/fetch?legacyQuery=true";
+
+    	return jQuery.ajax({
+            type: "GET",
+            url: urlBase,
+            dataType: 'json',
             headers: {
             	"x-aims-auth-token":ciAIMSService.getSessionData().token
             }
