@@ -47,7 +47,6 @@ import com.atlassian.jira.scheme.Scheme;
 import com.atlassian.jira.workflow.JiraWorkflow;
 import com.atlassian.jira.workflow.WorkflowSchemeManager;
 import com.atlassian.sal.api.message.I18nResolver;
-
 /**
  * Create an screen and associate it to a project.
  */
@@ -432,7 +431,7 @@ public class ScreenConfigService {
 	 * @return String[] array with fields
 	 */
 	public String[] getFieldsCreateScreen(String product){
-		String[] fieldsCreateScreen = new String[8];
+		String[] fieldsCreateScreen = new String[9];
 
 		try {
 			CustomField groupCustomField = getGroupCustomField();
@@ -442,20 +441,21 @@ public class ScreenConfigService {
 			fieldsCreateScreen[2] = IssueFieldConstants.DESCRIPTION;
 			fieldsCreateScreen[3] = IssueFieldConstants.STATUS;
 			fieldsCreateScreen[4] = IssueFieldConstants.ASSIGNEE;
+
+			CustomField accountIdCustomField = getAccountIdCustomField();
+			fieldsCreateScreen[5] = accountIdCustomField.getId();//250 characters is the limit
+
 			if( product.equals(remediationsProduct) ){
 				CustomField remediationItemCustomField = getRemediationItemCustomField();
 				CustomField remediationIdCustomField = getRemediationIdCustomField();
 
-				fieldsCreateScreen[5] = remediationItemCustomField.getId();//250 characters is the limit
-				fieldsCreateScreen[6] = remediationIdCustomField.getId();
-				fieldsCreateScreen[7] = groupCustomField.getId();
+				fieldsCreateScreen[6] = remediationItemCustomField.getId();//250 characters is the limit
+				fieldsCreateScreen[7] = remediationIdCustomField.getId();
+				fieldsCreateScreen[8] = groupCustomField.getId();
 			}
 			if( product.equals(incidentsProduct) ){
 				CustomField incidentIdCustomField = getIncidentIdCustomField();
-				CustomField accountIdCustomField = getAccountIdCustomField();
-
-				fieldsCreateScreen[5] = incidentIdCustomField.getId();//250 characters is the limit
-				fieldsCreateScreen[6] = accountIdCustomField.getId();//250 characters is the limit
+				fieldsCreateScreen[6] = incidentIdCustomField.getId();//250 characters is the limit
 				fieldsCreateScreen[7] = groupCustomField.getId();
 			}
 			//fieldsCreateScreen[8] = IssueFieldConstants.CREATOR;

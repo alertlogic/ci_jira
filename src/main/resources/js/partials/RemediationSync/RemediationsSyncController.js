@@ -903,6 +903,7 @@ AJS.$(document).ready(
                         var remediation = self.getRemediation( plannedItems[i].properties.remediation_id );
 
                         jiraService.Issue().create(
+                            actingAccountId,
                             AUIUtils.formatSummary( remediation.name ),
                             descriptionsArray[ remediation.remediation_id ],
                             project,

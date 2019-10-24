@@ -261,7 +261,7 @@ public class JIRAService {
      * @return JSONObject with a log and if it was success or not
      * @throws Exception
      */
-    public void createRemediationIssue(String summary, String description, long projectID, String remediationItem, String remediationId, String jiraGroup, String level, String userName) throws Exception {
+    public void createRemediationIssue(String accountId, String summary, String description, long projectID, String remediationItem, String remediationId, String jiraGroup, String level, String userName) throws Exception {
 
         Project project = getProject(projectID);
 
@@ -273,6 +273,7 @@ public class JIRAService {
         IssueType ciIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.remediationsProduct );
         CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
         CustomField remediationIdCustomField =screenConfigService.getRemediationIdCustomField();
+        CustomField accountIdCustomField =screenConfigService.getAccountIdCustomField();
 
         //setting values
         IssueInputParameters issueInputParameters = createBaseIssueInputParameters( summary, description, project, ciIssueType, jiraGroup, level);
@@ -280,6 +281,8 @@ public class JIRAService {
         // adding data for remediations
         issueInputParameters.addCustomFieldValue( remediationItemCustomField.getId(), remediationItem);
         issueInputParameters.addCustomFieldValue( remediationIdCustomField.getId(), remediationId);
+        issueInputParameters.addCustomFieldValue( accountIdCustomField.getId(), accountId);
+
         //Perform the validation and create the issue
         createValidationResultData( user, issueInputParameters);
     }
