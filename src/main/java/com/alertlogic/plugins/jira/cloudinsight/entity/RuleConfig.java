@@ -13,6 +13,8 @@ import java.util.Date;
  */
 @Preload
 public interface RuleConfig extends Entity{
+	public String getActingAccountId();
+	public void setActingAccountId( String actingAccountId);
 
 	public void setName( String name );
 	public String getName();

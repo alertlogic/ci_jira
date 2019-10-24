@@ -9,19 +9,19 @@ var EnvironmentsService = function() {
      * @param  {Function} callback The callback function
      * 
      */
-    self.listEnvironments =  function(callback,callbackError) {
+    self.listEnvironments =  function(accountId,callback,callbackError) {
 
-    	var urlBase = ciAIMSService.getSessionData().endpoint
-    	+"/sources/"+configService.serviceVersion
-    	+"/"+ciAIMSService.getSessionData().accountId
-    	+"/sources?source.config.aws.defender_support=!true&source.config.azure.defender_support=!true&source.config.datacenter.defender_support=!true&source.type=environment&source.config.collection_type=aws,azure,datacenter&source.config.collection_method=api";
+        var urlBase = ciAIMSService.getSessionData().endpoint
+        +"/sources/"+configService.serviceVersion
+        +"/"+accountId
+        +"/sources?source.config.aws.defender_support=!true&source.config.azure.defender_support=!true&source.config.datacenter.defender_support=!true&source.type=environment&source.config.collection_type=aws,azure,datacenter&source.config.collection_method=api";
 
         AJS.$.ajax({
             type: "GET",
             url: urlBase,
             dataType: 'json',
             headers: {
-            	"x-aims-auth-token":ciAIMSService.getSessionData().token
+                "x-aims-auth-token":ciAIMSService.getSessionData().token
             },
             beforeSend: function (xhr) {
                 xhr.setRequestHeader ("x-aims-auth-token",ciAIMSService.getSessionData().token);

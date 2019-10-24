@@ -121,6 +121,12 @@ AJS.$(document).ready(
 						action: action
 					},
 					{
+						header: "header-account",
+						data: rule.aaid,
+						style: 'row_pointer',
+						action: action
+					},
+					{
 						header: "header-project",
 						data: self.getProjectName( rule.project ),
 						style: 'row_pointer',
@@ -165,17 +171,18 @@ AJS.$(document).ready(
 			 * @return {String} html
 			 */
 			self.getBasicRule = function( rule ){
-				var bascihtml = "<div>";
+				var basichtml = "<div>";
 
-				bascihtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.name") + " : " + rule.name + "<br>";
-				bascihtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.environment") + " : " + rule.environment + "<br>";
-				bascihtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.group") + " : " + rule.group + "<br>";
-				bascihtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.user") + " : " + rule.user + "<br>";
+				basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.name") + " : " + rule.name + "<br>";
+				basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.environment") + " : " + rule.environment + "<br>";
+				basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.account") + " : " + rule.aaid + "<br>";
+				basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.group") + " : " + rule.group + "<br>";
+				basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.user") + " : " + rule.user + "<br>";
 				if(rule.hasOwnProperty('lastExecution')){
-					bascihtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.lastExecution") + " : " + rule.lastExecution + "<br>";
+					basichtml += AJS.I18n.getText("ci.partials.ruleconfiguration.vm.header.lastExecution") + " : " + rule.lastExecution + "<br>";
 				}
-				bascihtml += "</div>";
-				return bascihtml;
+				basichtml += "</div>";
+				return basichtml;
 			};
 
 			/**
@@ -472,7 +479,7 @@ AJS.$(document).ready(
 				groups = [];
 				rules = [];
 
-				environmentsService.listEnvironments( function( data ){
+				environmentsService.listEnvironments(  ciAIMSService.getSessionData().accountId, function( data ){
 					for (var i = 0; i < data.length; i++) {
 						environments[ data[i].id ] = data[i].name;
 					}

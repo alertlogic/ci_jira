@@ -39,9 +39,9 @@ public class RemediationsService {
      * @return	JSONObject 		Get the information of a remediation item.
 	 * @throws Exception
      */
-    public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser) throws Exception{
+    public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
 
-    	restUtil.setupAuthetication( jiraUser );
+		restUtil.setupAuthetication( jiraUser, actingAccountId );
     	String urlBase = restUtil.urlEndPointAsset;
     	ClientResponse responseGetRemediationItem;
 
@@ -68,8 +68,8 @@ public class RemediationsService {
      * @param  {String} environment The environment to query
      * @throws Exception
      */
-    public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser ) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
+    public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser, String actingAccountId ) throws Exception {
+		restUtil.setupAuthetication( jiraUser, actingAccountId);
     	String urlBase = restUtil.urlEndPointAsset;
     	ClientResponse responseGetRemediationItem;
 
@@ -94,8 +94,8 @@ public class RemediationsService {
      * CI return  remediations and the filters
      * @throws Exception
      */
-    public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser ) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
+    public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser, String actingAccountId ) throws Exception {
+		restUtil.setupAuthetication( jiraUser, actingAccountId );
     	String urlBase = restUtil.urlEndPointAsset ;
     	ClientResponse response;
 
@@ -166,8 +166,8 @@ public class RemediationsService {
      * Plan a set of remediations
 	 * @throws Exception 
      */
-    public JSONArray planRemediations( String environment, JSONArray remediationsKeys, JSONArray filters, String jiraUser) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
+    public JSONArray planRemediations( String environment, JSONArray remediationsKeys, JSONArray filters, String jiraUser, String actingAccountId) throws Exception {
+		restUtil.setupAuthetication( jiraUser, actingAccountId);
     	String urlBase = restUtil.urlEndPointAsset;
 
         JSONObject payload = new JSONObject();
@@ -193,7 +193,7 @@ public class RemediationsService {
      	}
 
      	return null;
-    }
+	}
 
     /**
      * This method mark as complete a remediation in CI.
@@ -202,11 +202,11 @@ public class RemediationsService {
      * @return Boolean			True if the remediation was completed.
      * @throws Exception
      */
-    public Boolean markAsComplete(String env,String remediationItem, String jiraUser) throws Exception{
-    	restUtil.setupAuthetication( jiraUser );
+    public Boolean markAsComplete(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
+		restUtil.setupAuthetication( jiraUser , actingAccountId);
     	String urlBase = restUtil.urlEndPointAsset;
 
-    	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
+		JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser, actingAccountId);
     	String status = getStatusRemediationItem( remediationsItemResponse , remediationItem);
  		log.debug("CI Plugin: Status CI : "+status);
 
@@ -279,11 +279,11 @@ public class RemediationsService {
      * @return	Boolean			True if the undipose call was successfull
      * @throws Exception 
      */
-    public Boolean unDipose(String env,String remediationItem, String jiraUser) throws Exception{
-    	restUtil.setupAuthetication( jiraUser );
+    public Boolean unDipose(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
+		restUtil.setupAuthetication( jiraUser, actingAccountId );
     	String urlBase = restUtil.urlEndPointAsset;
 
-    	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
+		JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser, actingAccountId);
     	String status = getStatusRemediationItem( remediationsItemResponse, remediationItem );
 
     	ClientResponse responseUndispose;
@@ -364,8 +364,8 @@ public class RemediationsService {
      * @return JSONObject with remediations descriptions
      * @throws Exception
      */
-    public JSONObject getRemediationsDescriptions(String jiraUser) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
+    public JSONObject getRemediationsDescriptions(String jiraUser, String actingAccountId) throws Exception {
+		restUtil.setupAuthetication( jiraUser, actingAccountId);
     	String urlBase = restUtil.urlEndPointRemediation;
 
         ClientResponse response;

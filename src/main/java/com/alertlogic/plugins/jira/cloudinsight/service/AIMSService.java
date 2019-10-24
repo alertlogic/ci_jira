@@ -81,7 +81,7 @@ public class AIMSService {
 
     	String accessKeyId = credential.getCiAccessKeyId();
     	try {
-        	restUtil.setupAuthetication(credential);
+			restUtil.setupAuthetication(credential,"");
 	    	String urlBase = restUtil.urlEndPointAccessKey;
 
 	    	ClientResponse responseDelete;

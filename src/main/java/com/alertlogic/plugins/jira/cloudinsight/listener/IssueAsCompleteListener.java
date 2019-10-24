@@ -82,7 +82,7 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 				try{
 					String environment = remediationItem.split("/")[2].split(":")[1];
 					log.debug("CI Plugin: Reporter : "+reporter);
-					if (remediationService.markAsComplete( environment, remediationItem, reporter))
+					if (remediationService.markAsComplete( environment, remediationItem, reporter, ""))
 					{
 						log.debug("CI Plugin: adding comment to issue");
 						String commentMsg = i18nResolver.getText("ci.listener.markascomplete.msg.success");
@@ -90,8 +90,8 @@ public class IssueAsCompleteListener  extends AbstractIssueEventListener
 
 					} else {
 
-						JSONObject remediationsItemResponse = remediationService.getRemediationItem( environment, remediationItem, reporter);
-				    	String remediationStatus = remediationService.getStatusRemediationItem( remediationsItemResponse, remediationItem );
+						JSONObject remediationsItemResponse = remediationService.getRemediationItem( environment, remediationItem, reporter, "");
+						String remediationStatus = remediationService.getStatusRemediationItem( remediationsItemResponse, remediationItem);
 
 				    	if(!remediationStatus.equals("disposed"))
 						{

@@ -11,6 +11,12 @@
 
 		<h1>$i18n.getText('ci.partials.remediationssync.vm.title')</h1>
 
+		<div class="aui aui-spacing">
+		    $i18n.getText('ci.partials.common.vm.select.account'):
+
+            <select id="select-account" class="select-medium" size="1"></select>
+		</div>
+
         <div class="aui">
             $i18n.getText('ci.partials.remediationssync.vm.environment.select'):
 

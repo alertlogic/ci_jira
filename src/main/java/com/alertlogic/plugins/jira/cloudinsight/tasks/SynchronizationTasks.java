@@ -23,213 +23,213 @@ import com.atlassian.sal.api.scheduling.PluginJob;
  *	Jira issues and Cloud insight remediations.
  */
 public class SynchronizationTasks implements PluginJob {
-	private static final Logger log = LoggerFactory.getLogger(SynchronizationTasks.class);
+    private static final Logger log = LoggerFactory.getLogger(SynchronizationTasks.class);
 
-	private RemediationsService remediationsService;
-	private EnvironmentsService environmentsService;
-	private SynchronizationScheduledImpl monitor;
-	private long timeWait = 20000L;
+    private RemediationsService remediationsService;
+    private EnvironmentsService environmentsService;
+    private SynchronizationScheduledImpl monitor;
+    private long timeWait = 20000L;
 
-	@Override
-	public void execute(Map<String, Object> jobDataMap) {
-		//Get the reference to the monitor of the task
+    @Override
+    public void execute(Map<String, Object> jobDataMap) {
+        //Get the reference to the monitor of the task
         monitor = (SynchronizationScheduledImpl)jobDataMap.get(SynchronizationScheduledImpl.KEY);
         log.debug(monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing"));
 
         //Verify monitor is present
         if ( monitor != null ) {
-        	//Ignore task execution if it´s the first time, let the spring context initialize correctly.
-    		if (monitor.getLastRun() == null) {
-    			log.debug(SynchronizationScheduledImpl.JOB_NAME+":: Ignoring the first execution.");
-    			monitor.setLastRun(new Date());
-    		} else {
-    			//Set last run always, even if is the first time execution.
-	    		Date currentDate = new Date();
-	        	log.debug(SynchronizationScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
-	        	monitor.setLastRun(currentDate);
+            //Ignore task execution if it´s the first time, let the spring context initialize correctly.
+            if (monitor.getLastRun() == null) {
+                log.debug(SynchronizationScheduledImpl.JOB_NAME+":: Ignoring the first execution.");
+                monitor.setLastRun(new Date());
+            } else {
+                //Set last run always, even if is the first time execution.
+                Date currentDate = new Date();
+                log.debug(SynchronizationScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
+                monitor.setLastRun(currentDate);
 
-	        	if( monitor.getPluginConfigService() != null ){
-	        		searchCredentialsToSynchronization();
-	        	}
-    		}
+                if( monitor.getPluginConfigService() != null ){
+                    searchCredentialsToSynchronization();
+                }
+            }
         }
-	}
-
-	/**
-	 * Search the credential for star the synchronization proccess
-	 */
-    private void searchCredentialsToSynchronization(){
-    	Credential[] credentials = monitor.getCredentialService().getCredentials();
-
-    	for( int  i = 0; i < credentials.length; i++){
-    		synchronizeJob(monitor, credentials[i].getJiraUser());
-    	}
     }
 
-	/**
-	 * The main job, starts all the tasks required for the job.
-	 * @param monitor	Object	Reference to the tasks monitor object.
-	 */
-	private void synchronizeJob(SynchronizationScheduledImpl monitor, String jiraUser) {
+    /**
+     * Search the credential for star the synchronization proccess
+     */
+    private void searchCredentialsToSynchronization(){
+        Credential[] credentials = monitor.getCredentialService().getCredentials();
 
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
-		this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+        for( int  i = 0; i < credentials.length; i++){
+            synchronizeJob(monitor, credentials[i].getJiraUser());
+        }
+    }
 
-		try {
-			JSONObject environmentsAll = this.environmentsService.getAllEnvironments(jiraUser);
-			JSONArray environments = environmentsAll.getJSONArray("sources");
-			if (environments != null) {
+    /**
+     * The main job, starts all the tasks required for the job.
+     * @param monitor	Object	Reference to the tasks monitor object.
+     */
+    private void synchronizeJob(SynchronizationScheduledImpl monitor, String jiraUser) {
 
-				for ( int i = 0; i < environments.length(); i++ ) {
-					JSONObject environment = environments.getJSONObject(i).getJSONObject("source");
+        this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+        this.environmentsService = new EnvironmentsService(monitor.getPluginConfigService(), monitor.getRestUtil());
 
-					if (environment != null) {
+        try {
+            JSONObject environmentsAll = this.environmentsService.getAllEnvironments(jiraUser,"");
+            JSONArray environments = environmentsAll.getJSONArray("sources");
+            if (environments != null) {
 
-						String envId = environment.getString("id");
-						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
+                for ( int i = 0; i < environments.length(); i++ ) {
+                    JSONObject environment = environments.getJSONObject(i).getJSONObject("source");
 
-						try {
-							executeSynchronizeJob(monitor, envId, jiraUser);
-						} catch (Exception e) {
-							log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.executing.synchronizejob") + e.getMessage() );		
-							e.printStackTrace();
-						}
-					}
+                    if (environment != null) {
 
-				}
+                        String envId = environment.getString("id");
+                        log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.executing.environment") +envId);
 
-			} else {
-				log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notenvironments"));		
-			}
-		} catch(Exception exception){
-			exception.printStackTrace();
-		}
-	}
+                        try {
+                            executeSynchronizeJob(monitor, envId, jiraUser);
+                        } catch (Exception e) {
+                            log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.executing.synchronizejob") + e.getMessage() );		
+                            e.printStackTrace();
+                        }
+                    }
 
-	/**
-	 * How many time passed since last updating
-	 * @param issue
-	 * @return
-	 */
-	private boolean skipSynchronization(Issue issue){
+                }
 
-		long time = (new Date()).getTime() - issue.getUpdated().getTime();
+            } else {
+                log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notenvironments"));		
+            }
+        } catch(Exception exception){
+            exception.printStackTrace();
+        }
+    }
 
-		if( time < timeWait ){
-			return true;
-		}
-		return false;
-	}
+    /**
+     * How many time passed since last updating
+     * @param issue
+     * @return
+     */
+    private boolean skipSynchronization(Issue issue){
 
-	/**
-	 * Synchronize the status between Cloud insight and jira,
-	 * can reopen issues that are close
-	 * can close issues that are open
-	 * @param issue
-	 * @param statusCI
-	 * @param monitor
-	 * @throws UnsupportedEncodingException
-	 */
-	private void synchronizeStatus(Issue issue, String statusCI, SynchronizationScheduledImpl monitor ) {
-		String statusJira = issue.getStatusObject().getNameTranslation();
+        long time = (new Date()).getTime() - issue.getUpdated().getTime();
 
-		try{
-			if( !skipSynchronization( issue ) ){
-				if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
-					if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
-						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
+        if( time < timeWait ){
+            return true;
+        }
+        return false;
+    }
 
-						int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
-						monitor.getJIRAService().doTransitionIssue(
-								issue,
-								state,
-								issue.getProjectObject().getLeadUserName(),
-								monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.reopen")
-								);
-						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenreopen")  + issue.getKey());		
-						}
-			    }
-				else{
-				    if ( statusCI.equals("disposed") || statusCI.equals("complete") ) {
-				    	if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
-				    		log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
+    /**
+     * Synchronize the status between Cloud insight and jira,
+     * can reopen issues that are close
+     * can close issues that are open
+     * @param issue
+     * @param statusCI
+     * @param monitor
+     * @throws UnsupportedEncodingException
+     */
+    private void synchronizeStatus(Issue issue, String statusCI, SynchronizationScheduledImpl monitor ) {
+        String statusJira = issue.getStatusObject().getNameTranslation();
 
-				    		int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
-							monitor.getJIRAService().doTransitionIssue(
-									issue,
-									state,
-									issue.getProjectObject().getLeadUserName(),
-									monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.close")
-								);
+        try{
+            if( !skipSynchronization( issue ) ){
+                if ( statusCI.equals("planned") || statusCI.equals("incomplete") ) {
+                    if( statusJira.equals("Closed") || statusJira.equals("Resolved")) {
+                        log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobereopen")  + issue.getKey());		
 
-							log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenclosed")  + issue.getKey());		
-						}
-				    }
-		        }
-			}
-		}catch(Exception e){
-			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.status"));		
-			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.jirastatus") + statusJira);		
-			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.cistatus") + statusCI);		
-			log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.issuekey") + issue.getKey());		
+                        int state = monitor.getJIRAService().getActionWorkflow(issue,"Reopen Issue");
+                        monitor.getJIRAService().doTransitionIssue(
+                                issue,
+                                state,
+                                issue.getProjectObject().getLeadUserName(),
+                                monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.reopen")
+                                );
+                        log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenreopen")  + issue.getKey());		
+                        }
+                }
+                else{
+                    if ( statusCI.equals("disposed") || statusCI.equals("complete") ) {
+                        if( !statusJira.equals("Closed") && !statusJira.equals("Resolved")){
+                            log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.goingtobeclose")  + issue.getKey());		
 
-			e.printStackTrace();
-		}
-	}
+                            int state = monitor.getJIRAService().getActionWorkflow(issue,"Close Issue");
+                            monitor.getJIRAService().doTransitionIssue(
+                                    issue,
+                                    state,
+                                    issue.getProjectObject().getLeadUserName(),
+                                    monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.transation.close")
+                                );
 
-	/**
-	 * Synchronize the remediations items in an environment with the issues assigned
-	 * @param monitor
-	 * @param environmentId
-	 */
-	private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId, String jiraUser) {
-		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
+                            log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.issue.hasbeenclosed")  + issue.getKey());		
+                        }
+                    }
+                }
+            }
+        }catch(Exception e){
+            log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.status"));		
+            log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.jirastatus") + statusJira);		
+            log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.cistatus") + statusCI);		
+            log.error( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.error.synchr.issuekey") + issue.getKey());		
 
-    	if (!environmentId.isEmpty()) {
-    		try{
+            e.printStackTrace();
+        }
+    }
 
-		    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environmentId, jiraUser);
+    /**
+     * Synchronize the remediations items in an environment with the issues assigned
+     * @param monitor
+     * @param environmentId
+     */
+    private void executeSynchronizeJob(SynchronizationScheduledImpl monitor, String environmentId, String jiraUser) {
+        this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
 
-		    	if ( allRemediationsItems.has("assets") ) {
+        if (!environmentId.isEmpty()) {
+            try{
 
-		    		JSONArray assets = allRemediationsItems.getJSONArray("assets");
+                JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environmentId, jiraUser, "");
 
-		    		if ( assets.length() != 0 ) {
+                if ( allRemediationsItems.has("assets") ) {
 
-		    			for(int i = 0; i < assets.length(); i++)
-		    	    	{
-		    	    		for(int j = 0; j < assets.getJSONArray(i).length(); j++)
-		    	        	{
-		    	    			JSONObject remediationItem = assets.getJSONArray(i).getJSONObject(j);
-		    	    			if( remediationItem.has("state")  && remediationItem.has("key")){
-			    	    			String state = remediationItem.getString("state");
-			    	    			String key = remediationItem.getString("key");
-			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
+                    JSONArray assets = allRemediationsItems.getJSONArray("assets");
 
-			    	    			List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);
-			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue") + key);
-			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.amount") + issues.size());
-			    	    			log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.cistate") + state);
+                    if ( assets.length() != 0 ) {
 
-			    	    			for(int k=0; k<issues.size();k++){
-			    	    				synchronizeStatus( issues.get(k), state, monitor);
-			    	    			}
-		    	    			}
-		    	        	}
-		    	    	}
+                        for(int i = 0; i < assets.length(); i++)
+                        {
+                            for(int j = 0; j < assets.getJSONArray(i).length(); j++)
+                            {
+                                JSONObject remediationItem = assets.getJSONArray(i).getJSONObject(j);
+                                if( remediationItem.has("state")  && remediationItem.has("key")){
+                                    String state = remediationItem.getString("state");
+                                    String key = remediationItem.getString("key");
+                                    log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.user") + jiraUser);	
 
-					} else {
-						log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notassets") );	
-					}
+                                    List<Issue> issues = monitor.getJIRAService().searchIssueByRemeditionItem(key, jiraUser);
+                                    log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue") + key);
+                                    log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.amount") + issues.size());
+                                    log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.searchissue.cistate") + state);
 
-				} else{
-					log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notremediations") );	
-				}
+                                    for(int k=0; k<issues.size();k++){
+                                        synchronizeStatus( issues.get(k), state, monitor);
+                                    }
+                                }
+                            }
+                        }
 
-    		} catch(Exception exception) {
-	    		exception.printStackTrace();
-	    	}
-    	}
-	}
+                    } else {
+                        log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notassets") );	
+                    }
+
+                } else{
+                    log.debug( monitor.getI18nResolver().getText("ci.job.autosynchronization.msg.log.debug.notremediations") );	
+                }
+
+            } catch(Exception exception) {
+                exception.printStackTrace();
+            }
+        }
+    }
 
 }

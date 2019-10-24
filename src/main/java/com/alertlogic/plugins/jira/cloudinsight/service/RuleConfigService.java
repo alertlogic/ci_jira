@@ -36,14 +36,8 @@ public class RuleConfigService {
 
     /**
      * Creates a rule configuration, return the configuration reference object
-     * @param group
-     * @param project
-     * @param ruleName
-     * @param environment
-     * @param filters
-     * @return RuleConfig
      */
-    public RuleConfig createRule(String group, int project, String ruleName, String environment, String[] filters, String userName)
+    public RuleConfig createRule(String actingAccountId, String group, int project, String ruleName, String environment, String[] filters, String userName)
     {
     	RuleConfig conf;
 
@@ -52,6 +46,7 @@ public class RuleConfigService {
     	conf.setProject(project);
         conf.setGroup(group);
         conf.setName(ruleName);
+        conf.setActingAccountId(actingAccountId);
         conf.setEnvironment(environment);
         conf.setUser(userName);
         conf.setLastExecution(null);
@@ -171,18 +166,15 @@ public class RuleConfigService {
 
     /**
      * Update the log and last execution of a rule
-     * @param id
-     * @param log
-     * @param lastExecution
-     * @return boolean
      */
-    public boolean updateRule(Integer id, String group, int project, String ruleName, String environment, String[] filters, String userName)
+    public boolean updateRule(String actingAccountId, Integer id, String group, int project, String ruleName, String environment, String[] filters, String userName)
     {
     	RuleConfig conf = getRuleById(id);
     	if( conf != null ){
 	    	conf.setProject(project);
 	        conf.setGroup(group);
-	        conf.setName(ruleName);
+            conf.setName(ruleName);
+            conf.setActingAccountId(actingAccountId);
 	        conf.setEnvironment(environment);
 	        conf.setUser(userName);
 	        conf.save();
@@ -286,6 +278,7 @@ public class RuleConfigService {
             obj.put("environment",rules[i].getEnvironment());
             obj.put("project",rules[i].getProject());
             obj.put("group",rules[i].getGroup());
+            obj.put("aaid",rules[i].getActingAccountId());
             obj.put("user",rules[i].getUser());
             obj.put("lastExecution",rules[i].getLastExecution());
             obj.put("lastLog",rules[i].getLastLog());
