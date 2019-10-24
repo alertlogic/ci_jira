@@ -18,11 +18,10 @@ function statusController( user ) {
 
 				/**
 				 * Get the status of ci
-				 * @param  {String}   jiraIssueId The Jira issue id
 				 */
-				self.getStatusRemediationItem = function( remediationItemKey ){
+				self.getStatusRemediationItem = function( accountId, remediationItemKey ){
 					var environment = remediationsService.getEnvironmentFromRemediationItem( remediationItemKey );
-					var remediationItem = remediationsService.getFiltersByRemediationItem( environment, remediationItemKey );
+					var remediationItem = remediationsService.getFiltersByRemediationItem( accountId, environment, remediationItemKey );
 
 					remediationItem.done(function(remediationsItems){
 						if( remediationsItems.assets.length > 0){
@@ -99,23 +98,25 @@ function statusController( user ) {
 					//validate that the custom field exist
 					var fields = jiraService.Field().getFields();
 					var remediationItemCustomName = fields.remediationItem;
+					var accountIdCustomName = fields.accountId;
 
-	                if( remediationItemCustomName == null )
+	                if( remediationItemCustomName == null || accountIdCustomName == null)
 	                {
 	                	return false;
 					}
 
 					//validate that the issue have a custom field
-					if( !issueData.fields.hasOwnProperty( remediationItemCustomName ) ) {
+					if( !issueData.fields.hasOwnProperty( remediationItemCustomName ) || !issueData.fields.hasOwnProperty( accountIdCustomName )) {
 				    	return false;
 				    }
 
 				    //validate that remediation item has a value
-				    if( issueData.fields[ remediationItemCustomName ] == null ) {
+				    if( issueData.fields[ remediationItemCustomName ] == null || issueData.fields[ accountIdCustomName ] == null) {
 				    	return false;
 				    }
 
 				    status.remediationKey = issueData.fields[ remediationItemCustomName ];
+					status.accountId = issueData.fields[ accountIdCustomName ];
 
 				    return true;
 				}
@@ -136,7 +137,7 @@ function statusController( user ) {
 
 						if( self.isValidIssue( issueData ) )
 						{
-							self.getStatusRemediationItem( status.remediationKey );
+							self.getStatusRemediationItem( issueData.fields.accountId, status.remediationKey );
 
 							//Verify status every 4 seconds.
 							setTimeout(function(){
