@@ -154,7 +154,7 @@
 		key="plugin-configuration-servlet-key"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.PluginConfigurationServlet">
 		<description>
-			Add-on configuration for connecting with Cloud Insight
+			Add-on configuration for connecting with Alert Logic
 		</description>
 		<url-pattern>/pluginconfiguration</url-pattern>
 	</servlet>
@@ -195,7 +195,7 @@
 	<servlet name="Proxy Auth Servlet"
 		i18n-name-key="proxy-auth-servlet.name" key="proxy-auth-servlet"
 		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CIProxyAuthServlet">
-    	<description key="proxy-auth-servlet.description">Allow authentication in Cloud Insight</description>
+    	<description key="proxy-auth-servlet.description">Allow authentication in Alert Logic</description>
     	<url-pattern>/proxyauthservlet</url-pattern>
   	</servlet>
 

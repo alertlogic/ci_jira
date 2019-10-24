@@ -40,196 +40,196 @@ import com.opensymphony.workflow.loader.ActionDescriptor;
  * Management of Jira Issues.
  */
 public class JIRAService {
-	private ScreenConfigService screenConfigService;
-	private static final Logger log = LoggerFactory.getLogger(JIRAService.class);
+    private ScreenConfigService screenConfigService;
+    private static final Logger log = LoggerFactory.getLogger(JIRAService.class);
 
-	public JIRAService(ScreenConfigService screenConfigService) {
-		this.screenConfigService = screenConfigService;
-	}
+    public JIRAService(ScreenConfigService screenConfigService) {
+        this.screenConfigService = screenConfigService;
+    }
 
-	/**
-	 * Creates a comment in an issue.
-	 * @param issue	The Issue reference
-	 * @param user	The User reference
-	 * @param body	The string body of the comment
-	 */
-	public void commentIssue(Issue issue, ApplicationUser user, String body ) {
-		CommentManager commentManager = ComponentAccessor.getCommentManager();
-		commentManager.create(issue, user, body, false);
-	}
+    /**
+     * Creates a comment in an issue.
+     * @param issue	The Issue reference
+     * @param user	The User reference
+     * @param body	The string body of the comment
+     */
+    public void commentIssue(Issue issue, ApplicationUser user, String body ) {
+        CommentManager commentManager = ComponentAccessor.getCommentManager();
+        commentManager.create(issue, user, body, false);
+    }
 
-	/**
-	 * Return the priority id according to the position or just the last
-	 * @param prioritiesArray
-	 * @param position
-	 * @return String Return the priority id
-	 */
-	public String getPriorityByPosition(ArrayList<Priority> prioritiesArray, int position){
+    /**
+     * Return the priority id according to the position or just the last
+     * @param prioritiesArray
+     * @param position
+     * @return String Return the priority id
+     */
+    public String getPriorityByPosition(ArrayList<Priority> prioritiesArray, int position){
 
-		if( position < prioritiesArray.size() ) {
-			return prioritiesArray.get( position ).getId();
-		} else {
-			return prioritiesArray.get( prioritiesArray.size() - 1 ).getId();
-		}
-	}
+        if( position < prioritiesArray.size() ) {
+            return prioritiesArray.get( position ).getId();
+        } else {
+            return prioritiesArray.get( prioritiesArray.size() - 1 ).getId();
+        }
+    }
 
-	/**
-	 * Loggin the user into jira
-	 * some action validate that the user has permmissions to execute the action
-	 * an for this reason we need to loggin the user in the jira context
-	 * @param user
-	 */
-	public void logginUser(ApplicationUser user) {
-		JiraAuthenticationContext jiraAutheticationContext = ComponentAccessor.getJiraAuthenticationContext();
-    	jiraAutheticationContext.setLoggedInUser( user );
-	}
+    /**
+     * Loggin the user into jira
+     * some action validate that the user has permmissions to execute the action
+     * an for this reason we need to loggin the user in the jira context
+     * @param user
+     */
+    public void logginUser(ApplicationUser user) {
+        JiraAuthenticationContext jiraAutheticationContext = ComponentAccessor.getJiraAuthenticationContext();
+        jiraAutheticationContext.setLoggedInUser( user );
+    }
 
-	/**
-	 * Search issues by remediation item
-	 * @param remediationItemValue
-	 * @return
-	 */
-	public List<Issue> searchIssueByRemeditionItem(String remediationItemValue, String userName){
-		try {
-			screenConfigService.assigValuesToVariables();
-			CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
+    /**
+     * Search issues by remediation item
+     * @param remediationItemValue
+     * @return
+     */
+    public List<Issue> searchIssueByRemeditionItem(String remediationItemValue, String userName){
+        try {
+            screenConfigService.assigValuesToVariables();
+            CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
       SearchService searchService = ComponentAccessor.getComponentOfType(SearchService.class);
 
-			JqlQueryBuilder builder = JqlQueryBuilder.newBuilder();
-			ApplicationUser user = ComponentAccessor.getUserManager().getUserByName( userName );
-			logginUser( user );
+            JqlQueryBuilder builder = JqlQueryBuilder.newBuilder();
+            ApplicationUser user = ComponentAccessor.getUserManager().getUserByName( userName );
+            logginUser( user );
 
-			builder.where().customField(remediationItemCustomField.getIdAsLong()).like( remediationItemValue );
+            builder.where().customField(remediationItemCustomField.getIdAsLong()).like( remediationItemValue );
 
           SearchResults<Issue> results = searchService.search(user, builder.buildQuery(), PagerFilter.getUnlimitedFilter());
-	        return  results.getResults();
-	    } catch (Exception e) {
-	    	log.error("CI Plugin:"+e.toString());
-			e.printStackTrace();
-		}
+            return  results.getResults();
+        } catch (Exception e) {
+            log.error("CI Plugin:"+e.toString());
+            e.printStackTrace();
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * Get the string for a level
-	 * @param level	The level for a threat
-	 * @return	String
-	 */
-	public String getTextLevel( int level) {
-		switch ( level ) {
-			case 1: return "low";
-			case 2: return "medium";
-			case 3: return "high";
-		}
-		return "info";
-	}
+    /**
+     * Get the string for a level
+     * @param level	The level for a threat
+     * @return	String
+     */
+    public String getTextLevel( int level) {
+        switch ( level ) {
+            case 1: return "low";
+            case 2: return "medium";
+            case 3: return "high";
+        }
+        return "info";
+    }
 
-	/**
-	 * Match between jira and cloud insight and return priority id
-	 * @param ciLevel can be high, medium, low or info
-	 * @return String Return the priority id
-	 */
-	public String getPriorityId( String ciLevel ){
-		Collection<Priority> priorities = ComponentAccessor.getConstantsManager().getPriorities();
-		ArrayList<Priority> prioritiesArray = new ArrayList<Priority>();
+    /**
+     * Match between jira and cloud insight and return priority id
+     * @param ciLevel can be high, medium, low or info
+     * @return String Return the priority id
+     */
+    public String getPriorityId( String ciLevel ){
+        Collection<Priority> priorities = ComponentAccessor.getConstantsManager().getPriorities();
+        ArrayList<Priority> prioritiesArray = new ArrayList<Priority>();
 
-		if(priorities.size() > 0){
-			for(Priority p : priorities){
-				if( !p.getName().equalsIgnoreCase("Blocker") ) {
-					prioritiesArray.add(p);
-				}
-			}
+        if(priorities.size() > 0){
+            for(Priority p : priorities){
+                if( !p.getName().equalsIgnoreCase("Blocker") ) {
+                    prioritiesArray.add(p);
+                }
+            }
 
-			if(ciLevel.equals("high")){
-				return getPriorityByPosition( prioritiesArray, 0);
-			}
+            if(ciLevel.equals("high")){
+                return getPriorityByPosition( prioritiesArray, 0);
+            }
 
-			if(ciLevel.equals("medium")){
-				return getPriorityByPosition( prioritiesArray, 1);
-			}
+            if(ciLevel.equals("medium")){
+                return getPriorityByPosition( prioritiesArray, 1);
+            }
 
-			if(ciLevel.equals("low")){
-				return getPriorityByPosition( prioritiesArray, 2);
-			}
+            if(ciLevel.equals("low")){
+                return getPriorityByPosition( prioritiesArray, 2);
+            }
 
-			if(ciLevel.equals("info")){
-				return getPriorityByPosition( prioritiesArray, 3);
-			}
-		}
-		return "";
-	}
+            if(ciLevel.equals("info")){
+                return getPriorityByPosition( prioritiesArray, 3);
+            }
+        }
+        return "";
+    }
 
-	/**
-	 * Format a summary, remove special characters and crop if it is necessary
-	 * @param description
-	 * @return
-	 */
-	public String formatSummary(String description){
-		String formated = description;
-		if( description.length() > 255){
-			 formated = description.substring(0,255) ;
-	    }
-		formated = formated.replaceAll("(\\r|\\n)", " ");
+    /**
+     * Format a summary, remove special characters and crop if it is necessary
+     * @param description
+     * @return
+     */
+    public String formatSummary(String description){
+        String formated = description;
+        if( description.length() > 255){
+             formated = description.substring(0,255) ;
+        }
+        formated = formated.replaceAll("(\\r|\\n)", " ");
 
-		return formated;
-	}
+        return formated;
+    }
 
-	/**
-	 * Create an issue with the information of cloud insight
-	 * @param summary
-	 * @param description
-	 * @param projectID
-	 * @param remediationItem
-	 * @param remediationId
-	 * @param jiraGroup
-	 * @param issueTypeId
-	 * @param level
-	 * @param userName
-	 * @return JSONObject with a log and if it was success or not
-	 * @throws Exception
-	 */
-	public void createIssue(String summary, String description, long projectID, String remediationItem, String remediationId, String jiraGroup, String level, String userName) throws Exception {
-
-		IssueService issueService = ComponentAccessor.getIssueService();
-		//Validation that the project exists and are valid
-		Project project = ComponentAccessor.getProjectManager().getProjectObj( projectID );
-		if( project == null ) {
+    /** get project by id or throws an error */
+    public Project getProject(long projectID) throws Exception {
+        //Validation that the project exists and are valid
+        Project project = ComponentAccessor.getProjectManager().getProjectObj( projectID );
+        if( project == null ) {
             throw new Exception("CI Plugin: this project does not exists "+projectID);
-		}
+        }
+        return project;
+    }
 
-		screenConfigService.assigValuesToVariables();
-		if( !screenConfigService.hasIssueTypeConfigurated(project) ){
+    /** check the project has the issue type configured or throws an error */
+    public void checkIssueType( Project project, String product, long projectID) throws Exception {
+        screenConfigService.assigValuesToVariables();
+        if( !screenConfigService.hasIssueTypeConfigurated(project, product) ){
             throw new Exception("CI Plugin: this project is not configured properly :"+projectID);
-		}
+        }
+    }
 
-		ApplicationUser user =  getUserByName(userName);
-		//Validation the user exist
-		if( user == null ) {
-			throw new Exception("CI Plugin: the user does not exist or is inactive :"+userName);
-		}
+    /** get the user or throws an error */
+    public ApplicationUser getUser(String userName) throws Exception{
+        ApplicationUser user =  getUserByName(userName);
+        //Validation the user exist
+        if( user == null ) {
+            throw new Exception("CI Plugin: the user does not exist or is inactive :"+userName);
+        }
+        return user;
+    }
 
-		//Get values of customs and issue type configured for cloud insight
-		IssueType ciIssueType = screenConfigService.getIssueTypeCI();
-		CustomField groupCustomField = screenConfigService.getGroupCustomField();
-		CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
-		CustomField remediationIdCustomField =screenConfigService.getRemediationIdCustomField();
+    /**
+     * Base structure for alert logic issue types
+     */
+    public IssueInputParameters createBaseIssueInputParameters( String summary, String description, Project project, IssueType productIssueType, String jiraGroup, String level) throws Exception{
+        IssueService issueService = ComponentAccessor.getIssueService();
+        CustomField groupCustomField = screenConfigService.getGroupCustomField();
 
-		//setting values
         IssueInputParameters issueInputParameters = issueService.newIssueInputParameters();
 
         issueInputParameters.setSummary( formatSummary(summary) );
         issueInputParameters.setDescription( description );
         issueInputParameters.setProjectId( project.getId() );
-        issueInputParameters.setIssueTypeId( ciIssueType.getId() );
+        issueInputParameters.setIssueTypeId( productIssueType.getId() );
         issueInputParameters.setPriorityId( getPriorityId( level ) );
-        issueInputParameters.addCustomFieldValue( remediationItemCustomField.getId(), remediationItem);
-        issueInputParameters.addCustomFieldValue( remediationIdCustomField.getId(), remediationId);
         issueInputParameters.addCustomFieldValue( groupCustomField.getId(), jiraGroup);
         issueInputParameters.setAssigneeId( project.getLeadUserName() );
+
+        return issueInputParameters;
+    }
+
+    /**
+     * Validate the issue structure and create it if the structure is ok
+     */
+    public void createValidationResultData(ApplicationUser user, IssueInputParameters issueInputParameters) throws Exception {
+        IssueService issueService = ComponentAccessor.getIssueService();
         //Perform the validation
         IssueService.CreateValidationResult result = issueService.validateCreate( user, issueInputParameters);
-
 
         if (result.getErrorCollection().hasAnyErrors()) {
 
@@ -237,128 +237,200 @@ public class JIRAService {
             String errorDetails="";
 
             for (String key: errors.keySet()) {
-            	errorDetails += "CI Plugin: Error Field, "+key + " - " + errors.get(key)+"\n";
-        	}
+                errorDetails += "CI Plugin: Error Field, "+key + " - " + errors.get(key)+"\n";
+            }
 
             throw new Exception(errorDetails);
 
         } else {
-        	issueService.create( user, result);
+            issueService.create( user, result);
+        }
+    }
+
+    /**
+     * Create an issue with the information of remediations
+     * @param summary
+     * @param description
+     * @param projectID
+     * @param remediationItem
+     * @param remediationId
+     * @param jiraGroup
+     * @param issueTypeId
+     * @param level
+     * @param userName
+     * @return JSONObject with a log and if it was success or not
+     * @throws Exception
+     */
+    public void createRemediationIssue(String summary, String description, long projectID, String remediationItem, String remediationId, String jiraGroup, String level, String userName) throws Exception {
+
+        Project project = getProject(projectID);
+
+        checkIssueType( project, ScreenConfigService.remediationsProduct, projectID);
+
+        ApplicationUser user = getUser(userName);
+
+        //Get values of customs and issue type configured for cloud insight
+        IssueType ciIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.remediationsProduct );
+        CustomField remediationItemCustomField = screenConfigService.getRemediationItemCustomField();
+        CustomField remediationIdCustomField =screenConfigService.getRemediationIdCustomField();
+
+        //setting values
+        IssueInputParameters issueInputParameters = createBaseIssueInputParameters( summary, description, project, ciIssueType, jiraGroup, level);
+
+        // adding data for remediations
+        issueInputParameters.addCustomFieldValue( remediationItemCustomField.getId(), remediationItem);
+        issueInputParameters.addCustomFieldValue( remediationIdCustomField.getId(), remediationId);
+        //Perform the validation and create the issue
+        createValidationResultData( user, issueInputParameters);
+    }
+
+    /**
+     * Create an issue with the information of cloud insight
+     * @param summary
+     * @param description
+     * @param projectID
+     * @param incidentId
+     * @param jiraGroup
+     * @param issueTypeId
+     * @param level
+     * @param userName
+     * @return JSONObject with a log and if it was success or not
+     * @throws Exception
+     */
+    public void createIncidentIssue(String summary, String description, long projectID,  String incidentId, String accountId,String jiraGroup, String level, String userName) throws Exception {
+
+        Project project = getProject(projectID);
+
+        checkIssueType( project, ScreenConfigService.incidentsProduct, projectID);
+
+        ApplicationUser user = getUser(userName);
+
+        //Get values of customs and issue type configured for cloud insight
+        IssueType incidentIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.incidentsProduct );
+        CustomField incidentIdCustomField = screenConfigService.getIncidentIdCustomField();
+        CustomField accountIdCustomField = screenConfigService.getAccountIdCustomField();
+
+        //setting values
+        IssueInputParameters issueInputParameters = createBaseIssueInputParameters( summary, description, project, incidentIssueType, jiraGroup, level);
+
+        // adding data for remediations
+        issueInputParameters.addCustomFieldValue( incidentIdCustomField.getId(), incidentId);
+        issueInputParameters.addCustomFieldValue( accountIdCustomField.getId(), accountId);
+        //Perform the validation and create the issue
+        createValidationResultData( user, issueInputParameters);
+    }
+
+    /**
+     * Get jira user by name
+     * @param userName
+     * @return User
+     */
+    public ApplicationUser getUserByName(String userName){
+        ApplicationUser user =  ComponentAccessor.getUserManager().getUserByName(userName);
+        //Validation the user exist
+        if( user == null ) {
+            log.error("CI Plugin: the user does not exist :" + userName );
+            return null;
         }
 
-	}
-
-	/**
-	 * Get jira user by name
-	 * @param userName
-	 * @return User
-	 */
-	public ApplicationUser getUserByName(String userName){
-		ApplicationUser user =  ComponentAccessor.getUserManager().getUserByName(userName);
-		//Validation the user exist
-		if( user == null ) {
-			log.error("CI Plugin: the user does not exist :" + userName );
-			return null;
-		}
-
-		if( !user.isActive() ) {
-			log.error("CI Plugin: the user is not active");
-			return null;
+        if( !user.isActive() ) {
+            log.error("CI Plugin: the user is not active");
+            return null;
         }
 
-    	//loggin user it is necesary to create an issue
-		logginUser( user );
-		return user;
-	}
+        //loggin user it is necesary to create an issue
+        logginUser( user );
+        return user;
+    }
 
-	/**
-	 * Move an issue in the workflow
-	 * @param issue
-	 * @param state
-	 * @param user
-	 * @return result the transation
-	 */
-	public boolean doTransitionIssue(Issue issue, int state, String userName,String msg) {
+    /**
+     * Move an issue in the workflow
+     * @param issue
+     * @param state
+     * @param user
+     * @return result the transation
+     */
+    public boolean doTransitionIssue(Issue issue, int state, String userName,String msg) {
 
-		ApplicationUser user = getUserByName(userName);
-	    IssueService issueService = ComponentAccessor.getIssueService();
-	    IssueInputParameters issueInputParameters = new IssueInputParametersImpl();
+        ApplicationUser user = getUserByName(userName);
+        IssueService issueService = ComponentAccessor.getIssueService();
+        IssueInputParameters issueInputParameters = new IssueInputParametersImpl();
 
-	    TransitionValidationResult validationResult = issueService.validateTransition(user, issue.getId(), state, issueInputParameters);
-	    if (validationResult.isValid()) {
-	    	IssueResult transResult = issueService.transition(user, validationResult);
-	    	if(transResult.isValid()){
+        TransitionValidationResult validationResult = issueService.validateTransition(user, issue.getId(), state, issueInputParameters);
+        if (validationResult.isValid()) {
+            IssueResult transResult = issueService.transition(user, validationResult);
+            if(transResult.isValid()){
 
-	    		commentIssue(transResult.getIssue(), 
-	    				transResult.getIssue().getProjectObject().getProjectLead(),
-						msg);
+                commentIssue(transResult.getIssue(), 
+                        transResult.getIssue().getProjectObject().getProjectLead(),
+                        msg);
 
-	    		return true;
-	    	}
-	    	else{
-	    		log.error("CI Plugin: error while do the transition "+transResult.getErrorCollection().toString());
-	    		return false;
-	    	}
-	    }
-	    else{
-	    	log.error("CI Plugin: error while do the transition");
-	    	log.error("CI Plugin: error while do the transition "+validationResult.getErrorCollection().toString());
-		}
+                return true;
+            }
+            else{
+                log.error("CI Plugin: error while do the transition "+transResult.getErrorCollection().toString());
+                return false;
+            }
+        }
+        else{
+            log.error("CI Plugin: error while do the transition");
+            log.error("CI Plugin: error while do the transition "+validationResult.getErrorCollection().toString());
+        }
 
-	    return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Get an workflow action by name
-	 * example Open Issue, Close Issue
-	 * @param issue
-	 * @param description
-	 * @return
-	 */
-	public int getActionWorkflow(Issue issue, String description){
+    /**
+     * Get an workflow action by name
+     * example Open Issue, Close Issue
+     * @param issue
+     * @param description
+     * @return
+     */
+    public int getActionWorkflow(Issue issue, String description){
 
-		Collection<ActionDescriptor> actions = ComponentAccessor
-			.getWorkflowManager().getWorkflow(issue)
-			.getAllActions();
+        Collection<ActionDescriptor> actions = ComponentAccessor
+            .getWorkflowManager().getWorkflow(issue)
+            .getAllActions();
 
-		for (ActionDescriptor action : actions) {
-			if(action.getName().equals(description)){
-				return action.getId();
-			}
-		}
+        for (ActionDescriptor action : actions) {
+            if(action.getName().equals(description)){
+                return action.getId();
+            }
+        }
 
-		return 0;
-	}
+        return 0;
+    }
 
-	/**
-	 * Get the groups for an user
-	 * @return
-	 */
-	public Collection<Group> getGroupsForUser(String user){
-		return ComponentAccessor.getGroupManager().getGroupsForUser(user);
-	}
+    /**
+     * Get the groups for an user
+     * @return
+     */
+    public Collection<Group> getGroupsForUser(String user){
+        return ComponentAccessor.getGroupManager().getGroupsForUser(user);
+    }
 
-	/**
-	 * Get the all groups
-	 * This function was introduce because the api not support get all groups
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public JSONObject getGroups(){
-		 
-		Collection<Group> groups = ComponentAccessor.getGroupManager().getAllGroups();
-		JSONArray groupsArray  =  new JSONArray();
-		JSONObject groupsJSON  =  new JSONObject();
-		 
-		for( Group group: groups ){
-			JSONObject obj  =  new JSONObject();
-			obj.put("name",group.getName());
-			
-			groupsArray.put ( obj );
-		}
-		
-		groupsJSON.put("groups", groupsArray);
+    /**
+     * Get the all groups
+     * This function was introduce because the api not support get all groups
+     * @return
+     */
+    @SuppressWarnings("deprecation")
+    public JSONObject getGroups(){
 
-		return groupsJSON;
-	}
+        Collection<Group> groups = ComponentAccessor.getGroupManager().getAllGroups();
+        JSONArray groupsArray  =  new JSONArray();
+        JSONObject groupsJSON  =  new JSONObject();
+
+        for( Group group: groups ){
+            JSONObject obj  =  new JSONObject();
+            obj.put("name",group.getName());
+
+            groupsArray.put ( obj );
+        }
+
+        groupsJSON.put("groups", groupsArray);
+
+        return groupsJSON;
+    }
 }
