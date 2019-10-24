@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 @SuppressWarnings("serial")
 public class IncidentsSyncServlet extends HttpServlet{
 
-	private static final String VM_TEMPLATE = "/js/partials/RemediationSync/RemediationsSyncPage.vm";
+	private static final String VM_TEMPLATE = "/js/partials/IncidentsSync/IncidentsSyncPage.vm";
     private TemplateRenderer templateRenderer;
     private PageBuilderService pageBuilderService;
     private PluginRetrievalService pluginRetrievalService;
@@ -44,8 +44,7 @@ public class IncidentsSyncServlet extends HttpServlet{
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":cloud-insight-for-jira-resources");
     	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":ciServices");
     	pageBuilderService.assembler().resources().requireWebResource("com.atlassian.auiplugin:aui-select2");
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":remediationsSyncController");
-    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":remediationSyncDetailsController");
+    	pageBuilderService.assembler().resources().requireWebResource(pluginKey+":incidentsSyncController");
     }
 
     @Override
