@@ -186,12 +186,13 @@ var CIJIRAService = function() {
              * @param issueTypeId
              * @param level to define the priority
              **/
-            create: function( summary, description, projectKey, remediationItem, remediationId, jiraGroup, issueTypeId, level ) {
+            create: function( accountId, summary, description, projectKey, remediationItem, remediationId, jiraGroup, issueTypeId, level ) {
 
                 var fields = self.Field().getFields();
 
                 var remediationItemCustomName = fields.remediationItem;
                 var remediationIdCustomName = fields.remediationId;
+                var accountIdCustomName = fields.accountId;
                 var jiraGroupCustomName = fields.group ;
                 var priorityId = self.Priority().getPriorities()[level];
 
@@ -209,6 +210,8 @@ var CIJIRAService = function() {
 
                     issue.fields[ remediationItemCustomName ] = remediationItem;
                     issue.fields[ remediationIdCustomName ] = remediationId;
+                    issue.fields[ accountIdCustomName ] = accountId;
+
                     if (jiraGroup) {
                         issue.fields[ jiraGroupCustomName ] = { "name": jiraGroup };
                     }

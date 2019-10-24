@@ -229,7 +229,7 @@ public class ScreenConfigServiceTest {
 		when(screenConfigServiceMock.getGroupCustomField()).thenReturn(customFieldMock);
 		
 		String[] fields = screenConfigServiceMock.getFieldsCreateScreen(screenConfigServiceMock.remediationsProduct);
-		assertEquals(fields.length,8);
+		assertEquals(fields.length,9);
 	}
 
 	@Test
