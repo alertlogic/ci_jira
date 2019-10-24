@@ -12,6 +12,7 @@ function statusController( user ) {
 					ci : '',
 					jira : '',
 					remediationKey: '',
+					accountId: '',
 					issueId: '',
 					issueUpdated: ''
 				};
@@ -137,7 +138,7 @@ function statusController( user ) {
 
 						if( self.isValidIssue( issueData ) )
 						{
-							self.getStatusRemediationItem( issueData.fields.accountId, status.remediationKey );
+							self.getStatusRemediationItem( status.accountId, status.remediationKey );
 
 							//Verify status every 4 seconds.
 							setTimeout(function(){
