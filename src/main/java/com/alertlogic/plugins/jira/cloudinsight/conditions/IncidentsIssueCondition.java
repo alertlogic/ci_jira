@@ -25,12 +25,12 @@ public class IncidentsIssueCondition extends AbstractIssueWebCondition {
     }
 
     @Override
-    public boolean shouldDisplay(ApplicationUser arg0, Issue arg1, JiraHelper arg2) {
+    public boolean shouldDisplay(ApplicationUser applicationUser, Issue issue, JiraHelper jiraHelper) {
         try {
             IssueType incidentsIssueType = screenConfigService.getIssueTypeCI( ScreenConfigService.incidentsProduct);
             if (incidentsIssueType != null) {
                 //Is this issue an incidents issue type?
-                if (arg1.getIssueTypeId().equals(incidentsIssueType.getId())){
+                if (issue.getIssueTypeId().equals(incidentsIssueType.getId())){
                     //Bring custom field names from properties.
                     screenConfigService.assigValuesToVariables();
 
