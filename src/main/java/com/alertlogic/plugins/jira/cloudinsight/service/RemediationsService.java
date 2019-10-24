@@ -21,46 +21,46 @@ import com.sun.jersey.api.json.JSONConfiguration;
  *	Service for all the remediations operations
  */
 public class RemediationsService {
-	private static final Logger log = LoggerFactory.getLogger(RemediationsService.class);
+    private static final Logger log = LoggerFactory.getLogger(RemediationsService.class);
 
-	public PluginConfigService pluginConfigService;
-	private RestUtil restUtil;
+    public PluginConfigService pluginConfigService;
+    private RestUtil restUtil;
 
-	public RemediationsService( PluginConfigService pluginConfigService, RestUtil restUtil )
-	{
-		this.pluginConfigService = pluginConfigService;
-		this.restUtil = restUtil;
-	}
+    public RemediationsService( PluginConfigService pluginConfigService, RestUtil restUtil )
+    {
+        this.pluginConfigService = pluginConfigService;
+        this.restUtil = restUtil;
+    }
 
-	/**
+    /**
      * This method get a remediation item data from the CI API.
      * @param 	env				The Environment ID.
      * @param 	remediationItem	The Remediation Item Key.
      * @return	JSONObject 		Get the information of a remediation item.
-	 * @throws Exception
+     * @throws Exception
      */
-    public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser) throws Exception{
+    public JSONObject getRemediationItem(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
 
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset;
-    	ClientResponse responseGetRemediationItem;
+        restUtil.setupAuthetication( jiraUser, actingAccountId );
+        String urlBase = restUtil.urlEndPointAsset;
+        ClientResponse responseGetRemediationItem;
 
-     	if ( urlBase != null && remediationItem != null)
-     	{
-     		urlBase += env + "/assets?asset_types=remediation-item&remediation-item.key="+remediationItem+"&optional=remediation-item";
-     		responseGetRemediationItem = restUtil.get(urlBase);
+         if ( urlBase != null && remediationItem != null)
+         {
+             urlBase += env + "/assets?asset_types=remediation-item&remediation-item.key="+remediationItem+"&optional=remediation-item";
+             responseGetRemediationItem = restUtil.get(urlBase);
 
-     		if ( responseGetRemediationItem.getStatus() == 200 )
-     		{
-     			JSONObject jsonObj = new JSONObject( responseGetRemediationItem.getEntity(String.class) );
-     			return jsonObj;
-     		}
-     		else{
-     			log.error("CI Plugin:We could not find the remediation"+urlBase);
-     			log.error("CI Plugin: " +responseGetRemediationItem.getStatus() );
-     		}
-     	}
-     	return null;
+             if ( responseGetRemediationItem.getStatus() == 200 )
+             {
+                 JSONObject jsonObj = new JSONObject( responseGetRemediationItem.getEntity(String.class) );
+                 return jsonObj;
+             }
+             else{
+                 log.error("CI Plugin:We could not find the remediation"+urlBase);
+                 log.error("CI Plugin: " +responseGetRemediationItem.getStatus() );
+             }
+         }
+         return null;
     }
 
     /**
@@ -68,25 +68,25 @@ public class RemediationsService {
      * @param  {String} environment The environment to query
      * @throws Exception
      */
-    public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser ) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset;
-    	ClientResponse responseGetRemediationItem;
+    public JSONObject getAllRemediationsItemsByEnvironment(String env ,String jiraUser, String actingAccountId ) throws Exception {
+        restUtil.setupAuthetication( jiraUser, actingAccountId);
+        String urlBase = restUtil.urlEndPointAsset;
+        ClientResponse responseGetRemediationItem;
 
-     	if ( urlBase != null ) {
-     		urlBase += env + "/assets?asset_types=remediation-item&reduce=true&remediation-item.deleted_on=0";
+         if ( urlBase != null ) {
+             urlBase += env + "/assets?asset_types=remediation-item&reduce=true&remediation-item.deleted_on=0";
 
-     		responseGetRemediationItem = restUtil.get(urlBase);
+             responseGetRemediationItem = restUtil.get(urlBase);
 
-     		if( responseGetRemediationItem.getStatus() == 200 ){
-     			JSONObject jsonObj = new JSONObject( responseGetRemediationItem.getEntity(String.class) );
-     			return jsonObj;
-     		}
-     		else{
-     			log.error("CI Plugin: Error getting remediations items. Status Code ["+responseGetRemediationItem.getStatus()+"]");
-     		}
-     	}
-     	return null;
+             if( responseGetRemediationItem.getStatus() == 200 ){
+                 JSONObject jsonObj = new JSONObject( responseGetRemediationItem.getEntity(String.class) );
+                 return jsonObj;
+             }
+             else{
+                 log.error("CI Plugin: Error getting remediations items. Status Code ["+responseGetRemediationItem.getStatus()+"]");
+             }
+         }
+         return null;
     }
 
     /**
@@ -94,30 +94,30 @@ public class RemediationsService {
      * CI return  remediations and the filters
      * @throws Exception
      */
-    public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser ) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset ;
-    	ClientResponse response;
+    public JSONObject getAllRemediations( String environment, JSONArray filters, String jiraUser, String actingAccountId ) throws Exception {
+        restUtil.setupAuthetication( jiraUser, actingAccountId );
+        String urlBase = restUtil.urlEndPointAsset ;
+        ClientResponse response;
 
-     	if ( urlBase != null )
-     	{
-     		urlBase += environment + "/remediations";
-	        String filterStringParams = getFilterStringParams(filters);
-     		urlBase += filterStringParams;
+         if ( urlBase != null )
+         {
+             urlBase += environment + "/remediations";
+            String filterStringParams = getFilterStringParams(filters);
+             urlBase += filterStringParams;
 
-     		response = restUtil.get( urlBase );
+             response = restUtil.get( urlBase );
 
-     		if ( response.getStatus() == 200 ) {
+             if ( response.getStatus() == 200 ) {
 
-     			JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
-     			return jsonObj;
+                 JSONObject jsonObj = new JSONObject( response.getEntity(String.class) );
+                 return jsonObj;
 
-     		} else {
-     			log.error("CI Plugin: Error getting remediations. Resource ["+urlBase+"] Status Code ["+response.getStatus()+"]");
-     		}
+             } else {
+                 log.error("CI Plugin: Error getting remediations. Resource ["+urlBase+"] Status Code ["+response.getStatus()+"]");
+             }
 
-     	}
-     	return null;
+         }
+         return null;
     }
 
     /**
@@ -127,8 +127,8 @@ public class RemediationsService {
      * @throws UnsupportedEncodingException
      */
     private String getFilterStringParams(JSONArray filters) throws UnsupportedEncodingException {
-    	if (filters != null)
-    	{
+        if (filters != null)
+        {
             if (filters.length() > 0)
             {
                 String filterStringParams = "?";
@@ -136,7 +136,7 @@ public class RemediationsService {
                 for (int i = 0; i < filters.length(); i++)
                 {
 
-                	JSONObject filter = filters.getJSONObject(i);
+                    JSONObject filter = filters.getJSONObject(i);
 
                     if( i != 0 )
                     {
@@ -159,16 +159,16 @@ public class RemediationsService {
 
             }
         }
-    	return "";
-	}
+        return "";
+    }
 
-	/**
+    /**
      * Plan a set of remediations
-	 * @throws Exception 
+     * @throws Exception 
      */
-    public JSONArray planRemediations( String environment, JSONArray remediationsKeys, JSONArray filters, String jiraUser) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset;
+    public JSONArray planRemediations( String environment, JSONArray remediationsKeys, JSONArray filters, String jiraUser, String actingAccountId) throws Exception {
+        restUtil.setupAuthetication( jiraUser, actingAccountId);
+        String urlBase = restUtil.urlEndPointAsset;
 
         JSONObject payload = new JSONObject();
         payload.put( "operation", "plan_remediations");
@@ -176,23 +176,23 @@ public class RemediationsService {
         payload.put( "filters", filters);
         payload.put( "user_id", restUtil.userId );
 
-    	ClientResponse responseRemediationItem;
+        ClientResponse responseRemediationItem;
 
-     	if ( urlBase != null ) {
+         if ( urlBase != null ) {
 
-     		urlBase += environment + "/assets";
-     		responseRemediationItem = restUtil.put( urlBase, payload.toString());
+             urlBase += environment + "/assets";
+             responseRemediationItem = restUtil.put( urlBase, payload.toString());
 
-     		if ( responseRemediationItem.getStatus() == 201 )
-     		{
-     			JSONArray jsonData = new JSONArray( responseRemediationItem.getEntity(String.class) );
-     			return jsonData;
-     		} else {
-     			throw new Exception("Error getting remediations items. Status Code ["+responseRemediationItem.getStatus()+"]");
-     		}
-     	}
+             if ( responseRemediationItem.getStatus() == 201 )
+             {
+                 JSONArray jsonData = new JSONArray( responseRemediationItem.getEntity(String.class) );
+                 return jsonData;
+             } else {
+                 throw new Exception("Error getting remediations items. Status Code ["+responseRemediationItem.getStatus()+"]");
+             }
+         }
 
-     	return null;
+         return null;
     }
 
     /**
@@ -202,46 +202,46 @@ public class RemediationsService {
      * @return Boolean			True if the remediation was completed.
      * @throws Exception
      */
-    public Boolean markAsComplete(String env,String remediationItem, String jiraUser) throws Exception{
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset;
+    public Boolean markAsComplete(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
+        restUtil.setupAuthetication( jiraUser , actingAccountId);
+        String urlBase = restUtil.urlEndPointAsset;
 
-    	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
-    	String status = getStatusRemediationItem( remediationsItemResponse , remediationItem);
- 		log.debug("CI Plugin: Status CI : "+status);
+        JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser, actingAccountId);
+        String status = getStatusRemediationItem( remediationsItemResponse , remediationItem);
+         log.debug("CI Plugin: Status CI : "+status);
 
-    	ClientResponse responseMarkasComplete;
+        ClientResponse responseMarkasComplete;
 
-     	if ( urlBase != null && (status.equals("planned") || status.equals("incomplete"))) {
+         if ( urlBase != null && (status.equals("planned") || status.equals("incomplete"))) {
 
-     		Map<String, Object> data = new HashMap<String, Object>();
-     		data.put("operation", "complete_remediations");
-     		data.put("remediation_items", Arrays.asList( remediationItem));
+             Map<String, Object> data = new HashMap<String, Object>();
+             data.put("operation", "complete_remediations");
+             data.put("remediation_items", Arrays.asList( remediationItem));
 
-     		urlBase += env + "/assets";
+             urlBase += env + "/assets";
 
-     		responseMarkasComplete = restUtil.put( urlBase, data);
+             responseMarkasComplete = restUtil.put( urlBase, data);
 
-     		log.debug("CI Plugin: Mark as complete status CI : "+responseMarkasComplete.getStatus());
+             log.debug("CI Plugin: Mark as complete status CI : "+responseMarkasComplete.getStatus());
 
-     		if( responseMarkasComplete.getStatus() != 201 ){
-     			log.debug("Response : "+responseMarkasComplete);
-     			log.debug("Data : "+data);
-     			log.debug("Url : "+urlBase);
+             if( responseMarkasComplete.getStatus() != 201 ){
+                 log.debug("Response : "+responseMarkasComplete);
+                 log.debug("Data : "+data);
+                 log.debug("Url : "+urlBase);
 
-     			return false;
-			}
+                 return false;
+            }
 
-			if( responseMarkasComplete.getStatus() == 201 ){
-				return true;
-			}
-     	}
+            if( responseMarkasComplete.getStatus() == 201 ){
+                return true;
+            }
+         }
 
-     	if ( status.equals("complete")) {
-     		return true;
-     	}
+         if ( status.equals("complete")) {
+             return true;
+         }
 
-     	return false;
+         return false;
     }
 
 
@@ -250,25 +250,25 @@ public class RemediationsService {
      * @param jsonObject 	The remediation response in json format
      * @return String 		status
      */
-	public String  getStatusRemediationItem(JSONObject jsonObject, String remediationItemKey){
-    	if( jsonObject != null ){
-	    	JSONArray assetsArray = jsonObject.getJSONArray("assets");
+    public String  getStatusRemediationItem(JSONObject jsonObject, String remediationItemKey){
+        if( jsonObject != null ){
+            JSONArray assetsArray = jsonObject.getJSONArray("assets");
 
-	    	for(int i = 0; i < assetsArray.length(); i++)
-	    	{
-	    		JSONArray  remediationItems = assetsArray.getJSONArray(i);
+            for(int i = 0; i < assetsArray.length(); i++)
+            {
+                JSONArray  remediationItems = assetsArray.getJSONArray(i);
 
-	    		for(int j = 0; j < remediationItems.length(); j++)
-	        	{
-	    			JSONObject remediationItem = remediationItems.getJSONObject(j);
+                for(int j = 0; j < remediationItems.length(); j++)
+                {
+                    JSONObject remediationItem = remediationItems.getJSONObject(j);
 
-	    			if(remediationItem.getString("key").equals(remediationItemKey)){
-	    				return remediationItem.getString("state");
-	    			}
-	        	}
-	    	}
-    	}
-    	return "";
+                    if(remediationItem.getString("key").equals(remediationItemKey)){
+                        return remediationItem.getString("state");
+                    }
+                }
+            }
+        }
+        return "";
     }
 
 
@@ -279,44 +279,44 @@ public class RemediationsService {
      * @return	Boolean			True if the undipose call was successfull
      * @throws Exception 
      */
-    public Boolean unDipose(String env,String remediationItem, String jiraUser) throws Exception{
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointAsset;
+    public Boolean unDipose(String env,String remediationItem, String jiraUser, String actingAccountId) throws Exception{
+        restUtil.setupAuthetication( jiraUser, actingAccountId );
+        String urlBase = restUtil.urlEndPointAsset;
 
-    	JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser);
-    	String status = getStatusRemediationItem( remediationsItemResponse, remediationItem );
+        JSONObject remediationsItemResponse = getRemediationItem( env, remediationItem, jiraUser, actingAccountId);
+        String status = getStatusRemediationItem( remediationsItemResponse, remediationItem );
 
-    	ClientResponse responseUndispose;
+        ClientResponse responseUndispose;
 
-     	if ( urlBase != null && status.equals("disposed")) {
+         if ( urlBase != null && status.equals("disposed")) {
 
-     		Map<String, Object> data = new HashMap<String, Object>();
-     		data.put("operation", "undispose_remediations");
-     		data.put("remediation_items", Arrays.asList( remediationItem));
+             Map<String, Object> data = new HashMap<String, Object>();
+             data.put("operation", "undispose_remediations");
+             data.put("remediation_items", Arrays.asList( remediationItem));
 
-     		urlBase += env + "/assets";
-     		responseUndispose = restUtil.put(urlBase, data );
+             urlBase += env + "/assets";
+             responseUndispose = restUtil.put(urlBase, data );
 
-     		log.debug("CI Plugin: Undipose status CI : "+responseUndispose.getStatus());
+             log.debug("CI Plugin: Undipose status CI : "+responseUndispose.getStatus());
 
-     		if( responseUndispose.getStatus() != 201 ){
-     			log.debug("Response : "+responseUndispose);
-     			log.debug("Data : "+data);
-     			log.debug("Url : "+urlBase);
+             if( responseUndispose.getStatus() != 201 ){
+                 log.debug("Response : "+responseUndispose);
+                 log.debug("Data : "+data);
+                 log.debug("Url : "+urlBase);
 
-     			return false;
-			}
+                 return false;
+            }
 
-			if( responseUndispose.getStatus() == 201 ){
-				return true;
-			}
-     	}
+            if( responseUndispose.getStatus() == 201 ){
+                return true;
+            }
+         }
 
-     	if ( status.equals("planned") ) {
-     		return true;
-     	}
+         if ( status.equals("planned") ) {
+             return true;
+         }
 
-     	return false;
+         return false;
     }
 
     /**
@@ -325,17 +325,17 @@ public class RemediationsService {
      * @param currentRemediations	The reference to the remediations
      * @return	String[]	The array of remediations keys
      */
-	public JSONArray getRemediationsKeys(JSONArray currentRemediations) {
-		JSONArray remediations = new  JSONArray();
+    public JSONArray getRemediationsKeys(JSONArray currentRemediations) {
+        JSONArray remediations = new  JSONArray();
 
-		for (int i = 0; i < currentRemediations.length(); i++)
-		{
-			JSONObject remediation = currentRemediations.getJSONObject(i);
-			remediations.put(remediation.getString("key"));
-		}
+        for (int i = 0; i < currentRemediations.length(); i++)
+        {
+            JSONObject remediation = currentRemediations.getJSONObject(i);
+            remediations.put(remediation.getString("key"));
+        }
 
-		return remediations;
-	};
+        return remediations;
+    };
 
     /**
      * Search in a remediation description
@@ -364,9 +364,9 @@ public class RemediationsService {
      * @return JSONObject with remediations descriptions
      * @throws Exception
      */
-    public JSONObject getRemediationsDescriptions(String jiraUser) throws Exception {
-    	restUtil.setupAuthetication( jiraUser );
-    	String urlBase = restUtil.urlEndPointRemediation;
+    public JSONObject getRemediationsDescriptions(String jiraUser, String actingAccountId) throws Exception {
+        restUtil.setupAuthetication( jiraUser, actingAccountId);
+        String urlBase = restUtil.urlEndPointRemediation;
 
         ClientResponse response;
 

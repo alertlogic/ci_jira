@@ -24,34 +24,34 @@ import com.atlassian.sal.api.scheduling.PluginJob;
  *	Jira issues.
  */
 public class AutoAssignTask implements PluginJob {
-	private static final Logger log = LoggerFactory.getLogger(AutoAssignTask.class);
+    private static final Logger log = LoggerFactory.getLogger(AutoAssignTask.class);
 
-	private RemediationsService remediationsService;
-	private RuleConfigService ruleConfigService;
-	private AutoAssignScheduledImpl monitor;
+    private RemediationsService remediationsService;
+    private RuleConfigService ruleConfigService;
+    private AutoAssignScheduledImpl monitor;
 
-	@Override
-	public void execute(Map<String, Object> jobDataMap) {
-		//Get the reference to the monitor of the task
+    @Override
+    public void execute(Map<String, Object> jobDataMap) {
+        //Get the reference to the monitor of the task
         monitor = (AutoAssignScheduledImpl)jobDataMap.get(AutoAssignScheduledImpl.KEY);
         log.debug("----------------------Job Auto Assign issues Cloud Insight---------------------");
 
         //Verify monitor is present
         if ( monitor != null ) {
-        	//Ignore task execution if it´s the first time, let the spring context initialize correctly.
-    		if (monitor.getLastRun() == null) {
-    			log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Ignoring the first execution.");
-    			monitor.setLastRun(new Date());
-    		} else {
-    			//Set last run always, even if is the first time execution.
-	    		Date currentDate = new Date();
-	        	log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
-	        	monitor.setLastRun(currentDate);
+            //Ignore task execution if it´s the first time, let the spring context initialize correctly.
+            if (monitor.getLastRun() == null) {
+                log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Ignoring the first execution.");
+                monitor.setLastRun(new Date());
+            } else {
+                //Set last run always, even if is the first time execution.
+                Date currentDate = new Date();
+                log.debug(AutoAssignScheduledImpl.JOB_NAME+":: Current Date: "+currentDate+" Last Execution: "+monitor.getLastRun());
+                monitor.setLastRun(currentDate);
 
-	        	if( monitor.getPluginConfigService() != null ){
-	        		assingJob();
-	        	}
-    		}
+                if( monitor.getPluginConfigService() != null ){
+                    assingJob();
+                }
+            }
         }
 	}
 
@@ -225,7 +225,8 @@ public class AutoAssignTask implements PluginJob {
 		this.remediationsService = new RemediationsService(monitor.getPluginConfigService(), monitor.getRestUtil());
 
     	String environment = rule.getString("environment");
-    	String jiraUser = rule.getString("user");
+        String jiraUser = rule.getString("user");
+        String actingAccountId = rule.getString("aaid");
 
     	if (!environment.isEmpty())
     	{
@@ -234,18 +235,18 @@ public class AutoAssignTask implements PluginJob {
 	    	JSONArray filtersString = rule.getJSONArray("filtersString");
 
 	    	//Get all remediation items for the configures environment in the rule
-	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environment, jiraUser);
+	    	JSONObject allRemediationsItems = this.remediationsService.getAllRemediationsItemsByEnvironment( environment, jiraUser, actingAccountId);
 	    	//Get all remediations based on the environment an the filter
-	    	JSONObject allRemediations = this.remediationsService.getAllRemediations( environment, filters, jiraUser);
+	    	JSONObject allRemediations = this.remediationsService.getAllRemediations( environment, filters, jiraUser, actingAccountId);
 	    	//Get all remediations descritions
-	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions(jiraUser);
+	    	JSONObject descriptions=this.remediationsService.getRemediationsDescriptions(jiraUser, actingAccountId);
 
 	    	JSONArray currentRemediations = getOpenRemediations(allRemediations,allRemediationsItems);
 
 	    	if (currentRemediations.length() > 0) {
 
 	    		JSONArray remediationKeys = this.remediationsService.getRemediationsKeys(currentRemediations);
-	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString, jiraUser);
+	    		JSONArray plannedItems = this.remediationsService.planRemediations(environment, remediationKeys, filtersString, jiraUser, actingAccountId);
 
 	    		if (plannedItems.length() <= 0) {
 	    			throw new Exception(currentRemediations.length()+" "+monitor.getI18nResolver().getText("ci.job.autoassign.msg.plannederror"));

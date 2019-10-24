@@ -33,6 +33,9 @@
                                 <th id="header-name">
                                     $i18n.getText('ci.partials.ruleconfiguration.vm.header.name')
                                 </th>
+                                <th id="header-account">
+                                    $i18n.getText('ci.partials.ruleconfiguration.vm.header.account')
+                                </th>
                                 <th id="header-project">
                                     $i18n.getText('ci.partials.ruleconfiguration.vm.header.project')
                                 </th>

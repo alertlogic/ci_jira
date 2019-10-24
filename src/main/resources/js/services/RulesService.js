@@ -52,10 +52,11 @@ var RulesService = function() {
     /**
      * Create Rule
      */
-    self.createRule = function( project, group, environment, filters, name) {
+    self.createRule = function(  actingAccountId, project, group, environment, filters, name) {
         var urlProxyServlet = self.getUrlBaseHost() + "ruleconfigurationservlet";
 
         var data={
+            "aaid" : actingAccountId,
             "project" : project,
             "group" : group,
             "environment": environment,
@@ -75,10 +76,11 @@ var RulesService = function() {
     /**
      * Update Rule
      */
-    self.updateRule = function( id, project, group, environment, filters, name) {
+    self.updateRule = function( actingAccountId, id, project, group, environment, filters, name) {
         var urlProxyServlet = self.getUrlBaseHost() + "ruleconfigurationservlet";
 
-        var data={
+        var data = {
+            "aaid": actingAccountId,
             "project" : project,
             "group" : group,
             "environment": environment,

@@ -36,22 +36,17 @@ public class RuleConfigService {
 
     /**
      * Creates a rule configuration, return the configuration reference object
-     * @param group
-     * @param project
-     * @param ruleName
-     * @param environment
-     * @param filters
-     * @return RuleConfig
      */
-    public RuleConfig createRule(String group, int project, String ruleName, String environment, String[] filters, String userName)
+    public RuleConfig createRule(String actingAccountId, String group, int project, String ruleName, String environment, String[] filters, String userName)
     {
-    	RuleConfig conf;
+        RuleConfig conf;
 
-    	conf = activeObjects.create( RuleConfig.class);
+        conf = activeObjects.create( RuleConfig.class);
 
-    	conf.setProject(project);
+        conf.setProject(project);
         conf.setGroup(group);
         conf.setName(ruleName);
+        conf.setActingAccountId(actingAccountId);
         conf.setEnvironment(environment);
         conf.setUser(userName);
         conf.setLastExecution(null);
@@ -63,7 +58,7 @@ public class RuleConfigService {
         log.debug("CI Plugin: creating a rule configuration on active objects");
 
         for( int i = 0; i < filters.length; i++){
-        	addFilter( conf , filters[ i ] );
+            addFilter( conf , filters[ i ] );
         }
 
         return conf;
@@ -76,11 +71,11 @@ public class RuleConfigService {
      */
     public void updateLastExecution(Integer id, Date lastExecution)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastExecution(lastExecution);
-    		conf.save();
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastExecution(lastExecution);
+            conf.save();
+        }
     }
 
     /**
@@ -90,11 +85,11 @@ public class RuleConfigService {
      */
     public void updateLastStatus(Integer id, int status)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastStatus(status);
-    		conf.save();
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastStatus(status);
+            conf.save();
+        }
     }
 
     /**
@@ -104,11 +99,11 @@ public class RuleConfigService {
      */
     public void updateLastImportantLog(Integer id, String lastImportantLog)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastImportantLog(lastImportantLog);
-    		conf.save();
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastImportantLog(lastImportantLog);
+            conf.save();
+        }
     }
 
     /**
@@ -118,11 +113,11 @@ public class RuleConfigService {
      */
     public void updateLastLog(Integer id, String lastLog)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastLog(lastLog);
-    		conf.save();
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastLog(lastLog);
+            conf.save();
+        }
     }
 
     /**
@@ -136,15 +131,15 @@ public class RuleConfigService {
      */
     public boolean updateLog(Integer id, String lastLog, String lastImportantLog, Date lastExecution, int status)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastLog(lastLog);
-    		conf.setLastImportantLog(lastImportantLog);
-    		conf.setLastExecution(lastExecution);
-    		conf.setLastStatus(status);
-    		conf.save();
-    		return true;
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastLog(lastLog);
+            conf.setLastImportantLog(lastImportantLog);
+            conf.setLastExecution(lastExecution);
+            conf.setLastStatus(status);
+            conf.save();
+            return true;
+        }
         return false;
     }
 
@@ -158,44 +153,41 @@ public class RuleConfigService {
      */
     public boolean updateLog(Integer id, String lastLog, Date lastExecution, int status)
     {
-    	RuleConfig conf = activeObjects.get(RuleConfig.class, id);
-    	if( conf != null ){
-    		conf.setLastLog(lastLog);
-    		conf.setLastExecution(lastExecution);
-    		conf.setLastStatus(status);
-    		conf.save();
-    		return true;
-    	}
+        RuleConfig conf = activeObjects.get(RuleConfig.class, id);
+        if( conf != null ){
+            conf.setLastLog(lastLog);
+            conf.setLastExecution(lastExecution);
+            conf.setLastStatus(status);
+            conf.save();
+            return true;
+        }
         return false;
     }
 
     /**
      * Update the log and last execution of a rule
-     * @param id
-     * @param log
-     * @param lastExecution
-     * @return boolean
      */
-    public boolean updateRule(Integer id, String group, int project, String ruleName, String environment, String[] filters, String userName)
+    public boolean updateRule(String actingAccountId, Integer id, String group, int project, String ruleName, String environment, String[] filters, String userName)
     {
-    	RuleConfig conf = getRuleById(id);
-    	if( conf != null ){
-	    	conf.setProject(project);
-	        conf.setGroup(group);
-	        conf.setName(ruleName);
-	        conf.setEnvironment(environment);
-	        conf.setUser(userName);
-	        conf.save();
+        RuleConfig conf = getRuleById(id);
+        if( conf != null ){
+            conf.setProject(project);
+            conf.setGroup(group);
+            conf.setName(ruleName);
+            conf.setActingAccountId(actingAccountId);
+            conf.setEnvironment(environment);
+            conf.setUser(userName);
+            conf.save();
 
-	        log.debug("CI Plugin: updateing a rule configuration on active objects");
-	        Filter[] filtersArray = conf.getFilters();
-			activeObjects.delete( filtersArray );
+            log.debug("CI Plugin: updateing a rule configuration on active objects");
+            Filter[] filtersArray = conf.getFilters();
+            activeObjects.delete( filtersArray );
 
-	        for( int i = 0; i < filters.length; i++){
-	        	addFilter( conf , filters[ i ] );
-	        }
-	        return true;
-    	}
+            for( int i = 0; i < filters.length; i++){
+                addFilter( conf , filters[ i ] );
+            }
+            return true;
+        }
 
         return false;
     }
@@ -209,10 +201,10 @@ public class RuleConfigService {
     public Filter addFilter( RuleConfig rule, String filterKey){
 
          Filter filter = activeObjects.create( Filter.class );
-	     filter.setRule(rule);
-	     filter.setKey(filterKey);
-	     filter.save();
-	     log.debug("CI Plugin: adding filter to the rule");
+         filter.setRule(rule);
+         filter.setKey(filterKey);
+         filter.save();
+         log.debug("CI Plugin: adding filter to the rule");
 
          return filter;
     }
@@ -223,11 +215,11 @@ public class RuleConfigService {
      */
     public RuleConfig[] getRules()
     {
-    	RuleConfig[]  configArray = activeObjects.find( RuleConfig.class );
-    	if (configArray.length > 0) {
-    		return configArray;
-    	}
-    	return null;
+        RuleConfig[]  configArray = activeObjects.find( RuleConfig.class );
+        if (configArray.length > 0) {
+            return configArray;
+        }
+        return null;
     }
 
     /**
@@ -237,7 +229,7 @@ public class RuleConfigService {
      */
     public RuleConfig getRuleById( int id )
     {
-    	return activeObjects.get(RuleConfig.class, id);
+        return activeObjects.get(RuleConfig.class, id);
     }
 
     /**
@@ -247,23 +239,23 @@ public class RuleConfigService {
      */
     public Boolean deleteConfiguration( int id )
     {
-    	try{
-    		RuleConfig[]  rulesArray = activeObjects.find( RuleConfig.class, Query.select().where("ID = ?", id));
-    		if (rulesArray.length > 0) {
-    			Filter[] filtersArray = rulesArray[0].getFilters();
-    			activeObjects.delete( filtersArray );
-    			log.debug("CI Plugin: deleting filters configured");
-	    		activeObjects.delete( rulesArray );
-	    		log.debug("CI Plugin: deleting rule configured");
-	    		return true;
-	    	}
-    		return false;
-    	}
-    	catch(Exception e){
-    		log.error("CI Plugin: " + e.toString());
-			e.printStackTrace();
-		}
-    	return false;
+        try{
+            RuleConfig[]  rulesArray = activeObjects.find( RuleConfig.class, Query.select().where("ID = ?", id));
+            if (rulesArray.length > 0) {
+                Filter[] filtersArray = rulesArray[0].getFilters();
+                activeObjects.delete( filtersArray );
+                log.debug("CI Plugin: deleting filters configured");
+                activeObjects.delete( rulesArray );
+                log.debug("CI Plugin: deleting rule configured");
+                return true;
+            }
+            return false;
+        }
+        catch(Exception e){
+            log.error("CI Plugin: " + e.toString());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -272,12 +264,12 @@ public class RuleConfigService {
      */
     public JSONArray getRulesConfigured(){
 
-    	RuleConfig[] rules = this.getRules();
-    	JSONArray rulesArray  =  new JSONArray();
+        RuleConfig[] rules = this.getRules();
+        JSONArray rulesArray  =  new JSONArray();
 
-    	if (rules == null) {
-    		return null;
-    	}
+        if (rules == null) {
+            return null;
+        }
 
         for( int i = 0 ;i < rules.length ; i++ ) {
             JSONObject obj  =  new JSONObject();
@@ -286,6 +278,7 @@ public class RuleConfigService {
             obj.put("environment",rules[i].getEnvironment());
             obj.put("project",rules[i].getProject());
             obj.put("group",rules[i].getGroup());
+            obj.put("aaid",rules[i].getActingAccountId());
             obj.put("user",rules[i].getUser());
             obj.put("lastExecution",rules[i].getLastExecution());
             obj.put("lastLog",rules[i].getLastLog());
@@ -293,21 +286,21 @@ public class RuleConfigService {
             obj.put("lastStatus",rules[i].getLastStatus());
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(rules[i].getLastStatus()));
 
-        	JSONArray filtersArray  =  new JSONArray();
-        	Filter[] filters = rules[i].getFilters();
+            JSONArray filtersArray  =  new JSONArray();
+            Filter[] filters = rules[i].getFilters();
             JSONArray filtersString = new JSONArray();
 
-        	for ( int j = 0; j < filters.length ; j++ ) {
-        		JSONObject filter  =  new JSONObject();
-        		filter.put( "key", filters[j].getKey() );
-        		filtersArray.put(filter);
+            for ( int j = 0; j < filters.length ; j++ ) {
+                JSONObject filter  =  new JSONObject();
+                filter.put( "key", filters[j].getKey() );
+                filtersArray.put(filter);
                 filtersString.put( filters[j].getKey() );
-        	}
+            }
 
-        	obj.put("filters",filtersArray);
+            obj.put("filters",filtersArray);
             obj.put("filtersString",filtersString);
 
-        	rulesArray.put( obj );
+            rulesArray.put( obj );
         }
 
         return rulesArray;
@@ -319,13 +312,13 @@ public class RuleConfigService {
      */
     public JSONObject getRuleByIdJSON(int id){
 
-    	RuleConfig ruleConfig = this.getRuleById(id);
-    	JSONObject obj  =  new JSONObject();
+        RuleConfig ruleConfig = this.getRuleById(id);
+        JSONObject obj  =  new JSONObject();
 
-    	if (ruleConfig == null) {
-    		return null;
-    	}
-    	else{
+        if (ruleConfig == null) {
+            return null;
+        }
+        else{
             obj.put("id",ruleConfig.getID());
             obj.put("name",ruleConfig.getName());
             obj.put("environment",ruleConfig.getEnvironment());
@@ -338,18 +331,18 @@ public class RuleConfigService {
             obj.put("lastStatus",ruleConfig.getLastStatus());
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(ruleConfig.getLastStatus()));
 
-        	JSONArray filtersArray  =  new JSONArray();
-        	Filter[] filters = ruleConfig.getFilters();
+            JSONArray filtersArray  =  new JSONArray();
+            Filter[] filters = ruleConfig.getFilters();
             JSONArray filtersString = new JSONArray();
 
-        	for ( int j = 0; j < filters.length ; j++ ) {
-        		JSONObject filter  =  new JSONObject();
-        		filter.put( "key", filters[j].getKey() );
-        		filtersArray.put(filter);
+            for ( int j = 0; j < filters.length ; j++ ) {
+                JSONObject filter  =  new JSONObject();
+                filter.put( "key", filters[j].getKey() );
+                filtersArray.put(filter);
                 filtersString.put ( filters[j].getKey() );
-        	}
+            }
 
-        	obj.put("filters",filtersArray);
+            obj.put("filters",filtersArray);
             obj.put("filtersString",filtersString);
         }
 

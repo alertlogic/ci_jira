@@ -22,93 +22,93 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
  */
 public class AIMSService {
 
-	private static final Logger log = LoggerFactory.getLogger(AIMSService.class);
-	public static final String API_VERSION = "v1";
-	public PluginConfigService pluginConfigService;
-	private I18nResolver i18n;
-	private RestUtil restUtil;
+    private static final Logger log = LoggerFactory.getLogger(AIMSService.class);
+    public static final String API_VERSION = "v1";
+    public PluginConfigService pluginConfigService;
+    private I18nResolver i18n;
+    private RestUtil restUtil;
 
-	public AIMSService( PluginConfigService pluginConfigService, I18nResolver i18n, RestUtil restUtil )
-	{
-		this.pluginConfigService = pluginConfigService;
-		this.i18n = i18n;
-		this.restUtil = restUtil;
-	}
-
-	/**
-	 * Authenticates to CI and return the data.
-	 * @return JSONObject	The response of the authentication with an extra endpoint data.
-	 * @throws Exception
-	 */
-    public JSONObject ciAuthentication(String jiraUser) throws Exception{
-
-    	PluginConfig conf;
-
-     	if ( pluginConfigService.hasConfiguration( jiraUser ) ) {
-
-     		conf = pluginConfigService.getConfiguration( jiraUser );
-     		return ciAuthentication( conf.getCredential() );
-     	} else {
-     		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
-     	}
-
-     	return null;
+    public AIMSService( PluginConfigService pluginConfigService, I18nResolver i18n, RestUtil restUtil )
+    {
+        this.pluginConfigService = pluginConfigService;
+        this.i18n = i18n;
+        this.restUtil = restUtil;
     }
 
     /**
-	 * Authenticates to CI and return the data.
-	 * @return JSONObject	The response of the authentication with an extra endpoint data.
-	 * @throws Exception
-	 */
+     * Authenticates to CI and return the data.
+     * @return JSONObject	The response of the authentication with an extra endpoint data.
+     * @throws Exception
+     */
+    public JSONObject ciAuthentication(String jiraUser) throws Exception{
+
+        PluginConfig conf;
+
+         if ( pluginConfigService.hasConfiguration( jiraUser ) ) {
+
+             conf = pluginConfigService.getConfiguration( jiraUser );
+             return ciAuthentication( conf.getCredential() );
+         } else {
+             log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
+         }
+
+         return null;
+    }
+
+    /**
+     * Authenticates to CI and return the data.
+     * @return JSONObject	The response of the authentication with an extra endpoint data.
+     * @throws Exception
+     */
     public JSONObject ciAuthentication(Credential credential) throws Exception{
 
-     	if( credential != null ){
-     		return restUtil.autheticate(credential);
-     	} else {
-     		log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
-     	}
-     	
-     	return null;
+         if( credential != null ){
+             return restUtil.autheticate(credential);
+         } else {
+             log.error( i18n.getText("ci.service.aimsservice.msg.log.error.not.credentials") );
+         }
+         
+         return null;
     }
 
 
-	/**
-	 * Delete access key
-	 * @return boolean Return if the operation was successfull
-	 * @throws Exception
-	 */
+    /**
+     * Delete access key
+     * @return boolean Return if the operation was successfull
+     * @throws Exception
+     */
     public boolean deleteAccessKeyId(Credential credential) {
 
-    	String accessKeyId = credential.getCiAccessKeyId();
-    	try {
-        	restUtil.setupAuthetication(credential);
-	    	String urlBase = restUtil.urlEndPointAccessKey;
+        String accessKeyId = credential.getCiAccessKeyId();
+        try {
+            restUtil.setupAuthetication(credential,"");
+            String urlBase = restUtil.urlEndPointAccessKey;
 
-	    	ClientResponse responseDelete;
-	     	if ( urlBase != null) {
-	     		urlBase += accessKeyId;
+            ClientResponse responseDelete;
+             if ( urlBase != null) {
+                 urlBase += accessKeyId;
 
-	     		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.deleting") );
-	     		responseDelete = restUtil.delete(urlBase);
+                 log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.deleting") );
+                 responseDelete = restUtil.delete(urlBase);
 
-	     		if( responseDelete.getStatus() == 204 ){
-	     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.success") );
-	     			return true;
-				}
-	     		else {
-	     			log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
-	     			log.debug( "CI Plugin: "+responseDelete.getStatus() );
-	     			log.debug( "CI Plugin: "+urlBase );
-	     			log.debug( "CI Plugin: "+credential.getJiraUser() );
+                 if( responseDelete.getStatus() == 204 ){
+                     log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.success") );
+                     return true;
+                }
+                 else {
+                     log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
+                     log.debug( "CI Plugin: "+responseDelete.getStatus() );
+                     log.debug( "CI Plugin: "+urlBase );
+                     log.debug( "CI Plugin: "+credential.getJiraUser() );
 
-					return false;
-				}
-	     	}
-    	}catch(Exception e){
-    		log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
- 			e.printStackTrace();
-    	}
+                    return false;
+                }
+             }
+        }catch(Exception e){
+            log.debug( i18n.getText("ci.service.aimsservice.msg.log.debug.accesskey.detele.error") );
+             e.printStackTrace();
+        }
 
-     	return false;
+         return false;
     }
 }

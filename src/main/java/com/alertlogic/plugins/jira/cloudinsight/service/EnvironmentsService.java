@@ -30,9 +30,9 @@ public class EnvironmentsService {
 	 * @return
 	 * @throws Exception
 	 */
-	public JSONObject getAllEnvironments(String jiraUser) throws Exception{
-		restUtil.setupAuthetication( jiraUser );
-    String urlBase = restUtil.urlEndPointSource + "?source.config.aws.defender_support=!true&source.config.azure.defender_support=!true&source.config.datacenter.defender_support=!true&source.type=environment&source.config.collection_type=aws,azure,datacenter&source.config.collection_method=api";
+	public JSONObject getAllEnvironments(String jiraUser, String actingAccountId) throws Exception{
+		restUtil.setupAuthetication( jiraUser, actingAccountId );
+		String urlBase = restUtil.urlEndPointSource + "?source.config.aws.defender_support=!true&source.config.azure.defender_support=!true&source.config.datacenter.defender_support=!true&source.type=environment&source.config.collection_type=aws,azure,datacenter&source.config.collection_method=api";
 
     	ClientResponse responseGetEnvironments;
 

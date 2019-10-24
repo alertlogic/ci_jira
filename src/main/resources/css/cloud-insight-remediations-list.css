@@ -47,6 +47,10 @@
 .col-xs-1 {
   width: 8.33333333%;
 }
+.aui-spacing {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 .row.table-row {
   position: relative;
   width: 100%;
