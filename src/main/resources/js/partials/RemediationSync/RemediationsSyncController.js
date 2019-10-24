@@ -80,7 +80,7 @@ AJS.$(document).ready(
                     ciAIMSService.getSessionData().endpoint,
                     ciAIMSService.getSessionData().accountId ).success(function(data) {
 
-                    data.accounts.splice(300,data.accounts.length);
+                    data.accounts.splice(1000,data.accounts.length);
 
                     AUIUtils.addSelectOption(AJS.$("#select-account"),ciAIMSService.getSessionData().accountId,"SAME AS CREDENTIALS");
                     AUIUtils.addOptions( "#select-account", data.accounts, "id", "name" );
@@ -177,10 +177,10 @@ AJS.$(document).ready(
              * @return {void}
              */
             self.loadItems = function( currentEnvironment, selectedFiltersArray, selectedRemediations, remediationKey) {
-                remediationsService.getAllRemediationsItemsByEnvironment(currentEnvironment).done(function(remediationsItems){
+                remediationsService.getAllRemediationsItemsByEnvironment(actingAccountId, currentEnvironment).done(function(remediationsItems){
                     allRemediationsItems = remediationsItems;
 
-                    remediationsService.getAllRemediations(currentEnvironment,selectedFiltersArray).done(function(data){
+                    remediationsService.getAllRemediations(actingAccountId,currentEnvironment,selectedFiltersArray).done(function(data){
                         currentRemediations = [];
 
                         if ( data["remediations"] ) {
@@ -705,6 +705,7 @@ AJS.$(document).ready(
                     AJS.$( "#select-environment" ).auiSelect2();
                 }
                 AJS.$( "#select-environment" ).change(function() {
+                    actingAccountId = AJS.$( "#select-account" ).val();
                     currentEnvironment = AJS.$( "#select-environment" ).val();
                     
                     selectedFilters = [];
@@ -763,7 +764,7 @@ AJS.$(document).ready(
             /**
              * Plan remediations and create issues.
              */
-            self.planRemediationsAndCreateIssues = function( project, group, remediationKey ) {
+            self.planRemediationsAndCreateIssues = function( aaid, project, group, remediationKey ) {
                 var selectedRemediations = self.getSelectedRemediations();
 
                 if (selectedRemediations.length > 0 || remediationKey !== undefined) {
@@ -778,7 +779,7 @@ AJS.$(document).ready(
 
                     var selectedFiltersArray = self.getSelectedFiltersArray();
 
-                    remediationsService.planRemediations(currentEnvironment,remediationsKeys,selectedFiltersArray).done(
+                    remediationsService.planRemediations(aaid,currentEnvironment,remediationsKeys,selectedFiltersArray).done(
                         function(plannedItems){
 
                         JIRA.Messages.showSuccessMsg(
@@ -801,6 +802,7 @@ AJS.$(document).ready(
             self.assignRemediation = function (remediationKey) {
                 var group = AJS.$( "#select-group" ).val();
                 var project = AJS.$( "#select-project" ).val();
+                var aaid =  AJS.$( "#select-account" ).val();
                 JIRA.Loading.showLoadingIndicator();
 
                 if (project) {
@@ -817,7 +819,7 @@ AJS.$(document).ready(
                                 }
                             }
                             if (issueTypeId) {
-                                self.planRemediationsAndCreateIssues(project,group, remediationKey);
+                                self.planRemediationsAndCreateIssues(aaid, project,group, remediationKey);
                             } else {
                                 JIRA.Messages.showWarningMsg(
                                     AJS.I18n.getText("ci.partials.remediationssync.js.msg.issuetype.error")

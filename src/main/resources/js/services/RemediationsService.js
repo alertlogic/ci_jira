@@ -8,19 +8,19 @@ var RemediationsService = function() {
      * Get all the remediations for a specific environment.
      * CI return  remediations and the filters
      */
-    self.getAllRemediationsByEnvironment =  function( environment ) {
+    self.getAllRemediationsByEnvironment =  function( actingAccountId, environment ) {
 
-    	var urlBase = ciAIMSService.getSessionData().endpoint
-    	+"/assets/"+configService.serviceVersion
-    	+"/"+ciAIMSService.getSessionData().accountId
-    	+"/environments/"+environment+"remediations?scope=true";
+        var urlBase = ciAIMSService.getSessionData().endpoint
+        +"/assets/"+configService.serviceVersion
+        +"/"+actingAccountId
+        +"/environments/"+environment+"remediations?scope=true";
 
-    	return jQuery.ajax({
+        return jQuery.ajax({
             type: "GET",
             url: urlBase,
             dataType: 'json',
             headers: {
-            	"x-aims-auth-token":ciAIMSService.getSessionData().token
+                "x-aims-auth-token":ciAIMSService.getSessionData().token
             }
         });
     };
@@ -29,11 +29,11 @@ var RemediationsService = function() {
      * Get all the remediations for a specific environment.
      * CI return  remediations and the filters
      */
-    self.getAllRemediations = function( environment, filters ) {
+    self.getAllRemediations = function( actingAccountId, environment, filters ) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+actingAccountId
         +"/environments/"+environment
         +"/remediations";
 
@@ -112,11 +112,11 @@ var RemediationsService = function() {
      * Get all the remediations items
      * @param  {String} environment The environment to query
      */
-    self.getAllRemediationsItemsByEnvironment =  function( environment ) {
+    self.getAllRemediationsItemsByEnvironment =  function( actingAccountId, environment ) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+actingAccountId
         +"/environments/"+environment
         +"/assets?asset_types=remediation-item&reduce=true&remediation-item.deleted_on=0";
 
@@ -166,11 +166,11 @@ var RemediationsService = function() {
     /**
      * Plan a set of remediations
      */
-    self.planRemediations =  function( environment, remediationsKeys, filters ) {
+    self.planRemediations =  function( actingAccountId, environment, remediationsKeys, filters ) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+actingAccountId
         +"/environments/"+environment+"/assets";
 
         var payload = {
@@ -234,11 +234,11 @@ var RemediationsService = function() {
      * Get vulnerabilities and assets the remediation for a specific environment and remediation id.
      * CI return remediation and the filters
      */
-    self.getVulnerabilityAndAssetsByRemediationId = function( environment, remediationId ) {
+    self.getVulnerabilityAndAssetsByRemediationId = function( actingAccountId, environment, remediationId ) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+actingAccountId
         +"/environments/"+environment
         +"/remediations?key="+remediationId
         +"&scope=true";
@@ -258,11 +258,11 @@ var RemediationsService = function() {
      * @param  {String} environment The environment to query
      * @param  {String} remediation_item
      */
-    self.getFiltersByRemediationItem =  function( environment , remediation_item) {
+    self.getFiltersByRemediationItem =  function( actingAccountId, environment , remediation_item) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+actingAccountId
         +"/environments/"+environment
         +"/assets?asset_types=remediation-item&remediation-item.key="+remediation_item+"";
 
