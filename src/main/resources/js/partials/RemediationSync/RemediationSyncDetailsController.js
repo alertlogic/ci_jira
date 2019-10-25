@@ -415,7 +415,7 @@ function remediationSyncDetailsController( remediationKey ) {
                     var filters = remediationsService.getFiltersByRemediationItem( environment, remediationKey );
                     var description = remediationsService.getRemediationById( remediationId );
                     var vulnerabilitiesDetails = remediationsService.getVulnerabilityDetailsByRemediationId( remediationId );
-                    var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( environment, remediationKey );
+                    var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( accountId, environment, remediationKey );
 
                     var optionsEvidence =[
                         {

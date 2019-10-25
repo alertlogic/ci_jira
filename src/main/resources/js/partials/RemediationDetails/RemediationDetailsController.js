@@ -461,7 +461,7 @@ function remediationDetailsController( issueId ) {
                         var filters = remediationsService.getFiltersByRemediationItem( accountId, environment, remediationItemKey );
                         var description = remediationsService.getRemediationById( remediationId );
                         var vulnerabilitiesDetails = remediationsService.getVulnerabilityDetailsByRemediationId( remediationId );
-                        var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( environment, remediationKey );
+                        var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( accountId, environment, remediationKey );
 
                         var optionsEvidence =[
                             {
