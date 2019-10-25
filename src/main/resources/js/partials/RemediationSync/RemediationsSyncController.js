@@ -660,7 +660,6 @@ AJS.$(document).ready(
                 
                 var projectSelected = AJS.$("#select-project option:selected");
                 var groupSelected = AJS.$( "#select-group option:selected" );
-                var accountId = AJS.$( "#select-account option:selected" );
                 var assignButtonDialog = AJS.$( "#assign-button-dialog" );
                 
                 AJS.$("#details-loading").removeClass("hidden");
@@ -678,6 +677,7 @@ AJS.$(document).ready(
                 } 
                 
                 remediationKeyDetail = remediation_key;
+                var accountId = AJS.$( "#select-account option:selected" ).val();
                 remediationSyncDetailsController(accountId, remediation_key);
                 
                 AJS.dialog2("#detail-dialog").show();
