@@ -188,7 +188,7 @@ AJS.$(document).ready(
 
                                 var remediationCount = 0;
                                 
-                                assetsService.byType(currentEnvironment, 'vulnerability', []).done( function( response ){
+                                assetsService.byType(actingAccountId, currentEnvironment, 'vulnerability', []).done( function( response ){
 
                                     vulnerabilityInstanceMap = {};
                                 

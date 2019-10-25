@@ -10,11 +10,11 @@ var AssetsService = function() {
      * @param  {String} assets type
      * @param  {String} asset key
      */
-    self.byType =  function( environment, assetType, optionals) {
+    self.byType =  function( accountId, environment, assetType, optionals) {
 
         var urlBase = ciAIMSService.getSessionData().endpoint
         +"/assets/"+configService.serviceVersion
-        +"/"+ciAIMSService.getSessionData().accountId
+        +"/"+accountId
         +"/environments/"+environment
         +"/assets";
 

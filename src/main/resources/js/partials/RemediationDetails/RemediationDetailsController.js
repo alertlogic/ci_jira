@@ -22,6 +22,7 @@ function remediationDetailsController( issueId ) {
 
             issue.done( function( issueData ){
                 var user = issueData.fields.reporter.name;
+                var accountId = "";
 
                 Bootstrap.start( user, function(){
                     var self = this;
@@ -88,6 +89,7 @@ function remediationDetailsController( issueId ) {
                         for( assetKey in remediationDetails.assets.values ){
 
                             assetsService.byType(
+                                accountId,
                                 remediationDetails.environment,
                                 AUIUtils.getTypeFromKey( assetKey ) ,
                                 [{
@@ -267,6 +269,7 @@ function remediationDetailsController( issueId ) {
                             AJS.$( "#"+ AUIUtils.escapeSelector ( assetKey ) + " > td ").addClass("table-simple-row-selected");
 
                             assetsService.byType(
+                                accountId,
                                 remediationDetails.environment ,
                                 AUIUtils.getTypeFromKey( assetKey ),
                                 [{
@@ -447,7 +450,7 @@ function remediationDetailsController( issueId ) {
                     /**
                     * Load the details of a remediations on Cloud Insight
                     */
-                    self.loadDetailsFromCI = function(  remediationKey, remediationItemKey ){
+                    self.loadDetailsFromCI = function(  accountId, remediationKey, remediationItemKey ){
                         var environment = remediationsService.getEnvironmentFromRemediationItem( remediationItemKey );
                         var remediationId = AUIUtils.getLastDetailFromKey( remediationKey );
                         var arrayComplementsFromAssets = [];
@@ -455,7 +458,7 @@ function remediationDetailsController( issueId ) {
                         remediationDetails.remediationId = remediationId;
 
                         //get information of remediations
-                        var filters = remediationsService.getFiltersByRemediationItem( environment, remediationItemKey );
+                        var filters = remediationsService.getFiltersByRemediationItem( accountId, environment, remediationItemKey );
                         var description = remediationsService.getRemediationById( remediationId );
                         var vulnerabilitiesDetails = remediationsService.getVulnerabilityDetailsByRemediationId( remediationId );
                         var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( environment, remediationKey );
@@ -470,7 +473,7 @@ function remediationDetailsController( issueId ) {
                                 value: remediationId
                             }
                         ];
-                        var vulnerabilitiesEvidence = assetsService.byType( environment ,'vulnerability', optionsEvidence);
+                        var vulnerabilitiesEvidence = assetsService.byType( accountId, environment ,'vulnerability', optionsEvidence);
 
                         description.done( function( descriptionData ) {
                             remediationDetails.basic = remediationSupportService.getDescription ( descriptionData );
@@ -543,13 +546,15 @@ function remediationDetailsController( issueId ) {
                         var remediationItemCustomName = fields.remediationItem ;
                         var remediationIdCustomName = fields.remediationId ;
                         var jiraGroupCustomName = fields.group ;
+                        var accountIdCustomName = fields.accountId;
 
-                        if( remediationItemCustomName != null  && remediationIdCustomName != null && jiraGroupCustomName != null)
+                        if( remediationItemCustomName != null  && remediationIdCustomName != null && jiraGroupCustomName != null && accountIdCustomName != null)
                         {
                             //get and transform data
                             var remediationItemKey =  issueData.fields[ remediationItemCustomName ];
                             var remediationKey =  issueData.fields[ remediationIdCustomName ];
-                            self.loadDetailsFromCI( remediationKey, remediationItemKey );
+                            accountId = issueData.fields[ accountIdCustomName ];
+                            self.loadDetailsFromCI( accountId, remediationKey, remediationItemKey );
 
                         }
                     };
