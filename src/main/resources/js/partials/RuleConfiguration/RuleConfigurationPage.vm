@@ -9,7 +9,7 @@
             <!-- Page Content -->
             <div class="aui-group">
                 <div class="aui-item">
-    		      <h1>$i18n.getText('ci.partials.ruleconfiguration.vm.title')</h1>
+                    <h1><span class="aui-icon aui-icon-large aui-iconfont-settings"></span> $i18n.getText('ci.partials.ruleconfiguration.vm.title')</h1>
                 </div>
                 <div class="aui-item button-align-right">
                     <button id="unblock-rule-button" class="aui-button aui-button-primary">

@@ -12,20 +12,22 @@
         <h1>$i18n.getText('ci.partials.remediationssync.vm.title')</h1>
 
         <div class="aui aui-spacing">
+            <span class="aui-icon aui-icon-small aui-iconfont-person"></span>
             $i18n.getText('ci.partials.common.vm.select.account'):
 
             <select id="select-account" class="select-medium" size="1"></select>
-        </div>
 
-        <div class="aui">
+            <span class="aui-icon aui-icon-small aui-iconfont-office-building-filled"></span>
             $i18n.getText('ci.partials.remediationssync.vm.environment.select'):
 
             <select id="select-environment" class="select-medium" size="1">
                 <option value="">$i18n.getText('ci.partials.remediationssync.vm.environment.select.option')</option>
             </select>
 
+            <span class="aui-icon aui-icon-small aui-iconfont-settings"></span>
+
             $i18n.getText('ci.partials.remediationssync.vm.rule.name'):
-            <input id="rule-name" class="height-field-input" type="text"
+            <input id="rule-name" class="height-field-input" type="text" size="40"
                 #if ($ruleName)
                 value="$ruleName"
                 #end
@@ -73,11 +75,13 @@
 
                 <div class="content-data-div">
                     <div class="bottom-panel">
+                        <span class="aui-icon aui-icon-small aui-iconfont-jira"></span>
                         $i18n.getText('ci.partials.remediationssync.vm.project.select'):
                         <select id="select-project" class="select-medium" size="1">
                             <option value="">$i18n.getText('ci.partials.remediationssync.vm.project.select.option')</option>
                         </select>
 
+                        <span class="aui-icon aui-icon-small aui-iconfont-group"></span>
                         $i18n.getText('ci.partials.remediationssync.vm.group.select'):
                         <select id="select-group" class="select-medium" size="1">
                             <option value="">$i18n.getText('ci.partials.remediationssync.vm.group.select.option')</option>
