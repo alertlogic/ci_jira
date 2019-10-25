@@ -299,6 +299,14 @@
     	<resource type="download" name="StatusPanelController.js" location="/js/partials/StatusPanel/StatusPanelController.js"/>
   	</web-resource>
 
+	<web-resource name="IncidentStatusPanelController" key="incidentStatusPanelController">
+    	<context>atl.general</context>
+    	<transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+    	<resource type="download" name="IncidentStatusPanelController.js" location="/js/partials/IncidentStatusPanel/IncidentStatusPanelController.js"/>
+  	</web-resource>
+
   	<web-resource key="ruleConfigurationController" name="RuleConfigurationController" >
         <resource type="download" name="RuleConfigurationController.js" location="/js/partials/RuleConfiguration/RuleConfigurationController.js" />
         <transformation extension="js">
@@ -422,7 +430,15 @@
     </project-blueprint>
 
 	<web-panel  key="validator-remediation"  location="atl.jira.view.issue.right.context">
-		<label key="ci.atlassianplugin.validator.remediation.title"/>
+		<label key="ci.atlassianplugin.webpanel.incidentstatuspanel.title"/>
+		<resource name="view" type="velocity" location="/js/partials/IncidentStatusPanel/IncidentStatusPanel.vm"/>
+		<conditions type="AND">
+			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
+		</conditions>
+	</web-panel>
+
+	<web-panel  key="incident-status"  location="atl.jira.view.issue.right.context">
+		<label key="ci.atlassianplugin.statuspanel.title"/>
 		<resource name="view" type="velocity" location="/js/partials/StatusPanel/StatusPanel.vm"/>
 		<conditions type="AND">
 			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
