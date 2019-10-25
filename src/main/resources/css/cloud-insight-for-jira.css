@@ -131,3 +131,29 @@
     margin-bottom: 5px;
     margin-top: 15px;
 }
+
+/* Colors incidents filter */
+.risk-critical {
+    padding-left: 15px;
+    border-left: 5px solid #ef534f;
+}
+
+.risk-high {
+    padding-left: 15px;
+    border-left: 5px solid #f78c1e;
+}
+
+.risk-medium {
+    padding-left: 15px;
+    border-left: 5px solid #ffd54f;
+}
+
+.risk-low {
+    padding-left: 15px;
+    border-left: 5px solid #868686;
+}
+
+.risk-info {
+    padding-left: 15px;
+    border-left: 5px solid #b3aeae;
+}

@@ -1,0 +1,78 @@
+<html>
+<head>
+    <title>$i18n.getText('ci.partials.incidentssync.vm.title')</title>
+    <meta name="decorator" content="atl.general">
+</head>
+<body class="page-type-admin">
+
+<div class="content-container">
+    <div class="content-body">
+        <!-- Page Content -->
+
+        <h1>$i18n.getText('ci.partials.incidentssync.vm.title')</h1>
+
+        <section id="content" role="main">
+          <div class="aui-page-panel">
+
+            <div class="aui-page-panel-inner">
+                <div class="aui-page-panel-nav filters-panel">
+                    <b>$i18n.getText('ci.partials.incidentssync.vm.filters')</b>
+                    <hr>
+                    <div class="content-data-div">
+
+                        <table class="aui" id="selectedFilters">
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                    <b>$i18n.getText('ci.partials.incidentssync.vm.available.filters')</b>
+                    <hr>
+                    <div class="content-data-div">
+
+                        <table class="aui" id="dataFilters">
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                <div class="content-data-div">
+                    <div class="bottom-panel">
+                        $i18n.getText('ci.partials.incidentssync.vm.project.select'):
+                        <select id="select-project" class="select-medium" size="1">
+                            <option value="">$i18n.getText('ci.partials.incidentssync.vm.project.select.option')</option>
+                        </select>
+                    </div>
+                    <div class="bottom-panel">
+                        $i18n.getText('ci.partials.incidentssync.vm.group.select'):
+                        <select id="select-group" class="select-medium" size="1">
+                            <option value="">$i18n.getText('ci.partials.incidentssync.vm.group.select.option')</option>
+                        </select>
+                    </div>
+                    <div class="bottom-panel">
+                        $i18n.getText('ci.partials.incidentssync.vm.rule.name'):
+                        <input id="rule-name" class="height-field-input" type="text"
+                            #if ($ruleName)
+                            value="$ruleName"
+                            #end
+                        />
+                        <input id="rule-id" class="text long-field" type="hidden"
+                            #if ($ruleId)
+                            value="$ruleId"
+                            #end
+                        />
+                        <button id="save-rule-button" class="aui-button aui-button-primary">
+                            $i18n.getText('ci.partials.incidentssync.vm.button.save')
+                        </button>
+                    </div>
+                    <div style="min-height: 250px;">
+                    </div>
+            	</div>
+          	</div>
+        </section>
+        <!-- End of Content -->
+    </div>
+</div>
+
+</body>
+</html>

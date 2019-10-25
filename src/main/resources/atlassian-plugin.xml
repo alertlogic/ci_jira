@@ -247,6 +247,7 @@
         <resource type="download" name="EnvironmentsService.js"         location="/js/services/EnvironmentsService.js" />
         <resource type="download" name="RemediationsService.js"         location="/js/services/RemediationsService.js" />
         <resource type="download" name="IrisService.js"                 location="/js/services/IrisService.js" />
+		<resource type="download" name="incidentsUtilityService.js"     location="/js/services/incidentsUtilityService.js" />
         <resource type="download" name="DashboardService.js"            location="/js/services/DashboardService.js" />
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
@@ -259,6 +260,13 @@
 	<!-- Start of Javascript Page controllers -->
 	<web-resource key="remediationsSyncController" name="RemediationsSyncController" >
         <resource type="download" name="RemediationsSyncController.js" location="/js/partials/RemediationSync/RemediationsSyncController.js" />
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+    </web-resource>
+
+	<web-resource key="incidentsSyncController" name="IncidentsSyncController" >
+        <resource type="download" name="IncidentsSyncController.js" location="/js/partials/IncidentsSync/IncidentsSyncController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
