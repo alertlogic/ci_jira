@@ -1,7 +1,8 @@
 /**
  * Global vars
  */
-var currentEnvironment;
+var currentEnvironment = null;
+var actingAccountId = null;
 var incidentsSyncController;
 /**
  * Incidents sync page Controller
@@ -9,6 +10,7 @@ var incidentsSyncController;
 AJS.$(document).ready(
 	function() {
 		var currentUser = AJS.Meta.get('remote-user');
+		var ruleType = 'incident';
 
 		Bootstrap.start( currentUser, function(){
 			var self = incidentsSyncController = this;
@@ -66,7 +68,7 @@ AJS.$(document).ready(
 			};
 
 			/**
-			 * Get all projects that has associated the CI Remediation Issue Type.
+			 * Get all projects that has associated the CI Incident Issue Type.
 			 */
 			jiraService.Project().getAll().success(function(data){
 				var customsProjectsArray = [];
@@ -269,7 +271,7 @@ AJS.$(document).ready(
                 var filtersArray = [];
                 if (selectedFilters) {
                     for(var i = 0; i< selectedFilters.length; i++) {
-                        var itemKey = selectedFilters[i].type === 'application' ? selectedFilters[i].name : selectedFilters[i].key;
+                        var itemKey = selectedFilters[i].key;
                         filtersArray.push(selectedFilters[i].type+":"+itemKey);
                     }
                 }
@@ -290,7 +292,7 @@ AJS.$(document).ready(
 				if( id === ''){
 					var projectIsConfigured = jiraService.ConfigureProject(project);
 					projectIsConfigured.done( function(){
-						var rulePromise = rulesService.createRule( project, group, currentEnvironment, filters, ruleName);
+						var rulePromise = rulesService.createRule( actingAccountId, project, group, currentEnvironment, filters, ruleName, ruleType);
 
 						rulePromise.done( function( data ) {
 							JIRA.Messages.showSuccessMsg(
@@ -313,7 +315,7 @@ AJS.$(document).ready(
 						);
 					});
 				} else {
-					var rulePromise = rulesService.updateRule( id, project, group, currentEnvironment, filters, ruleName);
+					var rulePromise = rulesService.updateRule( actingAccountId, id, project, group, currentEnvironment, filters, ruleName, ruleType);
 					rulePromise.done( function( data ) {
 						JIRA.Messages.showSuccessMsg(
 							AJS.I18n.getText("ci.partials.incidentssync.js.msg.rule.updated"
