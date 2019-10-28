@@ -178,23 +178,24 @@ public class RuleConfigurationServlet extends HttpServlet{
                         res.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     }
                 }
+                String group = jsonArray.getString("group");
+                String environment = jsonArray.getString("environment");
+                String name = jsonArray.getString("name");
+                String actingAccountId = jsonArray.getString("aaid");
+                String actingType = jsonArray.getString("type");
+                JSONArray filtersArray = jsonArray.getJSONArray("filters");
+
+                List<String> list = new ArrayList<String>();
+                for(int i = 0; i < filtersArray.length(); i++){
+                    list.add(filtersArray.getString(i));
+                }
+                String[] filters= list.toArray(new String[list.size()]);
+                int project = (int) jsonArray.getInt("project");
+
+                String userName = userManager.getRemoteUsername(req);
+
                 if( option.equals("create") ){
-                    String group = jsonArray.getString("group");
-                    String environment = jsonArray.getString("environment");
-                    String name = jsonArray.getString("name");
-                    String actingAccountId = jsonArray.getString("aaid");
-                    JSONArray filtersArray = jsonArray.getJSONArray("filters");
-
-                    List<String> list = new ArrayList<String>();
-                    for(int i = 0; i < filtersArray.length(); i++){
-                        list.add(filtersArray.getString(i));
-                    }
-                    String[] filters= list.toArray(new String[list.size()]);
-                    int project = (int) jsonArray.getInt("project");
-
-                    String userName = userManager.getRemoteUsername(req);
-                    
-                    RuleConfig rule = ruleConfigService.createRule(actingAccountId,group, project, name, environment, filters, userName);
+                    RuleConfig rule = ruleConfigService.createRule(actingAccountId,group, project, name, environment, filters, userName, actingType);
 
                     String rulesJson  =  new JSONObject().put( "rules", rule ).toString();
 
@@ -210,20 +211,6 @@ public class RuleConfigurationServlet extends HttpServlet{
                 }
                 if( option.equals("update") ){
                     int id = jsonArray.getInt("id");
-                    String group = jsonArray.getString("group");
-                    String environment = jsonArray.getString("environment");
-                    String name = jsonArray.getString("name");
-                    String actingAccountId = jsonArray.getString("aaid");
-                    JSONArray filtersArray = jsonArray.getJSONArray("filters");
-
-                    List<String> list = new ArrayList<String>();
-                    for(int i = 0; i < filtersArray.length(); i++){
-                        list.add(filtersArray.getString(i));
-                    }
-                    String[] filters= list.toArray(new String[list.size()]);
-                    int project = (int) jsonArray.getInt("project");
-
-                    String userName = userManager.getRemoteUsername(req);
 
                     boolean result = ruleConfigService.updateRule(actingAccountId, id, group, project, name, environment, filters, userName);
 

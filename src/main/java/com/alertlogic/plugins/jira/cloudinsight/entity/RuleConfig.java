@@ -38,6 +38,9 @@ public interface RuleConfig extends Entity{
 	public int getLastStatus();
 	public void setLastStatus( int status );
 
+	public String getType();
+	public void setType( String type );
+
 	@StringLength(StringLength.UNLIMITED)
 	public String getLastLog();
 	@StringLength(StringLength.UNLIMITED)
