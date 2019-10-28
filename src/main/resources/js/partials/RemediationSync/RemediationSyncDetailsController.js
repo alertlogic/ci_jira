@@ -2,10 +2,10 @@
  * Explicit load of the controller, to be used
  * into a JIRA Dialog.
  */
-function remediationSyncDetailsController( remediationKey ) {
+function remediationSyncDetailsController( accountId, remediationKey ) {
     AJS.$(document).ready(
         function() {
-        	var currentUser = AJS.Meta.get('remote-user');
+            var currentUser = AJS.Meta.get('remote-user');
             Bootstrap.start( currentUser, function(){
                 var self = this;
 
@@ -270,9 +270,9 @@ function remediationSyncDetailsController( remediationKey ) {
                 *Insert table of filters
                 */
                 self.buildFiltersTable = function(){
-                	var selectedFilters = remediationsSyncController.getSelectedFiltersArray();
-                	
-                	if( selectedFilters != null && selectedFilters.length > 0 ){
+                    var selectedFilters = remediationsSyncController.getSelectedFiltersArray();
+
+                    if( selectedFilters != null && selectedFilters.length > 0 ){
                         var headerNameFilter = remediationDetails.filters.titles.filter;
                         var headerElementFilter = AJS.$("#filtersTable thead tr");
                         AUIUtils.addTableHeader( headerElementFilter, headerNameFilter, AJS.I18n.getText("ci.partials.remediationdetails.js.html.filters.title") );
@@ -290,19 +290,21 @@ function remediationSyncDetailsController( remediationKey ) {
                             AUIUtils.createTableRow( tableBody, rowData);
                         }
                     } else{
-                    	var headerNameFilter = remediationDetails.filters.titles.filter;
-                        var headerElementFilter = AJS.$("#filtersTable thead tr");
-                    	AUIUtils.addTableHeader( headerElementFilter, headerNameFilter, AJS.I18n.getText("ci.partials.remediationdetails.js.html.filters.title") );
-                    	
-                    	var tableBody = AJS.$("#filtersTable tbody");
-                        var rowData = [
-                            {
-                                header: headerNameFilter,
-                                data: "<div>" + AJS.I18n.getText("ci.partials.remediationdetails.js.html.without.filters.title") + "</div>"
-                            }
-                        ];
+                        if (remediationDetails.filters.titles) {
+                            var headerNameFilter = remediationDetails.filters.titles.filter;
+                            var headerElementFilter = AJS.$("#filtersTable thead tr");
+                            AUIUtils.addTableHeader( headerElementFilter, headerNameFilter, AJS.I18n.getText("ci.partials.remediationdetails.js.html.filters.title") );
 
-                        AUIUtils.createTableRow( tableBody, rowData);
+                            var tableBody = AJS.$("#filtersTable tbody");
+                            var rowData = [
+                                {
+                                    header: headerNameFilter,
+                                    data: "<div>" + AJS.I18n.getText("ci.partials.remediationdetails.js.html.without.filters.title") + "</div>"
+                                }
+                            ];
+
+                            AUIUtils.createTableRow( tableBody, rowData);
+                        }
                     }
                 };
 
@@ -363,15 +365,15 @@ function remediationSyncDetailsController( remediationKey ) {
                  * Clean modal to show new information for remediation selected.
                  */
                 self.clearData = function () {
-                	AJS.$("#detailsPanel").empty();
-                	AJS.$("#vulnerabilitiesTable thead tr").empty();
-                	AJS.$("#vulnerabilitiesTable tbody").empty();
-                	AJS.$("#assetsTable thead tr").empty();
-                	AJS.$("#assetsTable tbody").empty();
-                	AJS.$("#filtersTable thead tr").empty();
-                	AJS.$("#filtersTable tbody").empty();
-                	AJS.$("#evidencesTable thead tr").empty();
-                	AJS.$("#evidencesTable tbody").empty();
+                    AJS.$("#detailsPanel").empty();
+                    AJS.$("#vulnerabilitiesTable thead tr").empty();
+                    AJS.$("#vulnerabilitiesTable tbody").empty();
+                    AJS.$("#assetsTable thead tr").empty();
+                    AJS.$("#assetsTable tbody").empty();
+                    AJS.$("#filtersTable thead tr").empty();
+                    AJS.$("#filtersTable tbody").empty();
+                    AJS.$("#evidencesTable thead tr").empty();
+                    AJS.$("#evidencesTable tbody").empty();
                 }
                 
                 /**
@@ -404,7 +406,7 @@ function remediationSyncDetailsController( remediationKey ) {
                 /**
                 * Load the details of a remediations on Cloud Insight
                 */
-                self.loadDetailsFromCI = function( remediationKey ){
+                self.loadDetailsFromCI = function( accountId, remediationKey ){
                     var environment = remediationsService.getEnvironmentFromRemediationItem( remediationKey );
                     var remediationId = AUIUtils.getLastDetailFromKey( remediationKey );
                     var arrayComplementsFromAssets = [];
@@ -412,10 +414,10 @@ function remediationSyncDetailsController( remediationKey ) {
                     remediationDetails.remediationId = remediationId;
 
                     //get information of remediations
-                    var filters = remediationsService.getFiltersByRemediationItem( environment, remediationKey );
+                    var filters = remediationsService.getFiltersByRemediationItem( accountId, environment, remediationKey );
                     var description = remediationsService.getRemediationById( remediationId );
                     var vulnerabilitiesDetails = remediationsService.getVulnerabilityDetailsByRemediationId( remediationId );
-                    var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( environment, remediationKey );
+                    var assetsAffected = remediationsService.getVulnerabilityAndAssetsByRemediationId( accountId, environment, remediationKey );
 
                     var optionsEvidence =[
                         {
@@ -427,7 +429,7 @@ function remediationSyncDetailsController( remediationKey ) {
                             value: remediationId
                         }
                     ];
-                    var vulnerabilitiesEvidence = assetsService.byType( environment ,'vulnerability', optionsEvidence);
+                    var vulnerabilitiesEvidence = assetsService.byType( accountId, environment ,'vulnerability', optionsEvidence);
 
                     description.done( function( descriptionData ) {
                         remediationDetails.basic = remediationSupportService.getDescription ( descriptionData );
@@ -493,9 +495,9 @@ function remediationSyncDetailsController( remediationKey ) {
                 /**
                 * Load information of a remediation
                 */
-                self.loadData = function( remediationKey ){
+                self.loadData = function( accountId, remediationKey ){
                     if (remediationKey !== null) {
-                    	self.loadDetailsFromCI( remediationKey );
+                        self.loadDetailsFromCI( accountId, remediationKey );
                     }
                 };
                 
@@ -509,7 +511,7 @@ function remediationSyncDetailsController( remediationKey ) {
                 }
 
                 //call the function
-                self.loadData( remediationKey );
+                self.loadData( accountId, remediationKey );
             });
         }
     );

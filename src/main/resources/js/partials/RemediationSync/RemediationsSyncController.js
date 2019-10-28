@@ -677,7 +677,8 @@ AJS.$(document).ready(
                 } 
                 
                 remediationKeyDetail = remediation_key;
-                remediationSyncDetailsController(remediation_key);
+                var accountId = AJS.$( "#select-account option:selected" ).val();
+                remediationSyncDetailsController(accountId, remediation_key);
                 
                 AJS.dialog2("#detail-dialog").show();
             };
