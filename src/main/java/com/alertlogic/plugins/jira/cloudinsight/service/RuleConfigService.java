@@ -321,6 +321,7 @@ public class RuleConfigService {
         else{
             obj.put("id",ruleConfig.getID());
             obj.put("name",ruleConfig.getName());
+            obj.put("aaid",ruleConfig.getActingAccountId());
             obj.put("environment",ruleConfig.getEnvironment());
             obj.put("project",ruleConfig.getProject());
             obj.put("group",ruleConfig.getGroup());

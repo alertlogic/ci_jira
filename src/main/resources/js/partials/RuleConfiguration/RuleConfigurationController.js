@@ -97,7 +97,7 @@ AJS.$(document).ready(
                 if(environments.hasOwnProperty( envId )){
                     return environments[ envId ];
                 }
-                return "";
+                return "(Child) "+envId;
             };
 
             /**

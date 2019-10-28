@@ -15,12 +15,20 @@
             <span class="aui-icon aui-icon-small aui-iconfont-person"></span>
             $i18n.getText('ci.partials.common.vm.select.account'):
 
-            <select id="select-account" class="select-medium" size="1"></select>
+            <select id="select-account" class="select-medium" size="1"
+                #if ($ruleId)
+                disabled
+                #end
+            ></select>
 
             <span class="aui-icon aui-icon-small aui-iconfont-office-building-filled"></span>
             $i18n.getText('ci.partials.remediationssync.vm.environment.select'):
 
-            <select id="select-environment" class="select-medium" size="1">
+            <select id="select-environment" class="select-medium" size="1"
+                #if ($ruleId)
+                disabled
+                #end
+            >
                 <option value="">$i18n.getText('ci.partials.remediationssync.vm.environment.select.option')</option>
             </select>
 
