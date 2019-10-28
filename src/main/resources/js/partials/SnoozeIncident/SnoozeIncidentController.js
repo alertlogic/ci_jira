@@ -75,7 +75,7 @@ function snoozeIncidentController() {
                                 incidents: [incidentId],
                                 period_ms: expirationTS,
                                 reason_code: snoozeUntil,
-                                notes: snoozeComment,
+                                notes: snoozeComment
                             };
                             var irisSnooze = irisService.snoozeIncident( accountId, payload);
 
