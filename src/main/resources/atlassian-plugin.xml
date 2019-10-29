@@ -131,13 +131,6 @@
         <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
     </web-item>
 
-    <web-item key="incidents_link" name="Incidents"
-              section="my_links_link/my_links_section" weight="10">
-        <label key="ci.atlassianplugin.menu.item.incidents"/>
-        <link linkId="incidents_link">/plugins/servlet/incidentssyncservlet</link>
-        <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
-    </web-item>
-
     <!-- Configuration of Servlets -->
     <servlet name="ci.atlassianplugin.servlet.projectsetup.name"
         i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
@@ -175,14 +168,6 @@
         class="com.alertlogic.plugins.jira.cloudinsight.servlet.RemediationsSyncServlet">
         <description>The Remediations Sync Servlet Plugin</description>
         <url-pattern>/remediationssyncservlet</url-pattern>
-    </servlet>
-
-    <servlet name="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
-             i18n-name-key="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
-             key="incidents-sync-servlet"
-             class="com.alertlogic.plugins.jira.cloudinsight.servlet.IncidentsSyncServlet">
-        <description>The Incidents Sync Servlet Plugin</description>
-        <url-pattern>/incidentssyncservlet</url-pattern>
     </servlet>
 
     <!-- Dispose servlet -->
@@ -253,7 +238,6 @@
         <resource type="download" name="EnvironmentsService.js"         location="/js/services/EnvironmentsService.js" />
         <resource type="download" name="RemediationsService.js"         location="/js/services/RemediationsService.js" />
         <resource type="download" name="IrisService.js"                 location="/js/services/IrisService.js" />
-        <resource type="download" name="incidentsUtilityService.js"     location="/js/services/incidentsUtilityService.js" />
         <resource type="download" name="DashboardService.js"            location="/js/services/DashboardService.js" />
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
@@ -266,13 +250,6 @@
     <!-- Start of Javascript Page controllers -->
     <web-resource key="remediationsSyncController" name="RemediationsSyncController" >
         <resource type="download" name="RemediationsSyncController.js" location="/js/partials/RemediationSync/RemediationsSyncController.js" />
-        <transformation extension="js">
-            <transformer key="jsI18n"/>
-        </transformation>
-    </web-resource>
-
-    <web-resource key="incidentsSyncController" name="IncidentsSyncController" >
-        <resource type="download" name="IncidentsSyncController.js" location="/js/partials/IncidentsSync/IncidentsSyncController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
