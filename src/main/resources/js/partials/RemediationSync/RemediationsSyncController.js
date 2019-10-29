@@ -79,7 +79,12 @@ AJS.$(document).ready(
                 ciAIMSService.getManagedAccounts(
                     ciAIMSService.getSessionData().endpoint,
                     ciAIMSService.getSessionData().accountId ).success(function(data) {
-
+                    // IMPORTANT!: This selector is limited to 1000 accounts, more accounts will make the selector slower.
+                    // TODO: Implement a custom selector to support more that 1000 accounts.
+                    var SELECTOR_LIMIT = 1000;
+                    if (data.accounts.length > SELECTOR_LIMIT) {
+                        console.warn("Alert Logic Add-on: The current credentials has more than "+SELECTOR_LIMIT+" managed accounts, the selector will be limited to this value.");
+                    }
                     data.accounts.splice(1000,data.accounts.length);
 
                     AUIUtils.addSelectOption(AJS.$("#select-account"),ciAIMSService.getSessionData().accountId,"SAME AS CREDENTIALS");
