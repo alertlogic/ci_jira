@@ -54,7 +54,7 @@
                     <div class="bottom-panel">
                         <span class="aui-icon aui-icon-small aui-iconfont-settings"></span>
                         $i18n.getText('ci.partials.incidentssync.vm.rule.name'):
-                        <input id="rule-name" class="height-field-input" type="text"
+                        <input id="rule-name" class="height-field-input" type="text" size="40"
                             #if ($ruleName)
                             value="$ruleName"
                             #end
