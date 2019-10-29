@@ -46,9 +46,9 @@ AJS.$(document).ready(
             /**
              * Loads the list of environments for the user.
              */
-            self.loadEnvironmentList = function() {
+            self.loadEnvironmentList = function(accountId) {
                 AUIUtils.addSelectOption(AJS.$("#select-environment"), "", AJS.I18n.getText("ci.partials.remediationssync.vm.environment.select.option") );
-                environmentsService.listEnvironments(actingAccountId,function(data) {
+                environmentsService.listEnvironments(accountId,function(data) {
                     AUIUtils.addOptions( "#select-environment", data, "id", "name" );
 
                     if( !isARuleLoaded ){
@@ -88,7 +88,7 @@ AJS.$(document).ready(
                     AJS.$( "#select-account" ).change(function() {
                         actingAccountId = AJS.$( "#select-account" ).val();
                         self.clearAll();
-                        self.loadEnvironmentList();
+                        self.loadEnvironmentList(actingAccountId);
                     });
                     AJS.$( "#select-account" ).select2().select2('val',ciAIMSService.getSessionData().accountId);
                     AJS.$( "#select-account" ).triggerHandler("change");
@@ -177,7 +177,7 @@ AJS.$(document).ready(
              * @param  {String} remediationKey. Remediation Key if it is add to project from detail.
              * @return {void}
              */
-            self.loadItems = function( currentEnvironment, selectedFiltersArray, selectedRemediations, remediationKey) {
+            self.loadItems = function( actingAccountId, currentEnvironment, selectedFiltersArray, selectedRemediations, remediationKey) {
                 remediationsService.getAllRemediationsItemsByEnvironment(actingAccountId, currentEnvironment).done(function(remediationsItems){
                     allRemediationsItems = remediationsItems;
 
@@ -188,7 +188,7 @@ AJS.$(document).ready(
                             if ( data.remediations.assets ) {
 
                                 var remediationCount = 0;
-                                
+
                                 assetsService.byType(actingAccountId, currentEnvironment, 'vulnerability', []).done( function( response ){
 
                                     vulnerabilityInstanceMap = {};
@@ -245,7 +245,7 @@ AJS.$(document).ready(
              * @param  {String} remediationKey. Remediation Key if it is add to project from detail.
              * @return {void}
              */
-            self.loadAllRemediationsItems = function(selectedRemediations, remediationKey) {
+            self.loadAllRemediationsItems = function(actingAccountId,selectedRemediations, remediationKey) {
                 AJS.$("#remediationItem").empty();
                 self.updateTableHeader( 0 );
                 AUIUtils.invisible("#div-zero-state");
@@ -253,7 +253,7 @@ AJS.$(document).ready(
 
                 if (currentEnvironment) {
                     var selectedFiltersArray = self.getSelectedFiltersArray();
-                    self.loadItems(currentEnvironment,selectedFiltersArray, selectedRemediations, remediationKey);
+                    self.loadItems(actingAccountId,currentEnvironment,selectedFiltersArray, selectedRemediations, remediationKey);
                 } else {
                     AUIUtils.visible("#div-zero-state");
                     AJS.$("#remediationSyncLoading").hide();
@@ -272,9 +272,9 @@ AJS.$(document).ready(
 
                 if (!self.isSelected(filterMapByType[type][position])) {
                     selectedFilters.push(filterMapByType[type][position]);
-
-                    self.refreshAfterFilterChange();
+                    self.refreshAfterFilterChange(AJS.$( "#select-account" ).val());
                 }
+                currentEnvironment = AJS.$( "#select-environment" ).val();
                 self.isReadySaveRuleButton();
                 self.validateSelected();
             };
@@ -282,10 +282,10 @@ AJS.$(document).ready(
             /**
              * Updates the view after a filter change.
              */
-            self.refreshAfterFilterChange = function() {
+            self.refreshAfterFilterChange = function(actingAccountId) {
                 self.updateSelectedFilterList();
                 AUIUtils.clearTable("#dataFilters");
-                self.loadAllRemediationsItems();
+                self.loadAllRemediationsItems(actingAccountId);
             };
 
             /**
@@ -422,8 +422,9 @@ AJS.$(document).ready(
                 if (selectedFilters) {
                     selectedFilters.splice(filterPosition,1);
 
-                    refreshAfterFilterChange();
+                    refreshAfterFilterChange(AJS.$( "#select-account" ).val());
                 }
+                currentEnvironment = AJS.$( "#select-environment" ).val();
                 self.isReadySaveRuleButton();
                 self.validateSelected();
             };
@@ -714,7 +715,7 @@ AJS.$(document).ready(
                     AUIUtils.clearTable("#selectedFilters");
 
                     if(ruleId === ''){
-                        self.loadAllRemediationsItems();
+                        self.loadAllRemediationsItems(actingAccountId);
                     }
                     else{
                         self.loadRule();
@@ -736,6 +737,7 @@ AJS.$(document).ready(
                     AJS.$( "#select-project" ).auiSelect2();
                 }
                 AJS.$( "#select-project" ).change(function() {
+                    currentEnvironment = AJS.$( "#select-environment" ).val();
                     self.isReadySaveRuleButton();
                     self.validateSelected();
                 });
@@ -758,6 +760,7 @@ AJS.$(document).ready(
 
             Bootstrap.onView("#rule-name", function(){
                 AJS.$( "#rule-name" ).keyup(function() {
+                    currentEnvironment = AJS.$( "#select-environment" ).val();
                     self.isReadySaveRuleButton();
                     self.validateSelected();
                 });
@@ -999,7 +1002,7 @@ AJS.$(document).ready(
              * Store a new rule
              */
             self.storeRules = function(){
-
+                var accountId = AJS.$( "#select-account" ).val();
                 var group = AJS.$( "#select-group" ).val();
                 var project = AJS.$( "#select-project" ).val();
                 var ruleName = AJS.$( "#rule-name" ).val();
@@ -1009,7 +1012,7 @@ AJS.$(document).ready(
                 if( id === ''){
                     var projectIsConfigured = jiraService.ConfigureProject(project);
                     projectIsConfigured.done( function(){
-                        var rulePromise = rulesService.createRule( actingAccountId, project, group, currentEnvironment, filters, ruleName, ruleType);
+                        var rulePromise = rulesService.createRule( accountId, project, group, currentEnvironment, filters, ruleName, ruleType);
 
                         rulePromise.done( function( data ) {
                             JIRA.Messages.showSuccessMsg(
@@ -1032,7 +1035,7 @@ AJS.$(document).ready(
                         );
                     });
                 } else {
-                    var rulePromise = rulesService.updateRule( id, project, group, currentEnvironment, filters, ruleName, ruleType);
+                    var rulePromise = rulesService.updateRule( accountId, id, project, group, currentEnvironment, filters, ruleName, ruleType);
                     rulePromise.done( function( data ) {
                         JIRA.Messages.showSuccessMsg(
                             AJS.I18n.getText("ci.partials.remediationssync.js.msg.rule.updated"
@@ -1074,16 +1077,11 @@ AJS.$(document).ready(
 
                 rulesService.getRule(ruleId).done(function(data){
                     AJS.$( "#rule-name" ).val(data.name);
-                    AJS.$( "#select-environment" ).select2().select2('val',data.environment);
+
+                    AJS.$( "#select-account" ).select2().select2('val',data.aaid);
                     AJS.$( "#select-project" ).select2().select2('val',data.project);
                     AJS.$( "#select-group" ).select2().select2('val',data.group);
 
-                    //Validations
-                    if(AJS.$( "#select-environment" ).val() === ''){
-                        JIRA.Messages.showWarningMsg(
-                            AJS.I18n.getText("ci.partials.remediationssync.js.msg.rule.environment.warning")
-                        );
-                    }
                     if(AJS.$( "#select-project" ).val() === ''){
                         JIRA.Messages.showWarningMsg(
                             AJS.I18n.getText("ci.partials.remediationssync.js.msg.rule.project.warning")
@@ -1105,10 +1103,24 @@ AJS.$(document).ready(
                         }
                     }
 
-                    if( AJS.$( "#select-environment" ).val() != ''){
+                    AUIUtils.clearSelect("#select-environment");
+
+                    environmentsService.listEnvironments(data.aaid,function(environments) {
+                        AUIUtils.addSelectOption(AJS.$("#select-environment"), "", AJS.I18n.getText("ci.partials.remediationssync.vm.environment.select.option") );
+                        AUIUtils.addOptions( "#select-environment", environments, "id", "name" );
+
+                        AJS.$( "#select-environment" ).select2().select2('val',data.environment);
+
                         currentEnvironment = AJS.$( "#select-environment" ).val();
-                        self.refreshAfterFilterChange();
-                    }
+
+                        self.refreshAfterFilterChange(data.aaid);
+                        self.isReadySaveRuleButton();
+                    },
+                    function(environments) {
+                        JIRA.Messages.showWarningMsg(
+                            AJS.I18n.getText("ci.partials.remediationssync.js.msg.environment.error")
+                        );
+                    });
                 });
             };
 
