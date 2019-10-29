@@ -182,7 +182,6 @@ public class RuleConfigurationServlet extends HttpServlet{
                 String environment = jsonArray.getString("environment");
                 String name = jsonArray.getString("name");
                 String actingAccountId = jsonArray.getString("aaid");
-                String actingType = jsonArray.getString("type");
                 JSONArray filtersArray = jsonArray.getJSONArray("filters");
 
                 List<String> list = new ArrayList<String>();
@@ -195,7 +194,7 @@ public class RuleConfigurationServlet extends HttpServlet{
                 String userName = userManager.getRemoteUsername(req);
 
                 if( option.equals("create") ){
-                    RuleConfig rule = ruleConfigService.createRule(actingAccountId,group, project, name, environment, filters, userName, actingType);
+                    RuleConfig rule = ruleConfigService.createRule(actingAccountId,group, project, name, environment, filters, userName);
 
                     String rulesJson  =  new JSONObject().put( "rules", rule ).toString();
 

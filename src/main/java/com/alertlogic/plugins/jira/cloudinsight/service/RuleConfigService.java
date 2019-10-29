@@ -37,7 +37,7 @@ public class RuleConfigService {
     /**
      * Creates a rule configuration, return the configuration reference object
      */
-    public RuleConfig createRule(String actingAccountId, String group, int project, String ruleName, String environment, String[] filters, String userName, String type)
+    public RuleConfig createRule(String actingAccountId, String group, int project, String ruleName, String environment, String[] filters, String userName)
     {
         RuleConfig conf;
 
@@ -52,7 +52,6 @@ public class RuleConfigService {
         conf.setLastExecution(null);
         conf.setLastLog(null);
         conf.setLastImportantLog(null);
-        conf.setType(type);
         conf.setLastStatus(TaskRuleExecutionState.SCHEDULED);
 
         conf.save();
@@ -285,7 +284,6 @@ public class RuleConfigService {
             obj.put("lastLog",rules[i].getLastLog());
             obj.put("lastImportantLog",rules[i].getLastImportantLog());
             obj.put("lastStatus",rules[i].getLastStatus());
-            obj.put("type",rules[i].getType());
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(rules[i].getLastStatus()));
 
             JSONArray filtersArray  =  new JSONArray();
@@ -332,7 +330,6 @@ public class RuleConfigService {
             obj.put("lastLog",ruleConfig.getLastLog());
             obj.put("lastImportantLog",ruleConfig.getLastImportantLog());
             obj.put("lastStatus",ruleConfig.getLastStatus());
-            obj.put("type",ruleConfig.getType());
             obj.put("lastStatusName",TaskRuleExecutionState.getStateName(ruleConfig.getLastStatus()));
 
             JSONArray filtersArray  =  new JSONArray();

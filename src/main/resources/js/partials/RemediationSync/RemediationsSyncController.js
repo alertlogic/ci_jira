@@ -9,7 +9,6 @@ var remediationsSyncController;
 AJS.$(document).ready(
     function() {
         var currentUser = AJS.Meta.get('remote-user');
-        var ruleType = 'remediation';
 
         Bootstrap.start( currentUser, function(){
             var self = remediationsSyncController = this;
@@ -1012,7 +1011,7 @@ AJS.$(document).ready(
                 if( id === ''){
                     var projectIsConfigured = jiraService.ConfigureProject(project);
                     projectIsConfigured.done( function(){
-                        var rulePromise = rulesService.createRule( accountId, project, group, currentEnvironment, filters, ruleName, ruleType);
+                        var rulePromise = rulesService.createRule( accountId, project, group, currentEnvironment, filters, ruleName);
 
                         rulePromise.done( function( data ) {
                             JIRA.Messages.showSuccessMsg(
@@ -1035,7 +1034,7 @@ AJS.$(document).ready(
                         );
                     });
                 } else {
-                    var rulePromise = rulesService.updateRule( accountId, id, project, group, currentEnvironment, filters, ruleName, ruleType);
+                    var rulePromise = rulesService.updateRule( accountId, id, project, group, currentEnvironment, filters, ruleName);
                     rulePromise.done( function( data ) {
                         JIRA.Messages.showSuccessMsg(
                             AJS.I18n.getText("ci.partials.remediationssync.js.msg.rule.updated"
