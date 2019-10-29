@@ -38,18 +38,21 @@
 
                 <div class="content-data-div">
                     <div class="bottom-panel">
+                        <span class="aui-icon aui-icon-small aui-iconfont-jira"></span>
                         $i18n.getText('ci.partials.incidentssync.vm.project.select'):
                         <select id="select-project" class="select-medium" size="1">
                             <option value="">$i18n.getText('ci.partials.incidentssync.vm.project.select.option')</option>
                         </select>
                     </div>
                     <div class="bottom-panel">
+                        <span class="aui-icon aui-icon-small aui-iconfont-group"></span>
                         $i18n.getText('ci.partials.incidentssync.vm.group.select'):
                         <select id="select-group" class="select-medium" size="1">
                             <option value="">$i18n.getText('ci.partials.incidentssync.vm.group.select.option')</option>
                         </select>
                     </div>
                     <div class="bottom-panel">
+                        <span class="aui-icon aui-icon-small aui-iconfont-settings"></span>
                         $i18n.getText('ci.partials.incidentssync.vm.rule.name'):
                         <input id="rule-name" class="height-field-input" type="text"
                             #if ($ruleName)
