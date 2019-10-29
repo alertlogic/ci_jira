@@ -1,135 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <atlassian-plugin key="${project.groupId}.${project.artifactId}"
-	name="${project.name}" plugins-version="2">
+    name="${project.name}" plugins-version="2">
 
-	<!--  Plugin information and extra parameters -->
-	<plugin-info>
-		<description>${project.description}</description>
-		<version>${project.version}</version>
-		<vendor name="${project.organization.name}" url="${project.organization.url}" />
+    <!--  Plugin information and extra parameters -->
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}" />
 
-		<!-- The images should have especific charateristics like size and extention -->
-		<param name="plugin-icon">images/al-logo-icon.png</param>
-		<param name="plugin-logo">images/al-logo.png</param>
+        <!-- The images should have especific charateristics like size and extention -->
+        <param name="plugin-icon">images/al-logo-icon.png</param>
+        <param name="plugin-logo">images/al-logo.png</param>
 
-		<!-- Custom params -->
-		<param name="plugin-key">${project.groupId}.${project.artifactId}</param>
+        <!-- Custom params -->
+        <param name="plugin-key">${project.groupId}.${project.artifactId}</param>
 
-		<!--servlet of configuration -->
-		<param name="configure.url">/plugins/servlet/pluginconfiguration</param>
-	</plugin-info>
+        <!--servlet of configuration -->
+        <param name="configure.url">/plugins/servlet/pluginconfiguration</param>
+    </plugin-info>
 
-	<!-- add our i18n resource -->
-	<resource type="i18n" name="i18n" location="cloud-insight-for-jira" />
+    <!-- add our i18n resource -->
+    <resource type="i18n" name="i18n" location="cloud-insight-for-jira" />
 
-	<!-- add our web resources -->
-	<web-resource key="cloud-insight-for-jira-resources" name="Cloud Insight Web Resources">
-		<dependency>com.atlassian.auiplugin:ajs</dependency>
-		<dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
-		<dependency>com.atlassian.auiplugin:aui-select2</dependency>
-		<dependency>com.atlassian.auiplugin:dialog2</dependency>
-		<dependency>jira.webresources:jquery-livestamp</dependency>
-		<resource type="download" name="cloud-insight-for-jira.css" location="/css/cloud-insight-for-jira.css" />
-		<resource type="download" name="cloud-insight-remediations-list.css" location="/css/cloud-insight-remediations-list.css" />
-		<resource type="download" name="images/" location="/images" />
-		<context>cloud-insight-for-jira</context>
-	</web-resource>
+    <!-- add our web resources -->
+    <web-resource key="cloud-insight-for-jira-resources" name="Cloud Insight Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select2</dependency>
+        <dependency>com.atlassian.auiplugin:dialog2</dependency>
+        <dependency>jira.webresources:jquery-livestamp</dependency>
+        <resource type="download" name="cloud-insight-for-jira.css" location="/css/cloud-insight-for-jira.css" />
+        <resource type="download" name="cloud-insight-remediations-list.css" location="/css/cloud-insight-remediations-list.css" />
+        <resource type="download" name="images/" location="/images" />
+        <context>cloud-insight-for-jira</context>
+    </web-resource>
 
-	<!-- Used to get the plugins information -->
-	<component-import
-		 key="plugin-retrieval-service"
-		 interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService"/>
+    <!-- Used to get the plugins information -->
+    <component-import
+        key="plugin-retrieval-service"
+        interface="com.atlassian.plugin.osgi.bridge.external.PluginRetrievalService"/>
 
-	<!-- import from the product container -->
-	<component-import key="application-properties"
-		interface="com.atlassian.sal.api.ApplicationProperties" />
+    <!-- import from the product container -->
+    <component-import key="application-properties"
+        interface="com.atlassian.sal.api.ApplicationProperties" />
 
-	<component-import key="permission-manager"
-		interface="com.atlassian.jira.security.PermissionManager" />
+    <component-import key="permission-manager"
+        interface="com.atlassian.jira.security.PermissionManager" />
 
-	<component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter="" />
+    <component-import key="templateRenderer" interface="com.atlassian.templaterenderer.TemplateRenderer" filter="" />
 
-	<component-import key="I18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
+    <component-import key="I18nResolver" interface="com.atlassian.sal.api.message.I18nResolver"/>
 
-	<ao key="ao-module">
-		<description>
-		The module configuring the Active Objects service used by this plugin
-		</description>
-		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Credential</entity>
-		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig</entity>
-		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Filter</entity>
-		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig</entity>
-		<entity>com.alertlogic.plugins.jira.cloudinsight.entity.Permission</entity>
-	</ao>
+    <ao key="ao-module">
+        <description>
+        The module configuring the Active Objects service used by this plugin
+        </description>
+        <entity>com.alertlogic.plugins.jira.cloudinsight.entity.Credential</entity>
+        <entity>com.alertlogic.plugins.jira.cloudinsight.entity.PluginConfig</entity>
+        <entity>com.alertlogic.plugins.jira.cloudinsight.entity.Filter</entity>
+        <entity>com.alertlogic.plugins.jira.cloudinsight.entity.RuleConfig</entity>
+        <entity>com.alertlogic.plugins.jira.cloudinsight.entity.Permission</entity>
+    </ao>
 
-	<component-import key="ao" name="Active Objects service"
-		interface="com.atlassian.activeobjects.external.ActiveObjects">
-		<description>
-			Component to access Active Objects functionality from the plugin
-		</description>
-	</component-import>
+    <component-import key="ao" name="Active Objects service"
+        interface="com.atlassian.activeobjects.external.ActiveObjects">
+        <description>
+            Component to access Active Objects functionality from the plugin
+        </description>
+    </component-import>
 
-	<component key="tx-processor" name="Transactional Annotation Processor"
-		class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
-		<decription>Processes @Transactional annotations.</decription>
-	</component>
+    <component key="tx-processor" name="Transactional Annotation Processor"
+        class="com.atlassian.activeobjects.external.TransactionalAnnotationProcessor">
+        <decription>Processes @Transactional annotations.</decription>
+    </component>
 
-	<component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
+    <component-import key="userManager" interface="com.atlassian.sal.api.user.UserManager"/>
 
-	<component-import key="pluginScheduler">
+    <component-import key="pluginScheduler">
         <description>SAL Scheduler Job</description>
         <interface>com.atlassian.sal.api.scheduling.PluginScheduler</interface>
     </component-import>
 
      <!-- Scheduled tasks (Jobs) -->
- 	<component key="autoAssignTaskScheduler" class="com.alertlogic.plugins.jira.cloudinsight.tasks.AutoAssignScheduledImpl"
-             system="true" public="true">
+     <component key="autoAssignTaskScheduler" class="com.alertlogic.plugins.jira.cloudinsight.tasks.AutoAssignScheduledImpl"
+            system="true" public="true">
         <description>The add-on component that schedules the automatic assign CI issues.</description>
         <interface>com.atlassian.sal.api.lifecycle.LifecycleAware</interface>
     </component>
 
     <component key="synchronizationTaskScheduler" class="com.alertlogic.plugins.jira.cloudinsight.tasks.SynchronizationScheduledImpl"
-             system="true" public="true">
+            system="true" public="true">
         <description>The add-on component that schedules the CI Synchronization of issues.</description>
         <interface>com.atlassian.sal.api.lifecycle.LifecycleAware</interface>
     </component>
 
-	<!--Configuration of menu items -->
+    <!--Configuration of menu items -->
 
-	<!--with this add a item in the menu. -->
-	<web-section key="my_links_section" name="Add CI Links Main Section"
-		location="my_links_link" weight="10">
-		<!--this is for indicate that only show when the user if authenticate. -->
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
-	</web-section>
+    <!--with this add a item in the menu. -->
+    <web-section key="my_links_section" name="Add CI Links Main Section"
+        location="my_links_link" weight="10">
+        <!--this is for indicate that only show when the user if authenticate. -->
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserLoggedInCondition" />
+    </web-section>
 
-	<web-item key="my_links_link" name="Link CI on My Links Main Section"
-		section="system.top.navigation.bar" weight="47">
-		<label key="ci.atlassianplugin.menu"/>
-		<link linkId="my_links_link" />
-		<condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition" />
-	</web-item>
+    <web-item key="my_links_link" name="Link CI on My Links Main Section"
+        section="system.top.navigation.bar" weight="47">
+        <label key="ci.atlassianplugin.menu"/>
+        <link linkId="my_links_link" />
+        <condition class="com.atlassian.jira.plugin.webfragment.conditions.UserIsAdminCondition" />
+    </web-item>
 
-	<web-item key="config_link" name="Plugin&apos;s config"
-		section="my_links_link/my_links_section" weight="10">
-		<label key="ci.atlassianplugin.menu.item.configuration"/>
-		<link linkId="config_link">/plugins/servlet/pluginconfiguration</link>
-	</web-item>
+    <web-item key="config_link" name="Plugin&apos;s config"
+        section="my_links_link/my_links_section" weight="10">
+        <label key="ci.atlassianplugin.menu.item.configuration"/>
+        <link linkId="config_link">/plugins/servlet/pluginconfiguration</link>
+    </web-item>
 
-	<web-item key="remediations_link" name="Remediations"
-		section="my_links_link/my_links_section" weight="10">
-		<label key="ci.atlassianplugin.menu.item.remediations"/>
-		<link linkId="remediations_link">/plugins/servlet/remediationssyncservlet</link>
-		<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
-	</web-item>
+    <web-item key="remediations_link" name="Remediations"
+        section="my_links_link/my_links_section" weight="10">
+        <label key="ci.atlassianplugin.menu.item.remediations"/>
+        <link linkId="remediations_link">/plugins/servlet/remediationssyncservlet</link>
+        <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
+    </web-item>
 
-	<web-item key="config_rules_link" name="Rules"
-		section="my_links_link/my_links_section" weight="10">
-		<label key="ci.atlassianplugin.menu.item.rules"/>
-		<link linkId="remediations_link">/plugins/servlet/ruleconfigurationservlet</link>
-		<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
-	</web-item>
+    <web-item key="config_rules_link" name="Rules"
+        section="my_links_link/my_links_section" weight="10">
+        <label key="ci.atlassianplugin.menu.item.rules"/>
+        <link linkId="remediations_link">/plugins/servlet/ruleconfigurationservlet</link>
+        <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
+    </web-item>
 
     <web-item key="incidents_link" name="Incidents"
               section="my_links_link/my_links_section" weight="10">
@@ -138,44 +138,44 @@
         <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightPluginHasConfigCondition"/>
     </web-item>
 
-	<!-- Configuration of Servlets -->
+    <!-- Configuration of Servlets -->
     <servlet name="ci.atlassianplugin.servlet.projectsetup.name"
-		i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
-		key="projectsetup-servlet-key"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.SetupProjectServlet">
-		<description>
-			Servlet that allow setting up a project
-		</description>
-		<url-pattern>/projectsetup</url-pattern>
-	</servlet>
+        i18n-name-key="ci.atlassianplugin.servlet.projectsetup.name"
+        key="projectsetup-servlet-key"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.SetupProjectServlet">
+        <description>
+            Servlet that allow setting up a project
+        </description>
+        <url-pattern>/projectsetup</url-pattern>
+    </servlet>
 
-	<servlet name="ci.atlassianplugin.servlet.pluginconfiguration.name"
-		i18n-name-key="ci.atlassianplugin.servlet.pluginconfiguration.name"
-		key="plugin-configuration-servlet-key"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.PluginConfigurationServlet">
-		<description>
-			Add-on configuration for connecting with Alert Logic
-		</description>
-		<url-pattern>/pluginconfiguration</url-pattern>
-	</servlet>
+    <servlet name="ci.atlassianplugin.servlet.pluginconfiguration.name"
+        i18n-name-key="ci.atlassianplugin.servlet.pluginconfiguration.name"
+        key="plugin-configuration-servlet-key"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.PluginConfigurationServlet">
+        <description>
+            Add-on configuration for connecting with Alert Logic
+        </description>
+        <url-pattern>/pluginconfiguration</url-pattern>
+    </servlet>
 
-	<!-- Credentials servlet -->
-	<servlet name="ci.atlassianplugin.servlet.credential.name"
-		i18n-name-key="ci.atlassianplugin.servlet.credential.name"
-		key="credential-servlet-key"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CredentialServlet">
-		<description key="ci.atlassianplugin.servlet.credential.description"></description>
-		<url-pattern>/credentialservlet</url-pattern>
-	</servlet>
+    <!-- Credentials servlet -->
+    <servlet name="ci.atlassianplugin.servlet.credential.name"
+        i18n-name-key="ci.atlassianplugin.servlet.credential.name"
+        key="credential-servlet-key"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.CredentialServlet">
+        <description key="ci.atlassianplugin.servlet.credential.description"></description>
+        <url-pattern>/credentialservlet</url-pattern>
+    </servlet>
 
-	<!-- Remediations Sync Servlet Controls the Remediations Sync Page -->
-	<servlet name="ci.atlassianplugin.servlet.remediations-sync-servlet.name"
-		i18n-name-key="ci.atlassianplugin.servlet.remediations-sync-servlet.name"
-		key="remediations-sync-servlet"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.RemediationsSyncServlet">
-		<description>The Remediations Sync Servlet Plugin</description>
-		<url-pattern>/remediationssyncservlet</url-pattern>
-	</servlet>
+    <!-- Remediations Sync Servlet Controls the Remediations Sync Page -->
+    <servlet name="ci.atlassianplugin.servlet.remediations-sync-servlet.name"
+        i18n-name-key="ci.atlassianplugin.servlet.remediations-sync-servlet.name"
+        key="remediations-sync-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.RemediationsSyncServlet">
+        <description>The Remediations Sync Servlet Plugin</description>
+        <url-pattern>/remediationssyncservlet</url-pattern>
+    </servlet>
 
     <servlet name="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
              i18n-name-key="ci.atlassianplugin.servlet.incidents-sync-servlet.name"
@@ -185,27 +185,27 @@
         <url-pattern>/incidentssyncservlet</url-pattern>
     </servlet>
 
-	<!-- Dispose servlet -->
-	<servlet name="Dispose Servlet" i18n-name-key="dispose-servlet.name" key="dispose-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.DisposeRemediationServlet">
-    	<description key="dispose-remediation.description">Allow dispose a remediation</description>
-    	<url-pattern>/disposeremediationservlet</url-pattern>
-  	</servlet>
+    <!-- Dispose servlet -->
+    <servlet name="Dispose Servlet" i18n-name-key="dispose-servlet.name" key="dispose-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.DisposeRemediationServlet">
+        <description key="dispose-remediation.description">Allow dispose a remediation</description>
+        <url-pattern>/disposeremediationservlet</url-pattern>
+      </servlet>
 
-  	<!-- Proxy CI Auth servlet -->
-	<servlet name="Proxy Auth Servlet"
-		i18n-name-key="proxy-auth-servlet.name" key="proxy-auth-servlet"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.CIProxyAuthServlet">
-    	<description key="proxy-auth-servlet.description">Allow authentication in Alert Logic</description>
-    	<url-pattern>/proxyauthservlet</url-pattern>
-  	</servlet>
+      <!-- Proxy CI Auth servlet -->
+    <servlet name="Proxy Auth Servlet"
+        i18n-name-key="proxy-auth-servlet.name" key="proxy-auth-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.CIProxyAuthServlet">
+        <description key="proxy-auth-servlet.description">Allow authentication in Alert Logic</description>
+        <url-pattern>/proxyauthservlet</url-pattern>
+      </servlet>
 
-	<!-- Rule configuration servlet -->
-	<servlet name="Rule Configuration Servlet"
-		i18n-name-key="rule-configuration-servlet.name" key="rule-configuration-servlet"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.RuleConfigurationServlet">
-    	<description key="rule-configuration-servlet.description">Rule configuration</description>
-    	<url-pattern>/ruleconfigurationservlet</url-pattern>
-  	</servlet>
+    <!-- Rule configuration servlet -->
+    <servlet name="Rule Configuration Servlet"
+        i18n-name-key="rule-configuration-servlet.name" key="rule-configuration-servlet"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.RuleConfigurationServlet">
+        <description key="rule-configuration-servlet.description">Rule configuration</description>
+        <url-pattern>/ruleconfigurationservlet</url-pattern>
+      </servlet>
 
     <!-- Permission configuration servlet -->
     <servlet name="Permission Configuration Servlet"
@@ -222,13 +222,19 @@
         <url-pattern>/groupsservlet</url-pattern>
     </servlet>
 
-	<!-- Snooze incident servlet -->
-	<servlet name="Snooze Incident Servlet" i18n-name-key="snooze-incident-servlet.name" key="snooze-incident-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.SnoozeIncidentServlet">
-    	<description key="snooze-incident.description">Allow snooze an incident</description>
-    	<url-pattern>/snoozeincidentservlet</url-pattern>
-  	</servlet>
+    <!-- Snooze incident servlet -->
+    <servlet name="Snooze Incident Servlet" i18n-name-key="snooze-incident-servlet.name" key="snooze-incident-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.SnoozeIncidentServlet">
+        <description key="snooze-incident.description">Allow snooze an incident</description>
+        <url-pattern>/snoozeincidentservlet</url-pattern>
+      </servlet>
 
-	<!-- JS Services -->
+    <!-- Close incident servlet -->
+    <servlet name="Close Incident Servlet" i18n-name-key="close-incident-servlet.name" key="close-incident-servlet" class="com.alertlogic.plugins.jira.cloudinsight.servlet.CloseIncidentServlet">
+        <description key="close-incident.description">Allow close an incident</description>
+        <url-pattern>/closeincidentservlet</url-pattern>
+      </servlet>
+
+    <!-- JS Services -->
     <web-resource key="ciServices" name="CIServices" >
         <dependency>com.atlassian.auiplugin:aui-select2</dependency>
         <dependency>jira.webresources:jquery-livestamp</dependency>
@@ -247,7 +253,7 @@
         <resource type="download" name="EnvironmentsService.js"         location="/js/services/EnvironmentsService.js" />
         <resource type="download" name="RemediationsService.js"         location="/js/services/RemediationsService.js" />
         <resource type="download" name="IrisService.js"                 location="/js/services/IrisService.js" />
-		<resource type="download" name="incidentsUtilityService.js"     location="/js/services/incidentsUtilityService.js" />
+        <resource type="download" name="incidentsUtilityService.js"     location="/js/services/incidentsUtilityService.js" />
         <resource type="download" name="DashboardService.js"            location="/js/services/DashboardService.js" />
         <resource type="download" name="RemediationSupportService.js"   location="/js/services/RemediationSupportService.js" />
         <resource type="download" name="AssetsService.js"               location="/js/services/AssetsService.js" />
@@ -257,15 +263,15 @@
         <resource type="download" name="cloud-insight-for-jira.css" 	location="/css/cloud-insight-for-jira.css" />
     </web-resource>
 
-	<!-- Start of Javascript Page controllers -->
-	<web-resource key="remediationsSyncController" name="RemediationsSyncController" >
+    <!-- Start of Javascript Page controllers -->
+    <web-resource key="remediationsSyncController" name="RemediationsSyncController" >
         <resource type="download" name="RemediationsSyncController.js" location="/js/partials/RemediationSync/RemediationsSyncController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
     </web-resource>
 
-	<web-resource key="incidentsSyncController" name="IncidentsSyncController" >
+    <web-resource key="incidentsSyncController" name="IncidentsSyncController" >
         <resource type="download" name="IncidentsSyncController.js" location="/js/partials/IncidentsSync/IncidentsSyncController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
@@ -274,16 +280,16 @@
 
     <!-- Remediation Details Servlet -->
     <servlet name="ci.atlassianplugin.servlet.remediationdetails.name"
-		i18n-name-key="ci.atlassianplugin.servlet.remediationdetails.name"
-		key="remediationdetails-servlet-key"
-		class="com.alertlogic.plugins.jira.cloudinsight.servlet.RemediationDetailsServlet">
-		<description>
-			Remediation Details
-		</description>
-		<url-pattern>/remediationdetailsservlet</url-pattern>
-	</servlet>
+        i18n-name-key="ci.atlassianplugin.servlet.remediationdetails.name"
+        key="remediationdetails-servlet-key"
+        class="com.alertlogic.plugins.jira.cloudinsight.servlet.RemediationDetailsServlet">
+        <description>
+            Remediation Details
+        </description>
+        <url-pattern>/remediationdetailsservlet</url-pattern>
+    </servlet>
 
-	<web-resource key="pluginConfigurationController" name="PluginConfigurationController" >
+    <web-resource key="pluginConfigurationController" name="PluginConfigurationController" >
         <resource type="download" name="PluginConfigurationController.js" location="/js/partials/PluginConfiguration/PluginConfigurationController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
@@ -292,76 +298,84 @@
     </web-resource>
 
     <web-resource name="DisposeController" key="disposeController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="DisposeController.js" location="/js/partials/Dispose/DisposeController.js"/>
-  	</web-resource>
+        <resource type="download" name="DisposeController.js" location="/js/partials/Dispose/DisposeController.js"/>
+      </web-resource>
 
-  	<web-resource name="StatusPanelController" key="statusPanelController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+      <web-resource name="StatusPanelController" key="statusPanelController">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="StatusPanelController.js" location="/js/partials/StatusPanel/StatusPanelController.js"/>
-  	</web-resource>
+        <resource type="download" name="StatusPanelController.js" location="/js/partials/StatusPanel/StatusPanelController.js"/>
+      </web-resource>
 
-	<web-resource name="IncidentStatusPanelController" key="incidentStatusPanelController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+    <web-resource name="IncidentStatusPanelController" key="incidentStatusPanelController">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="IncidentStatusPanelController.js" location="/js/partials/IncidentStatusPanel/IncidentStatusPanelController.js"/>
-  	</web-resource>
+        <resource type="download" name="IncidentStatusPanelController.js" location="/js/partials/IncidentStatusPanel/IncidentStatusPanelController.js"/>
+      </web-resource>
 
-  	<web-resource key="ruleConfigurationController" name="RuleConfigurationController" >
+      <web-resource key="ruleConfigurationController" name="RuleConfigurationController" >
         <resource type="download" name="RuleConfigurationController.js" location="/js/partials/RuleConfiguration/RuleConfigurationController.js" />
         <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
     </web-resource>
 
-	<web-resource name="SnoozeIncidentController" key="snoozeIncidentController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+    <web-resource name="SnoozeIncidentController" key="snoozeIncidentController">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="SnoozeIncidentController.js" location="/js/partials/SnoozeIncident/SnoozeIncidentController.js"/>
-  	</web-resource>
+        <resource type="download" name="SnoozeIncidentController.js" location="/js/partials/SnoozeIncident/SnoozeIncidentController.js"/>
+      </web-resource>
+
+    <web-resource name="CloseIncidentController" key="closeIncidentController">
+        <context>atl.general</context>
+        <transformation extension="js">
+            <transformer key="jsI18n"/>
+        </transformation>
+        <resource type="download" name="CloseIncidentController.js" location="/js/partials/CloseIncident/CloseIncidentController.js"/>
+      </web-resource>
     <!-- End of page controllers -->
 
 
-	<!-- Java Services -->
+    <!-- Java Services -->
     <component key="plugin-config-service" name="Plugin Config Service" class="com.alertlogic.plugins.jira.cloudinsight.service.PluginConfigService" />
 
-	<component key="ci-aims-service" name="AIMS Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.AIMSService" />
+    <component key="ci-aims-service" name="AIMS Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.AIMSService" />
 
-	<component key="ci-environment-service" name="Environment Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService" />
+    <component key="ci-environment-service" name="Environment Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.EnvironmentsService" />
 
-	<component key="ci-remediations-service" name="Remediations Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService" />
+    <component key="ci-remediations-service" name="Remediations Cloud insight Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RemediationsService" />
 
-	<component key="screen-config-service" name="Screen Config Service" class="com.alertlogic.plugins.jira.cloudinsight.service.ScreenConfigService" />
+    <component key="screen-config-service" name="Screen Config Service" class="com.alertlogic.plugins.jira.cloudinsight.service.ScreenConfigService" />
 
-	<component key="jira-service" name="Jira Service" class="com.alertlogic.plugins.jira.cloudinsight.service.JIRAService" />
+    <component key="jira-service" name="Jira Service" class="com.alertlogic.plugins.jira.cloudinsight.service.JIRAService" />
 
-	<component key="rule-configuration-service" name="Rule Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService" />
+    <component key="rule-configuration-service" name="Rule Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.RuleConfigService" />
 
-	<component key="permission-configuration-service" name="Permission Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.PermissionService" />
+    <component key="permission-configuration-service" name="Permission Configuration Service" class="com.alertlogic.plugins.jira.cloudinsight.service.PermissionService" />
 
-	<component key="credential-configuration-service" name="Credential Service" class="com.alertlogic.plugins.jira.cloudinsight.service.CredentialService" />
+    <component key="credential-configuration-service" name="Credential Service" class="com.alertlogic.plugins.jira.cloudinsight.service.CredentialService" />
 
-	<component key="rest-util" name="Utility Service" class="com.alertlogic.plugins.jira.cloudinsight.util.RestUtil" />
+    <component key="rest-util" name="Utility Service" class="com.alertlogic.plugins.jira.cloudinsight.util.RestUtil" />
 
-	<!-- Listeners -->
-  	<component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>
+    <!-- Listeners -->
+      <component-import key="event-publisher" interface="com.atlassian.event.api.EventPublisher"/>
 
-	<component key="event-listener" class="com.alertlogic.plugins.jira.cloudinsight.listener.IssueAsCompleteListener">
-	    <description>Mark as complete an issue that has been closed - JIRA issue events.</description>
-	</component>
+    <component key="event-listener" class="com.alertlogic.plugins.jira.cloudinsight.listener.IssueAsCompleteListener">
+        <description>Mark as complete an issue that has been closed - JIRA issue events.</description>
+    </component>
 
-  	<!--with transitions-all give the position in the issue-->
-  	<web-item section="transitions-all" weight="10" name="Dispose button on issue details" key="dipose_link">
+      <!--with transitions-all give the position in the issue-->
+      <web-item section="transitions-all" weight="10" name="Dispose button on issue details" key="dipose_link">
         <label>Dispose</label>
         <conditions type="AND">
             <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
@@ -372,15 +386,15 @@
         <styleClass>issueaction-dispose</styleClass>
     </web-item>
 
-  	<web-item section="transitions-all" weight="10" name="Details" key="remedaition_details_link">
-    	<label>Details</label>
-    	<conditions type="AND">
-		    <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
-		    <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-		</conditions>
-    	<link linkId="remediation_details_link">/plugins/servlet/remediationdetailsservlet?id=${issue.id}
-    	</link>
-    	<styleClass>issueaction-showdetail</styleClass>
+      <web-item section="transitions-all" weight="10" name="Details" key="remedaition_details_link">
+        <label>Details</label>
+        <conditions type="AND">
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
+        </conditions>
+        <link linkId="remediation_details_link">/plugins/servlet/remediationdetailsservlet?id=${issue.id}
+        </link>
+        <styleClass>issueaction-showdetail</styleClass>
     </web-item>
 
     <web-item section="transitions-all" weight="10" name="Snooze button on issue details" key="snooze_incident_link">
@@ -392,7 +406,17 @@
         <styleClass>issueaction-snooze</styleClass>
     </web-item>
 
-  	<web-resource key="ci-project-template-resources" name="ci-project-template-resources">
+    <web-item section="transitions-all" weight="10" name="Close button on issue details" key="close_incident_link">
+        <label>Close</label>
+        <conditions type="AND">
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
+            <condition class="com.atlassian.jira.plugin.webfragment.conditions.IsIssueEditableCondition"/>
+        </conditions>
+        <link linkId="close_incident">/plugins/servlet/closeincidentservlet?id=${issue.id}</link>
+        <styleClass>issueaction-close</styleClass>
+    </web-item>
+
+    <web-resource key="ci-project-template-resources" name="ci-project-template-resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
 
         <transformation extension="soy">
@@ -409,18 +433,18 @@
         <context>atl.admin</context>
     </web-resource>
 
-	<web-resource key="font-awesome-resource" name="Font Awesome Resources">
-		<context>atl.general</context>
-		<context>atl.admin</context>
-		<resource type="download" name="font-awesome.css" location="assets/font-awesome/css/font-awesome.css" />
-	    <resource type="download" name="font-awesome.min.css" location="assets/font-awesome/css/font-awesome.min.css" />
-	    <resource type="download" name="FontAwesome.otf" location="/fonts/font-awesome/fonts/FontAwesome.otf"/>
-	    <resource type="download" name="fontawesome-webfont.eot" location="assets/font-awesome/fonts/fontawesome-webfont.eot"/>
-	    <resource type="download" name="fontawesome-webfont.svg" location="assets/font-awesome/fonts/fontawesome-webfont.svg"/>
-	    <resource type="download" name="fontawesome-webfont.ttf" location="assets/font-awesome/fonts/fontawesome-webfont.ttf"/>
-	    <resource type="download" name="fontawesome-webfont.woff" location="assets/font-awesome/fonts/fontawesome-webfont.woff"/>
-	    <resource type="download" name="fontawesome-webfont.woff2" location="assets/font-awesome/fonts/fontawesome-webfont.woff2"/>
-	</web-resource>
+    <web-resource key="font-awesome-resource" name="Font Awesome Resources">
+        <context>atl.general</context>
+        <context>atl.admin</context>
+        <resource type="download" name="font-awesome.css" location="assets/font-awesome/css/font-awesome.css" />
+        <resource type="download" name="font-awesome.min.css" location="assets/font-awesome/css/font-awesome.min.css" />
+        <resource type="download" name="FontAwesome.otf" location="/fonts/font-awesome/fonts/FontAwesome.otf"/>
+        <resource type="download" name="fontawesome-webfont.eot" location="assets/font-awesome/fonts/fontawesome-webfont.eot"/>
+        <resource type="download" name="fontawesome-webfont.svg" location="assets/font-awesome/fonts/fontawesome-webfont.svg"/>
+        <resource type="download" name="fontawesome-webfont.ttf" location="assets/font-awesome/fonts/fontawesome-webfont.ttf"/>
+        <resource type="download" name="fontawesome-webfont.woff" location="assets/font-awesome/fonts/fontawesome-webfont.woff"/>
+        <resource type="download" name="fontawesome-webfont.woff2" location="assets/font-awesome/fonts/fontawesome-webfont.woff2"/>
+    </web-resource>
 
     <project-blueprint key="ci-project-template" weight="90">
         <label key="ci.atlassianplugin.project.template.name"/>
@@ -430,43 +454,43 @@
         <infoPage soy-template="JIRA.Templates.ProjectTemplates.CI.renderCustomProjectTemplateExplanation" />
 
         <icon location="images/al-logo.png"/>
-		<backgroundIcon location="images/al-logo-background.png"/>
+        <backgroundIcon location="images/al-logo-background.png"/>
 
         <add-project>
             <hook class="com.alertlogic.plugins.jira.cloudinsight.util.CustomProjectAddProjectHook"/>
         </add-project>
     </project-blueprint>
 
-	<web-panel  key="validator-remediation"  location="atl.jira.view.issue.right.context">
-		<label key="ci.atlassianplugin.webpanel.incidentstatuspanel.title"/>
-		<resource name="view" type="velocity" location="/js/partials/IncidentStatusPanel/IncidentStatusPanel.vm"/>
-		<conditions type="AND">
-			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
-		</conditions>
-	</web-panel>
+    <web-panel  key="validator-remediation"  location="atl.jira.view.issue.right.context">
+        <label key="ci.atlassianplugin.webpanel.incidentstatuspanel.title"/>
+        <resource name="view" type="velocity" location="/js/partials/IncidentStatusPanel/IncidentStatusPanel.vm"/>
+        <conditions type="AND">
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.IncidentsIssueCondition"/>
+        </conditions>
+    </web-panel>
 
-	<web-panel  key="incident-status"  location="atl.jira.view.issue.right.context">
-		<label key="ci.atlassianplugin.statuspanel.title"/>
-		<resource name="view" type="velocity" location="/js/partials/StatusPanel/StatusPanel.vm"/>
-		<conditions type="AND">
-			<condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
-		</conditions>
-	</web-panel>
+    <web-panel  key="incident-status"  location="atl.jira.view.issue.right.context">
+        <label key="ci.atlassianplugin.statuspanel.title"/>
+        <resource name="view" type="velocity" location="/js/partials/StatusPanel/StatusPanel.vm"/>
+        <conditions type="AND">
+            <condition class="com.alertlogic.plugins.jira.cloudinsight.conditions.CloudInsightIssueCondition"/>
+        </conditions>
+    </web-panel>
 
-	<web-resource name="RemediationDetailsController" key="remediationDetailsController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+    <web-resource name="RemediationDetailsController" key="remediationDetailsController">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="RemediationDetailsController.js" location="/js/partials/RemediationDetails/RemediationDetailsController.js"/>
-  	</web-resource>
+        <resource type="download" name="RemediationDetailsController.js" location="/js/partials/RemediationDetails/RemediationDetailsController.js"/>
+      </web-resource>
 
-  	<web-resource name="RemediationSyncDetailsController" key="remediationSyncDetailsController">
-    	<context>atl.general</context>
-    	<transformation extension="js">
+      <web-resource name="RemediationSyncDetailsController" key="remediationSyncDetailsController">
+        <context>atl.general</context>
+        <transformation extension="js">
             <transformer key="jsI18n"/>
         </transformation>
-    	<resource type="download" name="RemediationSyncDetailsController.js" location="/js/partials/RemediationSync/RemediationSyncDetailsController.js"/>
-  	</web-resource>
+        <resource type="download" name="RemediationSyncDetailsController.js" location="/js/partials/RemediationSync/RemediationSyncDetailsController.js"/>
+      </web-resource>
 
 </atlassian-plugin>
