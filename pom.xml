@@ -40,7 +40,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.13.1</version>
             <!-- The Active Objects test framework requires JUnit 4.8 or later. If you use an earlier version of JUnit, the tests may fail silently. -->
             <scope>test</scope>
         </dependency>
